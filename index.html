@@ -716,6 +716,103 @@
       text-transform: uppercase;
     }
     
+    /* Dashboard Styles */
+    .stat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      box-shadow: 0 8px 24px var(--shadow);
+      transform: translateY(-4px);
+    }
+    
+    .stat-card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-card-value {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--helena-green);
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-card-label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .dashboard-section {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .dashboard-section-title {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--helena-green);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--helena-green);
+    }
+    
+    .dashboard-issue-item {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--danger);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: grid;
+      grid-template-columns: 150px 150px 1fr 1fr 150px;
+      gap: 1rem;
+      align-items: start;
+    }
+    
+    .dashboard-issue-item.minor {
+      border-left-color: var(--warning);
+    }
+    
+    .dashboard-issue-field {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .dashboard-issue-field-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+    
+    .dashboard-issue-field-value {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    .days-down {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--danger);
+    }
+    
     @media (max-width: 768px) {
       h1 { font-size: 1.75rem; }
       header { flex-direction: column; text-align: center; }
@@ -747,6 +844,7 @@
     
     <div class="nav-tabs">
       <button class="nav-tab active" data-tab="equipment">Equipment Fleet</button>
+      <button class="nav-tab" data-tab="dashboard">Dashboard</button>
       <button class="nav-tab" data-tab="templates">Maintenance Templates</button>
       <button class="nav-tab" data-tab="schedule">Schedule</button>
       <button class="nav-tab" data-tab="issues">Equipment Issues</button>
@@ -757,6 +855,35 @@
         <button class="btn btn-primary" onclick="openAddEquipmentModal()">+ Add Equipment</button>
       </div>
       <div class="equipment-grid" id="equipmentGrid"></div>
+    </div>
+    
+    <!-- Dashboard Tab -->
+    <div id="dashboard-tab" class="tab-content">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="stat-card">
+          <div class="stat-card-icon" style="color: var(--danger);">⚠️</div>
+          <div class="stat-card-value" id="dashOverdueCount">0</div>
+          <div class="stat-card-label">Past Due Maintenance</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="color: var(--success);">✓</div>
+          <div class="stat-card-value" id="dashUpToDateCount">0</div>
+          <div class="stat-card-label">Up to Date</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="color: var(--danger);">🛑</div>
+          <div class="stat-card-value" id="dashOutOfServiceCount">0</div>
+          <div class="stat-card-label">Out of Service</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="color: var(--warning);">🔧</div>
+          <div class="stat-card-value" id="dashMinorIssuesCount">0</div>
+          <div class="stat-card-label">Minor Issues</div>
+        </div>
+      </div>
+      
+      <div id="dashboardCriticalIssues"></div>
+      <div id="dashboardMinorIssues"></div>
     </div>
     
     <div id="templates-tab" class="tab-content">
@@ -965,6 +1092,32 @@
     </div>
   </div>
   
+  <!-- Edit Schedule Modal -->
+  <div id="editScheduleModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Scheduled Maintenance</h2>
+        <button class="close-btn" onclick="closeModal('editScheduleModal')">&times;</button>
+      </div>
+      <form id="editScheduleForm" onsubmit="updateSchedule(event)">
+        <input type="hidden" id="editScheduleId">
+        <div class="form-group">
+          <label for="editScheduleEquipment">Equipment *</label>
+          <select id="editScheduleEquipment" required></select>
+        </div>
+        <div class="form-group">
+          <label for="editScheduleDate">Scheduled Date *</label>
+          <input type="date" id="editScheduleDate" required>
+        </div>
+        <div class="form-group">
+          <label for="editScheduleNotes">Maintenance Notes</label>
+          <textarea id="editScheduleNotes" placeholder="What maintenance is scheduled?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Schedule</button>
+      </form>
+    </div>
+  </div>
+  
   <!-- Add Issue Modal -->
   <div id="addIssueModal" class="modal">
     <div class="modal-content">
@@ -1020,6 +1173,10 @@
             <option value="Minor">Minor - Equipment can still be used</option>
             <option value="Critical">Critical - Equipment is out of service</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label for="editIssueReportedDate">Reported Date *</label>
+          <input type="date" id="editIssueReportedDate" required>
         </div>
         <div class="form-group">
           <label for="editIssueNotes">Issue Description/Notes *</label>
@@ -1115,6 +1272,7 @@
     
     function populateEquipmentSelects() {
       const scheduleEquipmentSelect = document.getElementById('scheduleEquipment');
+      const editScheduleEquipmentSelect = document.getElementById('editScheduleEquipment');
       const scheduleFilterSelect = document.getElementById('scheduleEquipmentFilter');
       const issueEquipmentSelect = document.getElementById('issueEquipment');
       const editIssueEquipmentSelect = document.getElementById('editIssueEquipment');
@@ -1146,6 +1304,10 @@
       
       if (scheduleEquipmentSelect) {
         scheduleEquipmentSelect.innerHTML = '<option value="">Select Equipment</option>' + groupedOptions;
+      }
+      
+      if (editScheduleEquipmentSelect) {
+        editScheduleEquipmentSelect.innerHTML = '<option value="">Select Equipment</option>' + groupedOptions;
       }
       
       if (scheduleFilterSelect) {
@@ -1188,6 +1350,8 @@
           renderScheduleCalendar();
         } else if (tabName === 'issues') {
           renderIssues();
+        } else if (tabName === 'dashboard') {
+          renderDashboard();
         }
       });
     });
@@ -1816,50 +1980,106 @@
       }
     }
     
+    window.openEditScheduleModal = function(scheduleId) {
+      const schedule = schedules.find(s => s.id === scheduleId);
+      if (!schedule) return;
+      
+      document.getElementById('editScheduleId').value = scheduleId;
+      document.getElementById('editScheduleEquipment').value = schedule.equipmentId;
+      document.getElementById('editScheduleDate').value = schedule.date;
+      document.getElementById('editScheduleNotes').value = schedule.notes || '';
+      
+      document.getElementById('editScheduleModal').classList.add('active');
+    }
+    
+    window.updateSchedule = async function(event) {
+      event.preventDefault();
+      
+      const scheduleId = document.getElementById('editScheduleId').value;
+      
+      const updatedSchedule = {
+        equipmentId: document.getElementById('editScheduleEquipment').value,
+        date: document.getElementById('editScheduleDate').value,
+        notes: document.getElementById('editScheduleNotes').value
+      };
+      
+      try {
+        await updateDoc(doc(db, 'schedules', scheduleId), updatedSchedule);
+        await loadData();
+        document.getElementById('editScheduleForm').reset();
+        closeModal('editScheduleModal');
+        renderScheduleCalendar();
+      } catch (error) {
+        console.error('Error updating schedule:', error);
+        alert('Error updating schedule. Please try again.');
+      }
+    }
+    
+    window.deleteSchedule = async function(scheduleId) {
+      if (!confirm('Delete this scheduled maintenance?')) return;
+      
+      try {
+        await deleteDoc(doc(db, 'schedules', scheduleId));
+        await loadData();
+        renderScheduleCalendar();
+      } catch (error) {
+        console.error('Error deleting schedule:', error);
+        alert('Error deleting schedule. Please try again.');
+      }
+    }
+    
     function renderSchedule() {
       const container = document.getElementById('scheduleView');
-      const allItems = [];
       
-      equipment.forEach(eq => {
-        if (eq.maintenanceItems) {
-          eq.maintenanceItems.forEach(item => {
-            const { status, daysUntil, nextDue } = getMaintenanceStatus(item);
-            allItems.push({
-              equipment: eq,
-              item: item,
-              status: status,
-              daysUntil: daysUntil,
-              nextDue: nextDue
-            });
-          });
-        }
-      });
+      // Show actual scheduled maintenance from schedules collection
+      const sortedSchedules = [...schedules].sort((a, b) => new Date(a.date) - new Date(b.date));
       
-      allItems.sort((a, b) => a.daysUntil - b.daysUntil);
-      
-      if (allItems.length === 0) {
+      if (sortedSchedules.length === 0) {
         container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><h3>No Scheduled Maintenance</h3></div>';
         return;
       }
       
-      container.innerHTML = '<div class="maintenance-list">' + allItems.map((mi, i) => {
-        let statusClass = mi.status === 'danger' ? 'status-danger' : mi.status === 'warning' ? 'status-warning' : 'status-good';
-        let statusText = mi.daysUntil < 0 ? Math.abs(mi.daysUntil) + ' days overdue' : mi.daysUntil === 0 ? 'Due today' : 'Due in ' + mi.daysUntil + ' days';
+      container.innerHTML = '<h3 style="font-family: \'Roboto Condensed\', sans-serif; color: var(--helena-green); margin-bottom: 1rem;">Upcoming Scheduled Maintenance</h3><div class="maintenance-list">' + sortedSchedules.map(schedule => {
+        const eq = equipment.find(e => e.id === schedule.equipmentId);
+        const scheduleDate = new Date(schedule.date);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        scheduleDate.setHours(0,0,0,0);
+        const daysUntil = Math.ceil((scheduleDate - today) / (1000 * 60 * 60 * 24));
+        
+        let statusClass = 'status-good';
+        let statusText = '';
+        
+        if (daysUntil < 0) {
+          statusClass = 'status-danger';
+          statusText = `${Math.abs(daysUntil)} days overdue`;
+        } else if (daysUntil === 0) {
+          statusClass = 'status-warning';
+          statusText = 'Due today';
+        } else if (daysUntil <= 7) {
+          statusClass = 'status-warning';
+          statusText = `Due in ${daysUntil} day${daysUntil > 1 ? 's' : ''}`;
+        } else {
+          statusText = `Due in ${daysUntil} days`;
+        }
         
         return `
           <div class="maintenance-item">
             <div class="maintenance-header">
               <div>
-                <div class="equipment-id">${mi.equipment.equipmentId}</div>
-                <div class="maintenance-title">${mi.item.name}</div>
-                <div class="equipment-type">${mi.equipment.name} - ${mi.equipment.type}</div>
+                <div class="equipment-id">${eq ? eq.equipmentId : 'Unknown'}</div>
+                <div class="maintenance-title">Scheduled Maintenance</div>
+                <div class="equipment-type">${eq ? `${eq.name} - ${eq.type}` : 'Unknown Equipment'}</div>
               </div>
               <span class="status-badge ${statusClass}">${statusText}</span>
             </div>
             <div class="maintenance-status">
-              <strong>Next Due:</strong> ${mi.nextDue}<br>
-              <strong>Interval:</strong> Every ${mi.item.interval} days
-              ${mi.item.description ? '<br><strong>Instructions:</strong> ' + mi.item.description : ''}
+              <strong>Date:</strong> ${new Date(schedule.date).toLocaleDateString()}<br>
+              ${schedule.notes ? '<strong>Notes:</strong> ' + schedule.notes : ''}
+            </div>
+            <div class="equipment-actions" style="margin-top: 1rem;">
+              <button class="btn btn-small" onclick="window.openEditScheduleModal('${schedule.id}')">Edit</button>
+              <button class="btn btn-small" onclick="window.deleteSchedule('${schedule.id}')">Delete</button>
             </div>
           </div>
         `;
@@ -1989,7 +2209,8 @@
       document.getElementById('editIssueId').value = issueId;
       document.getElementById('editIssueEquipment').value = issue.equipmentId;
       document.getElementById('editIssueTitle').value = issue.title;
-      document.getElementById('editIssueSeverity').value = issue.severity;
+      document.getElementById('editIssueSeverity').value = issue.severity || 'Minor';
+      document.getElementById('editIssueReportedDate').value = issue.createdAt ? issue.createdAt.split('T')[0] : new Date().toISOString().split('T')[0];
       document.getElementById('editIssueNotes').value = issue.notes;
       
       document.getElementById('editIssueModal').classList.add('active');
@@ -1999,12 +2220,14 @@
       event.preventDefault();
       
       const issueId = document.getElementById('editIssueId').value;
+      const reportedDate = document.getElementById('editIssueReportedDate').value;
       
       const updatedIssue = {
         equipmentId: document.getElementById('editIssueEquipment').value,
         title: document.getElementById('editIssueTitle').value,
         severity: document.getElementById('editIssueSeverity').value,
-        notes: document.getElementById('editIssueNotes').value
+        notes: document.getElementById('editIssueNotes').value,
+        createdAt: new Date(reportedDate).toISOString()
       };
       
       try {
@@ -2106,6 +2329,126 @@
       } catch (error) {
         console.error('Error deleting maintenance item:', error);
         alert('Error deleting maintenance item. Please try again.');
+      }
+    }
+    
+    // DASHBOARD FUNCTIONS
+    function renderDashboard() {
+      // Calculate stats
+      let overdueCount = 0;
+      let upToDateCount = 0;
+      
+      equipment.forEach(eq => {
+        let hasOverdue = false;
+        if (eq.maintenanceItems) {
+          eq.maintenanceItems.forEach(item => {
+            const { status } = getMaintenanceStatus(item);
+            if (status === 'danger') {
+              hasOverdue = true;
+            }
+          });
+        }
+        if (hasOverdue) {
+          overdueCount++;
+        } else {
+          upToDateCount++;
+        }
+      });
+      
+      const criticalIssues = issues.filter(i => i.status === 'Pending' && i.severity === 'Critical');
+      const minorIssues = issues.filter(i => i.status === 'Pending' && i.severity === 'Minor');
+      
+      document.getElementById('dashOverdueCount').textContent = overdueCount;
+      document.getElementById('dashUpToDateCount').textContent = upToDateCount;
+      document.getElementById('dashOutOfServiceCount').textContent = criticalIssues.length;
+      document.getElementById('dashMinorIssuesCount').textContent = minorIssues.length;
+      
+      // Render Critical Issues Section
+      const criticalContainer = document.getElementById('dashboardCriticalIssues');
+      if (criticalIssues.length > 0) {
+        criticalContainer.innerHTML = `
+          <div class="dashboard-section">
+            <h3 class="dashboard-section-title">🛑 Critical Issues - Out of Service</h3>
+            ${criticalIssues.map(issue => {
+              const eq = equipment.find(e => e.id === issue.equipmentId);
+              const reportedDate = new Date(issue.createdAt);
+              const today = new Date();
+              const daysDown = Math.floor((today - reportedDate) / (1000 * 60 * 60 * 24));
+              
+              return `
+                <div class="dashboard-issue-item">
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Equipment ID</div>
+                    <div class="dashboard-issue-field-value">${eq ? eq.equipmentId : 'Unknown'}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Equipment Type</div>
+                    <div class="dashboard-issue-field-value">${eq ? eq.type : 'Unknown'}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Issue Title</div>
+                    <div class="dashboard-issue-field-value">${issue.title}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Description</div>
+                    <div class="dashboard-issue-field-value">${issue.notes}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Days Down</div>
+                    <div class="days-down">${daysDown}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">Reported: ${reportedDate.toLocaleDateString()}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        criticalContainer.innerHTML = '';
+      }
+      
+      // Render Minor Issues Section
+      const minorContainer = document.getElementById('dashboardMinorIssues');
+      if (minorIssues.length > 0) {
+        minorContainer.innerHTML = `
+          <div class="dashboard-section">
+            <h3 class="dashboard-section-title">🔧 Minor Issues - Needs Repair</h3>
+            ${minorIssues.map(issue => {
+              const eq = equipment.find(e => e.id === issue.equipmentId);
+              const reportedDate = new Date(issue.createdAt);
+              const today = new Date();
+              const daysDown = Math.floor((today - reportedDate) / (1000 * 60 * 60 * 24));
+              
+              return `
+                <div class="dashboard-issue-item minor">
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Equipment ID</div>
+                    <div class="dashboard-issue-field-value">${eq ? eq.equipmentId : 'Unknown'}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Equipment Type</div>
+                    <div class="dashboard-issue-field-value">${eq ? eq.type : 'Unknown'}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Issue Title</div>
+                    <div class="dashboard-issue-field-value">${issue.title}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Description</div>
+                    <div class="dashboard-issue-field-value">${issue.notes}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Days Open</div>
+                    <div class="days-down" style="color: var(--warning);">${daysDown}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">Reported: ${reportedDate.toLocaleDateString()}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        minorContainer.innerHTML = '';
       }
     }
     

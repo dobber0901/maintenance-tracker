@@ -1336,39 +1336,40 @@
     
     window.printReport = function() {
       const eq = equipment.find(e => e.id === currentEquipmentId);
-      if (!eq) return;
+      if (!eq) {
+        alert('Equipment not found');
+        return;
+      }
       
-      document.getElementById('printDate').textContent = new Date().toLocaleDateString();
+      if (!eq.maintenanceItems || eq.maintenanceItems.length === 0) {
+        alert('No maintenance items to print for this equipment');
+        return;
+      }
       
-      document.getElementById('printEquipmentInfo').innerHTML = `
-        <div class="print-info-row">
-          <span class="print-label">Equipment ID:</span>
-          <span class="print-value">${eq.equipmentId}</span>
-        </div>
-        <div class="print-info-row">
-          <span class="print-label">Name:</span>
-          <span class="print-value">${eq.name}</span>
-        </div>
-        <div class="print-info-row">
-          <span class="print-label">Type:</span>
-          <span class="print-value">${eq.type}</span>
-        </div>
-        <div class="print-info-row">
-          <span class="print-label">Location:</span>
-          <span class="print-value">${eq.location || 'N/A'}</span>
-        </div>
-      `;
+      // Create print window
+      const printWindow = window.open('', '_blank');
       
-      document.getElementById('printMaintenanceList').innerHTML = eq.maintenanceItems.map(item => {
+      // Build maintenance items HTML
+      let maintenanceItemsHTML = '';
+      eq.maintenanceItems.forEach(item => {
         const { status, daysUntil, nextDue } = getMaintenanceStatus(item);
         
-        return `
+        let statusText = '';
+        if (status === 'danger') {
+          statusText = '⚠️ OVERDUE';
+        } else if (status === 'warning') {
+          statusText = '⚡ DUE SOON';
+        } else {
+          statusText = '✓ UP TO DATE';
+        }
+        
+        maintenanceItemsHTML += `
           <div class="print-maintenance-item">
             <div class="print-item-header">${item.name}</div>
             <p><strong>Interval:</strong> Every ${item.interval} days</p>
             <p><strong>Last Completed:</strong> ${item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never'}</p>
             <p><strong>Next Due:</strong> ${nextDue}</p>
-            <p><strong>Status:</strong> ${status === 'danger' ? '⚠️ OVERDUE' : status === 'warning' ? '⚡ DUE SOON' : '✓ UP TO DATE'}</p>
+            <p><strong>Status:</strong> ${statusText}</p>
             ${item.description ? `<p><strong>Instructions:</strong> ${item.description}</p>` : ''}
             <div style="margin-top: 1rem; border-top: 1px solid #ddd; padding-top: 0.5rem;">
               <strong>Completion Checklist:</strong>
@@ -1381,9 +1382,144 @@
             </div>
           </div>
         `;
-      }).join('');
+      });
       
-      window.print();
+      // Write full HTML document to print window
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Maintenance Report - ${eq.equipmentId}</title>
+          <style>
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            
+            body {
+              font-family: Arial, sans-serif;
+              padding: 20px;
+              background: white;
+              color: black;
+            }
+            
+            .print-header {
+              text-align: center;
+              margin-bottom: 30px;
+              padding-bottom: 20px;
+              border-bottom: 3px solid #ff6b35;
+            }
+            
+            .print-title {
+              font-size: 32px;
+              font-weight: 900;
+              color: #ff6b35;
+              margin-bottom: 10px;
+              text-transform: uppercase;
+            }
+            
+            .print-equipment-info {
+              background: #f5f5f5;
+              padding: 20px;
+              margin-bottom: 30px;
+              border-left: 4px solid #ff6b35;
+            }
+            
+            .print-info-row {
+              display: flex;
+              margin-bottom: 8px;
+            }
+            
+            .print-label {
+              font-weight: 700;
+              width: 150px;
+              color: #333;
+            }
+            
+            .print-value {
+              color: #666;
+            }
+            
+            h2 {
+              color: #ff6b35;
+              margin-bottom: 20px;
+              font-size: 24px;
+            }
+            
+            .print-maintenance-item {
+              border: 1px solid #ddd;
+              padding: 15px;
+              margin-bottom: 15px;
+              page-break-inside: avoid;
+            }
+            
+            .print-item-header {
+              background: #ff6b35;
+              color: white;
+              padding: 8px 15px;
+              margin: -15px -15px 15px -15px;
+              font-weight: 700;
+              font-size: 18px;
+            }
+            
+            p {
+              margin-bottom: 8px;
+              line-height: 1.6;
+            }
+            
+            @media print {
+              body {
+                padding: 0;
+              }
+              
+              @page {
+                margin: 1cm;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="print-header">
+            <h1 class="print-title">MAINTENANCE REPORT</h1>
+            <p>Generated: ${new Date().toLocaleDateString()}</p>
+          </div>
+          
+          <div class="print-equipment-info">
+            <div class="print-info-row">
+              <span class="print-label">Equipment ID:</span>
+              <span class="print-value">${eq.equipmentId}</span>
+            </div>
+            <div class="print-info-row">
+              <span class="print-label">Name:</span>
+              <span class="print-value">${eq.name}</span>
+            </div>
+            <div class="print-info-row">
+              <span class="print-label">Type:</span>
+              <span class="print-value">${eq.type}</span>
+            </div>
+            <div class="print-info-row">
+              <span class="print-label">Location:</span>
+              <span class="print-value">${eq.location || 'N/A'}</span>
+            </div>
+          </div>
+          
+          <h2>Maintenance Items</h2>
+          
+          ${maintenanceItemsHTML}
+          
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 250);
+            };
+          </script>
+        </body>
+        </html>
+      `);
+      
+      printWindow.document.close();
     }
     
     function renderSchedule() {

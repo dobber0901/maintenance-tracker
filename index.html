@@ -3,23 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fleet Maintenance Tracker</title>
+  <title>Preventive Maintenance Log - Helena Agri-Enterprises</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@400;700&display=swap');
     
     :root {
-      --bg-primary: #0d1117;
-      --bg-secondary: #161b22;
-      --bg-card: #1c2128;
-      --accent-primary: #ff6b35;
-      --accent-secondary: #f7931e;
-      --accent-success: #00ff88;
-      --accent-warning: #ffd60a;
-      --accent-danger: #ff006e;
-      --text-primary: #f0f6fc;
-      --text-secondary: #8b949e;
-      --border: #30363d;
-      --shadow: rgba(255, 107, 53, 0.15);
+      --helena-green: #215530;
+      --helena-green-light: #2d6e3f;
+      --helena-green-dark: #1a4426;
+      --accent-gold: #c5a562;
+      --accent-light: #e8dcc4;
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --text-primary: #212529;
+      --text-secondary: #6c757d;
+      --border: #dee2e6;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --shadow: rgba(33, 85, 48, 0.1);
     }
     
     * {
@@ -29,76 +32,54 @@
     }
     
     body {
-      font-family: 'Rajdhani', sans-serif;
+      font-family: 'Roboto', sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
       line-height: 1.6;
       min-height: 100vh;
     }
     
-    .bg-pattern {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 107, 53, 0.03) 2px, rgba(255, 107, 53, 0.03) 4px),
-        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 107, 53, 0.03) 2px, rgba(255, 107, 53, 0.03) 4px);
-      pointer-events: none;
-      z-index: 0;
-    }
-    
     .container {
-      max-width: 1600px;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 2rem;
-      position: relative;
-      z-index: 1;
     }
     
     header {
-      background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
-      border: 2px solid var(--accent-primary);
-      border-radius: 16px;
+      background: linear-gradient(135deg, var(--helena-green), var(--helena-green-light));
+      border-radius: 12px;
       padding: 2rem;
       margin-bottom: 2rem;
-      position: relative;
-      overflow: hidden;
-      animation: slideDown 0.6s ease-out;
+      box-shadow: 0 4px 12px var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
     }
     
-    header::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
-      animation: pulse 4s ease-in-out infinite;
+    .logo {
+      width: 140px;
+      height: auto;
+      filter: brightness(0) invert(1);
+    }
+    
+    .header-text {
+      flex: 1;
     }
     
     h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 3rem;
-      font-weight: 900;
-      letter-spacing: 0.05em;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
       margin-bottom: 0.5rem;
       text-transform: uppercase;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      position: relative;
+      letter-spacing: 0.05em;
     }
     
     .subtitle {
-      font-size: 1.1rem;
-      color: var(--text-secondary);
-      font-weight: 400;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.9);
+      font-weight: 300;
     }
     
     .nav-tabs {
@@ -106,41 +87,40 @@
       gap: 0.5rem;
       margin-bottom: 2rem;
       flex-wrap: wrap;
-      animation: fadeIn 0.8s ease-out 0.2s backwards;
+      background: white;
+      padding: 0.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     
     .nav-tab {
-      font-family: 'Orbitron', sans-serif;
-      background: var(--bg-card);
-      border: 2px solid var(--border);
+      font-family: 'Roboto Condensed', sans-serif;
+      background: transparent;
+      border: none;
       color: var(--text-secondary);
-      padding: 1rem 2rem;
-      font-size: 0.9rem;
-      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.05em;
       cursor: pointer;
       transition: all 0.3s ease;
-      position: relative;
-      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+      border-radius: 6px;
     }
     
     .nav-tab:hover {
-      border-color: var(--accent-primary);
-      color: var(--text-primary);
-      transform: translateY(-2px);
+      background: rgba(33, 85, 48, 0.05);
+      color: var(--helena-green);
     }
     
     .nav-tab.active {
-      background: var(--accent-primary);
-      border-color: var(--accent-primary);
-      color: var(--bg-primary);
-      box-shadow: 0 0 30px var(--shadow);
+      background: var(--helena-green);
+      color: white;
+      box-shadow: 0 2px 8px var(--shadow);
     }
     
     .tab-content {
       display: none;
-      animation: fadeIn 0.5s ease-out;
     }
     
     .tab-content.active {
@@ -155,54 +135,34 @@
     }
     
     .btn {
-      font-family: 'Orbitron', sans-serif;
-      padding: 0.9rem 1.8rem;
-      border: 2px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-family: 'Roboto', sans-serif;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid var(--helena-green);
+      background: white;
+      color: var(--helena-green);
+      font-size: 0.9rem;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.05em;
       cursor: pointer;
       transition: all 0.3s ease;
-      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: var(--accent-primary);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-      z-index: -1;
-    }
-    
-    .btn:hover::before {
-      width: 400px;
-      height: 400px;
+      border-radius: 6px;
     }
     
     .btn:hover {
-      border-color: var(--accent-primary);
-      color: var(--bg-primary);
+      background: var(--helena-green);
+      color: white;
+      box-shadow: 0 4px 12px var(--shadow);
     }
     
     .btn-primary {
-      background: var(--accent-primary);
-      border-color: var(--accent-primary);
-      color: var(--bg-primary);
+      background: var(--helena-green);
+      color: white;
     }
     
-    .btn-primary::before {
-      background: var(--accent-secondary);
+    .btn-primary:hover {
+      background: var(--helena-green-dark);
+      border-color: var(--helena-green-dark);
     }
     
     .equipment-grid {
@@ -213,29 +173,17 @@
     
     .equipment-card {
       background: var(--bg-card);
-      border: 2px solid var(--border);
-      border-radius: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       padding: 1.5rem;
       transition: all 0.3s ease;
-      position: relative;
-      animation: scaleIn 0.5s ease-out backwards;
-      clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
-    }
-    
-    .equipment-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     
     .equipment-card:hover {
-      border-color: var(--accent-primary);
-      box-shadow: 0 12px 40px var(--shadow);
+      box-shadow: 0 8px 24px var(--shadow);
       transform: translateY(-4px);
+      border-color: var(--helena-green);
     }
     
     .equipment-header {
@@ -243,60 +191,61 @@
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--helena-green);
     }
     
     .equipment-id {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--accent-primary);
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--helena-green);
       text-transform: uppercase;
       letter-spacing: 0.1em;
       margin-bottom: 0.25rem;
     }
     
     .equipment-name {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.3rem;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.25rem;
       font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 0.25rem;
     }
     
     .equipment-type {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .status-badge {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
     
-    .status-badge {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      border: 2px solid;
-    }
-    
     .status-good {
-      background: rgba(0, 255, 136, 0.2);
-      color: var(--accent-success);
-      border-color: var(--accent-success);
+      background: rgba(40, 167, 69, 0.1);
+      color: var(--success);
+      border: 1px solid var(--success);
     }
     
     .status-warning {
-      background: rgba(255, 214, 10, 0.2);
-      color: var(--accent-warning);
-      border-color: var(--accent-warning);
+      background: rgba(255, 193, 7, 0.1);
+      color: #d39e00;
+      border: 1px solid var(--warning);
     }
     
     .status-danger {
-      background: rgba(255, 0, 110, 0.2);
-      color: var(--accent-danger);
-      border-color: var(--accent-danger);
+      background: rgba(220, 53, 69, 0.1);
+      color: var(--danger);
+      border: 1px solid var(--danger);
     }
     
     .equipment-stats {
@@ -304,8 +253,8 @@
       gap: 1rem;
       margin: 1rem 0;
       padding: 1rem;
-      background: var(--bg-secondary);
-      border-radius: 8px;
+      background: var(--bg-primary);
+      border-radius: 6px;
     }
     
     .stat-item {
@@ -322,10 +271,10 @@
     }
     
     .stat-value {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.75rem;
       font-weight: 700;
-      color: var(--accent-primary);
+      color: var(--helena-green);
     }
     
     .equipment-actions {
@@ -337,7 +286,7 @@
     .btn-small {
       flex: 1;
       padding: 0.6rem 1rem;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
     }
     
     .modal {
@@ -347,8 +296,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.75);
       z-index: 2000;
       align-items: center;
       justify-content: center;
@@ -362,16 +310,13 @@
     
     .modal-content {
       background: var(--bg-card);
-      border: 2px solid var(--accent-primary);
-      border-radius: 16px;
+      border-radius: 8px;
       padding: 2rem;
       max-width: 800px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4);
-      animation: scaleIn 0.4s ease-out;
-      clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
     
     .modal-header {
@@ -380,16 +325,15 @@
       align-items: center;
       margin-bottom: 2rem;
       padding-bottom: 1rem;
-      border-bottom: 2px solid var(--border);
+      border-bottom: 2px solid var(--helena-green);
     }
     
     .modal-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--accent-primary);
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--helena-green);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
     }
     
     .close-btn {
@@ -407,7 +351,7 @@
     }
     
     .close-btn:hover {
-      color: var(--accent-danger);
+      color: var(--danger);
       transform: rotate(90deg);
     }
     
@@ -417,31 +361,31 @@
     
     label {
       display: block;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--accent-primary);
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--helena-green);
       margin-bottom: 0.5rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.05em;
     }
     
     input, select, textarea {
       width: 100%;
-      padding: 0.9rem 1.2rem;
-      background: var(--bg-secondary);
-      border: 2px solid var(--border);
-      border-radius: 8px;
+      padding: 0.75rem;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 4px;
       color: var(--text-primary);
-      font-family: 'Rajdhani', sans-serif;
+      font-family: 'Roboto', sans-serif;
       font-size: 1rem;
       transition: all 0.3s ease;
     }
     
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+      border-color: var(--helena-green);
+      box-shadow: 0 0 0 3px rgba(33, 85, 48, 0.1);
     }
     
     select {
@@ -451,7 +395,6 @@
     textarea {
       resize: vertical;
       min-height: 100px;
-      font-family: 'Rajdhani', sans-serif;
     }
     
     .maintenance-list {
@@ -461,16 +404,16 @@
     }
     
     .maintenance-item {
-      background: var(--bg-secondary);
-      border: 2px solid var(--border);
-      border-radius: 8px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
       padding: 1rem;
       transition: all 0.3s ease;
-      animation: slideRight 0.4s ease-out backwards;
     }
     
     .maintenance-item:hover {
-      border-color: var(--accent-primary);
+      border-color: var(--helena-green);
+      box-shadow: 0 2px 8px var(--shadow);
     }
     
     .maintenance-header {
@@ -481,22 +424,21 @@
     }
     
     .maintenance-title {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Roboto Condensed', sans-serif;
       font-size: 1.1rem;
       font-weight: 700;
       color: var(--text-primary);
     }
     
     .maintenance-interval {
-      font-family: 'Orbitron', sans-serif;
       font-size: 0.85rem;
-      color: var(--accent-secondary);
-      font-weight: 600;
+      color: var(--helena-green);
+      font-weight: 500;
     }
     
     .maintenance-description {
       color: var(--text-secondary);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       margin-top: 0.5rem;
     }
     
@@ -512,7 +454,7 @@
     }
     
     .empty-icon {
-      font-size: 5rem;
+      font-size: 4rem;
       margin-bottom: 1rem;
       opacity: 0.3;
     }
@@ -524,14 +466,20 @@
     }
     
     .template-item {
-      background: var(--bg-secondary);
-      border: 2px solid var(--border);
-      border-radius: 8px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
       padding: 1rem;
       margin-bottom: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .template-item:hover {
+      border-color: var(--helena-green);
+      box-shadow: 0 2px 8px var(--shadow);
     }
     
     .template-info {
@@ -539,7 +487,7 @@
     }
     
     .template-name {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Roboto Condensed', sans-serif;
       font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 0.25rem;
@@ -548,11 +496,6 @@
     .template-desc {
       font-size: 0.9rem;
       color: var(--text-secondary);
-    }
-    
-    .add-template-btn {
-      padding: 0.5rem 1rem;
-      font-size: 0.75rem;
     }
     
     .checkbox-group {
@@ -567,63 +510,33 @@
       cursor: pointer;
     }
     
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes slideRight {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    
-    @keyframes scaleIn {
-      from {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-    
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50% { transform: scale(1.1); opacity: 0.8; }
-    }
-    
     @media (max-width: 768px) {
-      h1 { font-size: 2rem; }
+      h1 { font-size: 1.75rem; }
+      header { flex-direction: column; text-align: center; }
+      .logo { width: 100px; }
       .equipment-grid { grid-template-columns: 1fr; }
-      .nav-tabs { flex-direction: column; }
     }
   </style>
 </head>
 <body>
-  <div class="bg-pattern"></div>
-  
   <div class="container">
     <header>
-      <h1>🔧 FLEET MAINTENANCE</h1>
-      <p class="subtitle">Equipment Management System</p>
+      <svg class="logo" viewBox="0 0 157 90" xmlns="http://www.w3.org/2000/svg">
+        <g fill="currentColor">
+          <path d="M78.487013,73.5487013 C57.974026,73.5487013 38.6298701,69.9837662 24.0194805,63.4967532 C8.53246753,56.6006494 0,47.1331169 0,36.788961 C0,26.4155844 8.53246753,16.9480519 24.0194805,10.0519481 C38.6298701,3.56493506 57.974026,0 78.487013,0 C99,0 118.344156,3.56493506 132.954545,10.0519481 C148.441558,16.9480519 156.974026,26.4155844 156.974026,36.7597403 C156.974026,47.1038961 148.441558,56.6006494 132.954545,63.4675325 C118.373377,69.9837662 99.0292208,73.5487013 78.487013,73.5487013 Z M78.487013,6.8961039 C58.9090909,6.8961039 40.5584416,10.2564935 26.7954545,16.3636364 C14.1136364,22.0032468 6.86688312,29.4253247 6.86688312,36.788961 C6.86688312,44.1525974 14.1428571,51.5746753 26.7954545,57.2142857 C40.5292208,63.3214286 58.9090909,66.6818182 78.487013,66.6818182 C98.0649351,66.6818182 116.415584,63.3214286 130.178571,57.2142857 C142.86039,51.5746753 150.107143,44.1525974 150.107143,36.788961 C150.107143,29.4253247 142.831169,22.0032468 130.178571,16.3636364 C116.444805,10.2564935 98.0649351,6.8961039 78.487013,6.8961039 Z"/>
+          <polygon points="25.5681818 49.1785714 25.5681818 39.5357143 32.5227273 39.5357143 32.5227273 49.1785714 39.9155844 49.1785714 39.9155844 24.3116883 32.5227273 24.3116883 32.5227273 32.6980519 25.5681818 32.6980519 25.5681818 24.3116883 18.1753247 24.3116883 18.1753247 49.1785714"/>
+          <polygon points="58.8506494 49.1785714 58.8506494 43.3928571 48.7402597 43.3928571 48.7402597 39.4772727 58.0324675 39.4772727 58.0324675 33.6623377 48.7402597 33.6623377 48.7402597 30.0974026 58.4123377 30.0974026 58.4123377 24.3116883 41.3474026 24.3116883 41.3474026 49.1785714"/>
+          <polygon points="75.4188312 49.1785714 75.4188312 42.9545455 67.8798701 42.9545455 67.8798701 24.3116883 60.487013 24.3116883 60.487013 49.1785714"/>
+          <polygon points="94.1201299 49.1785714 94.1201299 43.3928571 84.0097403 43.3928571 84.0097403 39.4772727 93.3019481 39.4772727 93.3019481 33.6623377 84.0097403 33.6623377 84.0097403 30.0974026 93.6818182 30.0974026 93.6818182 24.3116883 76.6168831 24.3116883 76.6168831 49.1785714"/>
+          <polygon points="104.172078 24.3116883 95.5519481 24.3116883 95.5519481 49.1785714 102.623377 49.1785714 102.623377 41.3181818 102.331169 35.6493506 108.642857 49.1785714 117.262987 49.1785714 117.262987 24.3116883 110.220779 24.3116883 110.220779 32.2305195 110.483766 37.8993506"/>
+          <polygon points="121.87987 37.8409091 132.691558 37.8409091 132.691558 43.9188312 121.87987 43.9188312"/>
+          <polygon points="122.931818 24.5746753 132.662338 24.5746753 139.587662 49.1785714 133.042208 49.1785714 127.811688 30.1558442 122.727273 49.1785714 115.275974 49.1785714"/>
+        </g>
+      </svg>
+      <div class="header-text">
+        <h1>🛠️ Preventive Maintenance Log</h1>
+        <p class="subtitle">Helena Agri-Enterprises Equipment Management System</p>
+      </div>
     </header>
     
     <div class="nav-tabs">
@@ -868,7 +781,7 @@
       container.innerHTML = typeTemplates.map(t => `
         <div class="checkbox-group">
           <input type="checkbox" id="template-${t.id}" value="${t.id}" checked>
-          <label for="template-${t.id}" style="margin: 0; text-transform: none; font-family: 'Rajdhani', sans-serif; color: var(--text-primary);">
+          <label for="template-${t.id}" style="margin: 0; text-transform: none; font-weight: normal; color: var(--text-primary);">
             ${t.name} (Every ${t.interval} days)
           </label>
         </div>
@@ -1012,7 +925,7 @@
         }
         
         return `
-          <div class="equipment-card" style="animation-delay: ${index * 0.1}s">
+          <div class="equipment-card">
             <div class="equipment-header">
               <div>
                 <div class="equipment-id">${eq.equipmentId}</div>
@@ -1029,11 +942,11 @@
               </div>
               <div class="stat-item">
                 <div class="stat-label">Overdue</div>
-                <div class="stat-value" style="color: var(--accent-danger);">${itemsOverdue}</div>
+                <div class="stat-value" style="color: var(--danger);">${itemsOverdue}</div>
               </div>
               <div class="stat-item">
                 <div class="stat-label">Due Soon</div>
-                <div class="stat-value" style="color: var(--accent-warning);">${itemsDueSoon}</div>
+                <div class="stat-value" style="color: var(--warning);">${itemsDueSoon}</div>
               </div>
             </div>
             
@@ -1070,7 +983,7 @@
       
       container.innerHTML = Object.keys(grouped).sort().map(type => `
         <div class="template-section">
-          <h3 style="font-family: 'Orbitron', sans-serif; color: var(--accent-primary); margin-bottom: 1rem;">${type}</h3>
+          <h3 style="font-family: 'Roboto Condensed', sans-serif; color: var(--helena-green); margin-bottom: 1rem;">${type}</h3>
           ${grouped[type].map(t => `
             <div class="template-item">
               <div class="template-info">
@@ -1221,7 +1134,7 @@
       }
     }
     
-    // SIMPLE PRINT FUNCTION
+    // COMPACT PRINT FUNCTION - ALL ITEMS ON ONE PAGE
     window.printReport = function() {
       const eq = equipment.find(e => e.id === currentEquipmentId);
       if (!eq || !eq.maintenanceItems || eq.maintenanceItems.length === 0) {
@@ -1229,37 +1142,53 @@
         return;
       }
       
+      const logoSVG = '<svg width="120" height="68" viewBox="0 0 157 90" xmlns="http://www.w3.org/2000/svg"><g fill="#215530"><path d="M78.487013,73.5487013 C57.974026,73.5487013 38.6298701,69.9837662 24.0194805,63.4967532 C8.53246753,56.6006494 0,47.1331169 0,36.788961 C0,26.4155844 8.53246753,16.9480519 24.0194805,10.0519481 C38.6298701,3.56493506 57.974026,0 78.487013,0 C99,0 118.344156,3.56493506 132.954545,10.0519481 C148.441558,16.9480519 156.974026,26.4155844 156.974026,36.7597403 C156.974026,47.1038961 148.441558,56.6006494 132.954545,63.4675325 C118.373377,69.9837662 99.0292208,73.5487013 78.487013,73.5487013 Z M78.487013,6.8961039 C58.9090909,6.8961039 40.5584416,10.2564935 26.7954545,16.3636364 C14.1136364,22.0032468 6.86688312,29.4253247 6.86688312,36.788961 C6.86688312,44.1525974 14.1428571,51.5746753 26.7954545,57.2142857 C40.5292208,63.3214286 58.9090909,66.6818182 78.487013,66.6818182 C98.0649351,66.6818182 116.415584,63.3214286 130.178571,57.2142857 C142.86039,51.5746753 150.107143,44.1525974 150.107143,36.788961 C150.107143,29.4253247 142.831169,22.0032468 130.178571,16.3636364 C116.444805,10.2564935 98.0649351,6.8961039 78.487013,6.8961039 Z"/><polygon points="25.5681818 49.1785714 25.5681818 39.5357143 32.5227273 39.5357143 32.5227273 49.1785714 39.9155844 49.1785714 39.9155844 24.3116883 32.5227273 24.3116883 32.5227273 32.6980519 25.5681818 32.6980519 25.5681818 24.3116883 18.1753247 24.3116883 18.1753247 49.1785714"/><polygon points="58.8506494 49.1785714 58.8506494 43.3928571 48.7402597 43.3928571 48.7402597 39.4772727 58.0324675 39.4772727 58.0324675 33.6623377 48.7402597 33.6623377 48.7402597 30.0974026 58.4123377 30.0974026 58.4123377 24.3116883 41.3474026 24.3116883 41.3474026 49.1785714"/><polygon points="75.4188312 49.1785714 75.4188312 42.9545455 67.8798701 42.9545455 67.8798701 24.3116883 60.487013 24.3116883 60.487013 49.1785714"/><polygon points="94.1201299 49.1785714 94.1201299 43.3928571 84.0097403 43.3928571 84.0097403 39.4772727 93.3019481 39.4772727 93.3019481 33.6623377 84.0097403 33.6623377 84.0097403 30.0974026 93.6818182 30.0974026 93.6818182 24.3116883 76.6168831 24.3116883 76.6168831 49.1785714"/><polygon points="104.172078 24.3116883 95.5519481 24.3116883 95.5519481 49.1785714 102.623377 49.1785714 102.623377 41.3181818 102.331169 35.6493506 108.642857 49.1785714 117.262987 49.1785714 117.262987 24.3116883 110.220779 24.3116883 110.220779 32.2305195 110.483766 37.8993506"/><polygon points="121.87987 37.8409091 132.691558 37.8409091 132.691558 43.9188312 121.87987 43.9188312"/><polygon points="122.931818 24.5746753 132.662338 24.5746753 139.587662 49.1785714 133.042208 49.1785714 127.811688 30.1558442 122.727273 49.1785714 115.275974 49.1785714"/></g></svg>';
+      
       let printHTML = '<html><head><title>Maintenance Report</title>';
       printHTML += '<style>';
-      printHTML += 'body{font-family:Arial;padding:20px;} ';
-      printHTML += 'h1{color:#ff6b35;} ';
-      printHTML += '.info{background:#f5f5f5;padding:15px;margin:20px 0;border-left:4px solid #ff6b35;} ';
-      printHTML += '.item{border:1px solid #ddd;padding:15px;margin:10px 0;page-break-inside:avoid;} ';
-      printHTML += '.header{background:#ff6b35;color:white;padding:8px;margin:-15px -15px 10px;font-weight:bold;}';
+      printHTML += 'body{font-family:Arial,sans-serif;padding:15px;font-size:11px;} ';
+      printHTML += 'h1{color:#215530;font-size:18px;margin:0 0 5px;text-transform:uppercase;} ';
+      printHTML += 'h2{color:#215530;font-size:14px;margin:15px 0 8px;border-bottom:2px solid #215530;padding-bottom:4px;} ';
+      printHTML += '.header{display:flex;align-items:center;gap:15px;margin-bottom:15px;border-bottom:2px solid #215530;padding-bottom:10px;} ';
+      printHTML += '.info{background:#f8f9fa;padding:8px;margin:0 0 10px;border-left:3px solid #215530;font-size:10px;} ';
+      printHTML += '.info p{margin:2px 0;} ';
+      printHTML += 'table{width:100%;border-collapse:collapse;font-size:10px;} ';
+      printHTML += 'th{background:#215530;color:white;padding:6px 8px;text-align:left;font-size:10px;} ';
+      printHTML += 'td{padding:6px 8px;border-bottom:1px solid #ddd;vertical-align:top;} ';
+      printHTML += 'tr:nth-child(even) td{background:#f8f9fa;} ';
+      printHTML += '.desc{font-size:9px;color:#666;margin-top:2px;} ';
+      printHTML += '.sign{border-top:1px solid #215530;margin-top:15px;padding-top:8px;font-size:10px;} ';
+      printHTML += '@page{margin:0.5in;}';
       printHTML += '</style></head><body>';
       
-      printHTML += '<h1>MAINTENANCE REPORT</h1>';
-      printHTML += '<p>Date: ' + new Date().toLocaleDateString() + '</p>';
+      printHTML += '<div class="header">' + logoSVG;
+      printHTML += '<div><h1>Preventive Maintenance Report</h1>';
+      printHTML += '<div style="font-size:10px;color:#666;">Helena Agri-Enterprises</div></div></div>';
+      
       printHTML += '<div class="info">';
-      printHTML += '<p><b>Equipment ID:</b> ' + eq.equipmentId + '</p>';
-      printHTML += '<p><b>Name:</b> ' + eq.name + '</p>';
-      printHTML += '<p><b>Type:</b> ' + eq.type + '</p>';
-      printHTML += '<p><b>Location:</b> ' + (eq.location || 'N/A') + '</p>';
-      printHTML += '</div><h2>Maintenance Items</h2>';
+      printHTML += '<p><b>Equipment ID:</b> ' + eq.equipmentId + ' &nbsp;&nbsp; <b>Name:</b> ' + eq.name + '</p>';
+      printHTML += '<p><b>Type:</b> ' + eq.type + ' &nbsp;&nbsp; <b>Location:</b> ' + (eq.location || 'N/A') + ' &nbsp;&nbsp; <b>Date:</b> ' + new Date().toLocaleDateString() + '</p>';
+      printHTML += '</div>';
+      
+      printHTML += '<h2>Maintenance Schedule</h2>';
+      printHTML += '<table><tr><th>Item</th><th>Interval</th><th>Last Completed</th><th>Instructions</th><th>Completed</th></tr>';
       
       eq.maintenanceItems.forEach(item => {
         const last = item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never';
-        printHTML += '<div class="item">';
-        printHTML += '<div class="header">' + item.name + '</div>';
-        printHTML += '<p><b>Interval:</b> Every ' + item.interval + ' days</p>';
-        printHTML += '<p><b>Last Completed:</b> ' + last + '</p>';
-        if (item.description) {
-          printHTML += '<p><b>Instructions:</b> ' + item.description + '</p>';
-        }
-        printHTML += '<p style="margin-top:15px;border-top:1px solid #ddd;padding-top:10px">';
-        printHTML += '☐ Completed<br>☐ Parts replaced<br>☐ Signed: ______ Date: _____</p>';
-        printHTML += '</div>';
+        printHTML += '<tr>';
+        printHTML += '<td><b>' + item.name + '</b></td>';
+        printHTML += '<td>' + item.interval + ' days</td>';
+        printHTML += '<td>' + last + '</td>';
+        printHTML += '<td style="font-size:9px;">' + (item.description ? item.description.substring(0,80) + (item.description.length > 80 ? '...' : '') : '') + '</td>';
+        printHTML += '<td style="width:60px;">☐</td>';
+        printHTML += '</tr>';
       });
+      
+      printHTML += '</table>';
+      printHTML += '<div class="sign">';
+      printHTML += '<table style="border:none;"><tr><td style="border:none;width:50%;"><b>Technician Signature:</b> ____________________</td>';
+      printHTML += '<td style="border:none;width:50%;"><b>Date:</b> ____________________</td></tr></table>';
+      printHTML += '</div>';
       
       printHTML += '</body></html>';
       
@@ -1301,7 +1230,7 @@
         let statusText = mi.daysUntil < 0 ? Math.abs(mi.daysUntil) + ' days overdue' : mi.daysUntil === 0 ? 'Due today' : 'Due in ' + mi.daysUntil + ' days';
         
         return `
-          <div class="maintenance-item" style="animation-delay:${i*0.05}s">
+          <div class="maintenance-item">
             <div class="maintenance-header">
               <div>
                 <div class="equipment-id">${mi.equipment.equipmentId}</div>

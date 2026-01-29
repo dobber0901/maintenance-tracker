@@ -877,18 +877,22 @@
   </div>
   
   <script type="module">
-   // Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDr0pjjcvsjheQfHLLXjLoIOOZGrURxQJQ",
-  authDomain: "fleet-maintenance-tracker.firebaseapp.com",
-  projectId: "fleet-maintenance-tracker",
-  storageBucket: "fleet-maintenance-tracker.firebasestorage.app",
-  messagingSenderId: "120436982285",
-  appId: "1:120436982285:web:2a1b39c7a6f2247ff18b44"
-};
+    // Firebase configuration - USER WILL REPLACE THIS
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+    const firebaseConfig = {
+      apiKey: "AIzaSyDVqhdUUCMcASjEewt9Yv1Nky0hr2-FTmQ",
+      authDomain: "pm-log.firebaseapp.com",
+      projectId: "pm-log",
+      storageBucket: "pm-log.firebasestorage.app",
+      messagingSenderId: "993822676610",
+      appId: "1:993822676610:web:1e001809e089a6c6a0069b"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
     
     // Global state
     let equipment = [];

@@ -1,1302 +1,1264 @@
-
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Preventive Maintenance Log - Helena Agri-Enterprises</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@400;700&display=swap');
-
-```
-:root {
---helena-green: #215530;
---helena-green-light: #2d6e3f;
---helena-green-dark: #1a4426;
---accent-gold: #c5a562;
---accent-light: #e8dcc4;
---bg-primary: #f8f9fa;
---bg-secondary: #ffffff;
---bg-card: #ffffff;
---text-primary: #212529;
---text-secondary: #6c757d;
---border: #dee2e6;
---success: #28a745;
---warning: #ffc107;
---danger: #dc3545;
---shadow: rgba(33, 85, 48, 0.1);
-}
-
-* {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-}
-
-body {
-font-family: 'Roboto', sans-serif;
-background: var(--bg-primary);
-color: var(--text-primary);
-line-height: 1.6;
-min-height: 100vh;
-}
-
-.container {
-max-width: 1400px;
-margin: 0 auto;
-padding: 2rem;
-}
-
-header {
-background: linear-gradient(135deg, var(--helena-green), var(--helena-green-light));
-border-radius: 12px;
-padding: 2rem;
-margin-bottom: 2rem;
-box-shadow: 0 4px 12px var(--shadow);
-display: flex;
-align-items: center;
-gap: 2rem;
-}
-
-.logo {
-width: 140px;
-height: auto;
-filter: brightness(0) invert(1);
-}
-
-.header-text {
-flex: 1;
-}
-
-h1 {
-font-family: 'Roboto Condensed', sans-serif;
-font-size: 2.5rem;
-font-weight: 700;
-color: white;
-margin-bottom: 0.5rem;
-text-transform: uppercase;
-letter-spacing: 0.05em;
-}
-
-.subtitle {
-font-size: 1rem;
-color: rgba(255,255,255,0.9);
-font-weight: 300;
-}
-
-.nav-tabs {
-display: flex;
-gap: 0.5rem;
-margin-bottom: 2rem;
-flex-wrap: wrap;
-background: white;
-padding: 0.5rem;
-border-radius: 8px;
-box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.nav-tab {
-font-family: 'Roboto Condensed', sans-serif;
-background: transparent;
-border: none;
-color: var(--text-secondary);
-padding: 0.75rem 1.5rem;
-font-size: 0.95rem;
-font-weight: 500;
-text-transform: uppercase;
-letter-spacing: 0.05em;
-cursor: pointer;
-transition: all 0.3s ease;
-border-radius: 6px;
-}
-
-.nav-tab:hover {
-background: rgba(33, 85, 48, 0.05);
-color: var(--helena-green);
-}
-
-.nav-tab.active {
-background: var(--helena-green);
-color: white;
-box-shadow: 0 2px 8px var(--shadow);
-}
-
-.tab-content {
-display: none;
-}
-
-.tab-content.active {
-display: block;
-}
-
-.action-bar {
-display: flex;
-gap: 1rem;
-margin-bottom: 2rem;
-flex-wrap: wrap;
-}
-
-.btn {
-font-family: 'Roboto', sans-serif;
-padding: 0.75rem 1.5rem;
-border: 2px solid var(--helena-green);
-background: white;
-color: var(--helena-green);
-font-size: 0.9rem;
-font-weight: 500;
-text-transform: uppercase;
-letter-spacing: 0.05em;
-cursor: pointer;
-transition: all 0.3s ease;
-border-radius: 6px;
-}
-
-.btn:hover {
-background: var(--helena-green);
-color: white;
-box-shadow: 0 4px 12px var(--shadow);
-}
-
-.btn-primary {
-background: var(--helena-green);
-color: white;
-}
-
-.btn-primary:hover {
-background: var(--helena-green-dark);
-border-color: var(--helena-green-dark);
-}
-
-.equipment-grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-gap: 1.5rem;
-}
-
-.equipment-card {
-background: var(--bg-card);
-border: 1px solid var(--border);
-border-radius: 8px;
-padding: 1.5rem;
-transition: all 0.3s ease;
-box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.equipment-card:hover {
-box-shadow: 0 8px 24px var(--shadow);
-transform: translateY(-4px);
-border-color: var(--helena-green);
-}
-
-.equipment-header {
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
-margin-bottom: 1rem;
-padding-bottom: 1rem;
-border-bottom: 2px solid var(--helena-green);
-}
-
-.equipment-id {
-font-family: 'Roboto Condensed', sans-serif;
-font-size: 0.85rem;
-font-weight: 700;
-color: var(--helena-green);
-text-transform: uppercase;
-letter-spacing: 0.1em;
-margin-bottom: 0.25rem;
-}
-
-.equipment-name {
-font-family: 'Roboto Condensed', sans-serif;
-font-size: 1.25rem;
-font-weight: 700;
-color: var(--text-primary);
-margin-bottom: 0.25rem;
-}
-
-.equipment-type {
-font-size: 0.9rem;
-color: var(--text-secondary);
-text-transform: uppercase;
-letter-spacing: 0.03em;
-}
-
-.status-badge {
-font-family: 'Roboto Condensed', sans-serif;
-font-size: 0.75rem;
-font-weight: 700;
-padding: 0.4rem 0.8rem;
-border-radius: 4px;
-text-transform: uppercase;
-letter-spacing: 0.05em;
-}
-
-.status-good {
-background: rgba(40, 167, 69, 0.1);
-color: var(--success);
-border: 1px solid var(--success);
-}
-
-.status-warning {
-background: rgba(255, 193, 7, 0.1);
-color: #d39e00;
-border: 1px solid var(--warning);
-}
-
-.status-danger {
-background: rgba(220, 53, 69, 0.1);
-color: var(--danger);
-border: 1px solid var(--danger);
-}
-
-.equipment-stats {
-display: flex;
-gap: 1rem;
-margin: 1rem 0;
-padding: 1rem;
-background: var(--bg-primary);
-border-radius: 6px;
-}
-
-.stat-item {
-flex: 1;
-text-align: center;
-}
-
-.stat-label {
-font-size: 0.75rem;
-color: var(--text-secondary);
-text-transform: uppercase;
-letter-spacing: 0.05em;
-margin-bottom: 0.25rem;
-}
-
-.stat-value {
-font-family: 'Roboto Condensed', sans-serif;
-font-size: 1.75rem;
-font-weight: 700;
-color: var(--helena-green);
-}
-
-.equipment-actions {
-display: flex;
-gap: 0.5rem;
-margin-top: 1rem;
-}
-
-.btn-small {
-flex: 1;
-padding: 0.6rem 1rem;
-font-size: 0.8rem;
-}
-
-.modal {
-display: none;
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0, 0, 0, 0.75);
-z-index: 2000;
-align-items: center;
-justify-content: center;
-padding: 2rem;
-overflow-y: auto;
-}
-
-.modal.active {
-display: flex;
-}
-
-.modal-content {
-background: var(--bg-card);
-border-radius: 8px;
-padding: 2rem;
-max-width: 800px;
-width: 100%;
-max-height: 90vh;
-overflow-y: auto;
-box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-}
-
-.modal-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 2rem;
-padding-bottom: 1rem;
-border-bottom: 2px solid var(--helena-green);
-}
-
-.modal-title {
-font-family: 'Roboto Condensed', sans-serif;
-font-size: 1.75rem;
-font-weight: 700;
-color: var(--helena-green);
-text-transform: uppercase;
-}
-
-.close-btn {
-background: none;
-border: none;
-color: var(--text-secondary);
-font-size: 2rem;
-cursor: pointer;
-transition: all 0.3s ease;
-width: 40px;
-height: 40px;
-display: flex;
-align-items: center;
-justify-content: center;
-}
-
-.close-btn:hover {
-color: var(--danger);
-transform: rotate(90deg);
-}
-
-.form-group {
-margin-bottom: 1.5rem;
-}
-
-label {
-display: block;
-font-family: 'Roboto Condensed', sans-serif;
-font-size: 0.9rem;
-font-weight: 500;
-color: var(--helena-green);
-margin-bottom: 0.5rem;
-text-transform: uppercase;
-letter-spacing: 0.05em;
-}
-
-input, select, textarea {
-width: 100%;
-padding: 0.75rem;
-background: white;
-border: 1px solid var(--border);
-border-radius: 4px;
-color: var(--text-primary);
-font-family: 'Roboto', sans-serif;
-font-size: 1rem;
-transition: all 0.3s ease;
-}
-
-input:focus, select:focus, textarea:focus {
-outline: none;
-border-color: var(--helena-green);
-box-shadow: 0 0 0 3px rgba(33, 85, 48, 0.1);
-}
-
-select {
-cursor: pointer;
-}
-
-textarea {
-resize: vertical;
-min-height: 100px;
-}
-
-.maintenance-list {
-display: flex;
-flex-direction: column;
-gap: 1rem;
-}
-
-.maintenance-item {
-background: var(--bg-primary);
-border: 1px solid var(--border);
-border-radius: 6px;
-padding: 1rem;
-transition: all 0.3s ease;
-}
-
-.maintenance-item:hover {
-border-color: var(--helena-green);
-box-shadow: 0 2px 8px var(--shadow);
-}
-
-.maintenance-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 0.5rem;
-}
-
-.maintenance-title {
-font-family: 'Roboto Condensed', sans-serif;
-font-size: 1.1rem;
-font-weight: 700;
-color: var(--text-primary);
-}
-
-.maintenance-interval {
-font-size: 0.85rem;
-color: var(--helena-green);
-font-weight: 500;
-}
-
-.maintenance-description {
-color: var(--text-secondary);
-font-size: 0.9rem;
-margin-top: 0.5rem;
-}
-
-.maintenance-status {
-margin-top: 0.5rem;
-font-size: 0.9rem;
-}
-
-.empty-state {
-text-align: center;
-padding: 4rem 2rem;
-color: var(--text-secondary);
-}
-
-.empty-icon {
-font-size: 4rem;
-margin-bottom: 1rem;
-opacity: 0.3;
-}
-
-.template-section {
-margin-top: 2rem;
-padding-top: 2rem;
-border-top: 2px solid var(--border);
-}
-
-.template-item {
-background: white;
-border: 1px solid var(--border);
-border-radius: 6px;
-padding: 1rem;
-margin-bottom: 1rem;
-display: flex;
-justify-content: space-between;
-align-items: center;
-transition: all 0.3s ease;
-}
-
-.template-item:hover {
-border-color: var(--helena-green);
-box-shadow: 0 2px 8px var(--shadow);
-}
-
-.template-info {
-flex: 1;
-}
-
-.template-name {
-font-family: 'Roboto Condensed', sans-serif;
-font-weight: 700;
-color: var(--text-primary);
-margin-bottom: 0.25rem;
-}
-
-.template-desc {
-font-size: 0.9rem;
-color: var(--text-secondary);
-}
-
-.checkbox-group {
-display: flex;
-align-items: center;
-gap: 0.5rem;
-margin-bottom: 0.5rem;
-}
-
-.checkbox-group input[type="checkbox"] {
-width: auto;
-cursor: pointer;
-}
-
-@media (max-width: 768px) {
-h1 { font-size: 1.75rem; }
-header { flex-direction: column; text-align: center; }
-.logo { width: 100px; }
-.equipment-grid { grid-template-columns: 1fr; }
-}
-```
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preventive Maintenance Log - Helena Agri-Enterprises</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@400;700&display=swap');
+
+    :root {
+      --helena-green: #215530;
+      --helena-green-light: #2d6e3f;
+      --helena-green-dark: #1a4426;
+      --accent-gold: #c5a562;
+      --accent-light: #e8dcc4;
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --text-primary: #212529;
+      --text-secondary: #6c757d;
+      --border: #dee2e6;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --shadow: rgba(33, 85, 48, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--helena-green), var(--helena-green-light));
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .logo {
+      width: 140px;
+      height: auto;
+      filter: brightness(0) invert(1);
+    }
+
+    .header-text {
+      flex: 1;
+    }
+
+    h1 {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.9);
+      font-weight: 300;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      background: white;
+      padding: 0.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .nav-tab {
+      font-family: 'Roboto Condensed', sans-serif;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 6px;
+    }
+
+    .nav-tab:hover {
+      background: rgba(33, 85, 48, 0.05);
+      color: var(--helena-green);
+    }
+
+    .nav-tab.active {
+      background: var(--helena-green);
+      color: white;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'Roboto', sans-serif;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid var(--helena-green);
+      background: white;
+      color: var(--helena-green);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 6px;
+    }
+
+    .btn:hover {
+      background: var(--helena-green);
+      color: white;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .btn-primary {
+      background: var(--helena-green);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--helena-green-dark);
+      border-color: var(--helena-green-dark);
+    }
+
+    .equipment-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .equipment-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .equipment-card:hover {
+      box-shadow: 0 8px 24px var(--shadow);
+      transform: translateY(-4px);
+      border-color: var(--helena-green);
+    }
+
+    .equipment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--helena-green);
+    }
+
+    .equipment-id {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--helena-green);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+    }
+
+    .equipment-name {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .equipment-type {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .status-badge {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-good {
+      background: rgba(40, 167, 69, 0.1);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .status-warning {
+      background: rgba(255, 193, 7, 0.1);
+      color: #d39e00;
+      border: 1px solid var(--warning);
+    }
+
+    .status-danger {
+      background: rgba(220, 53, 69, 0.1);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .equipment-stats {
+      display: flex;
+      gap: 1rem;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: var(--bg-primary);
+      border-radius: 6px;
+    }
+
+    .stat-item {
+      flex: 1;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--helena-green);
+    }
+
+    .equipment-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .btn-small {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 2rem;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--helena-green);
+    }
+
+    .modal-title {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--helena-green);
+      text-transform: uppercase;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-btn:hover {
+      color: var(--danger);
+      transform: rotate(90deg);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--helena-green);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      font-family: 'Roboto', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--helena-green);
+      box-shadow: 0 0 0 3px rgba(33, 85, 48, 0.1);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .maintenance-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .maintenance-item {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .maintenance-item:hover {
+      border-color: var(--helena-green);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .maintenance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .maintenance-title {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .maintenance-interval {
+      font-size: 0.85rem;
+      color: var(--helena-green);
+      font-weight: 500;
+    }
+
+    .maintenance-description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .maintenance-status {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+
+    .template-section {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid var(--border);
+    }
+
+    .template-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .template-item:hover {
+      border-color: var(--helena-green);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .template-info {
+      flex: 1;
+    }
+
+    .template-name {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .template-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 1.75rem; }
+      header { flex-direction: column; text-align: center; }
+      .logo { width: 100px; }
+      .equipment-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-<header>
-<svg class="logo" viewBox="0 0 157 90" xmlns="http://www.w3.org/2000/svg">
-<g fill="currentColor">
-<path d="M78.487013,73.5487013 C57.974026,73.5487013 38.6298701,69.9837662 24.0194805,63.4967532 C8.53246753,56.6006494 0,47.1331169 0,36.788961 C0,26.4155844 8.53246753,16.9480519 24.0194805,10.0519481 C38.6298701,3.56493506 57.974026,0 78.487013,0 C99,0 118.344156,3.56493506 132.954545,10.0519481 C148.441558,16.9480519 156.974026,26.4155844 156.974026,36.7597403 C156.974026,47.1038961 148.441558,56.6006494 132.954545,63.4675325 C118.373377,69.9837662 99.0292208,73.5487013 78.487013,73.5487013 Z M78.487013,6.8961039 C58.9090909,6.8961039 40.5584416,10.2564935 26.7954545,16.3636364 C14.1136364,22.0032468 6.86688312,29.4253247 6.86688312,36.788961 C6.86688312,44.1525974 14.1428571,51.5746753 26.7954545,57.2142857 C40.5292208,63.3214286 58.9090909,66.6818182 78.487013,66.6818182 C98.0649351,66.6818182 116.415584,63.3214286 130.178571,57.2142857 C142.86039,51.5746753 150.107143,44.1525974 150.107143,36.788961 C150.107143,29.4253247 142.831169,22.0032468 130.178571,16.3636364 C116.444805,10.2564935 98.0649351,6.8961039 78.487013,6.8961039 Z"/>
-<polygon points="25.5681818 49.1785714 25.5681818 39.5357143 32.5227273 39.5357143 32.5227273 49.1785714 39.9155844 49.1785714 39.9155844 24.3116883 32.5227273 24.3116883 32.5227273 32.6980519 25.5681818 32.6980519 25.5681818 24.3116883 18.1753247 24.3116883 18.1753247 49.1785714"/>
-<polygon points="58.8506494 49.1785714 58.8506494 43.3928571 48.7402597 43.3928571 48.7402597 39.4772727 58.0324675 39.4772727 58.0324675 33.6623377 48.7402597 33.6623377 48.7402597 30.0974026 58.4123377 30.0974026 58.4123377 24.3116883 41.3474026 24.3116883 41.3474026 49.1785714"/>
-<polygon points="75.4188312 49.1785714 75.4188312 42.9545455 67.8798701 42.9545455 67.8798701 24.3116883 60.487013 24.3116883 60.487013 49.1785714"/>
-<polygon points="94.1201299 49.1785714 94.1201299 43.3928571 84.0097403 43.3928571 84.0097403 39.4772727 93.3019481 39.4772727 93.3019481 33.6623377 84.0097403 33.6623377 84.0097403 30.0974026 93.6818182 30.0974026 93.6818182 24.3116883 76.6168831 24.3116883 76.6168831 49.1785714"/>
-<polygon points="104.172078 24.3116883 95.5519481 24.3116883 95.5519481 49.1785714 102.623377 49.1785714 102.623377 41.3181818 102.331169 35.6493506 108.642857 49.1785714 117.262987 49.1785714 117.262987 24.3116883 110.220779 24.3116883 110.220779 32.2305195 110.483766 37.8993506"/>
-<polygon points="121.87987 37.8409091 132.691558 37.8409091 132.691558 43.9188312 121.87987 43.9188312"/>
-<polygon points="122.931818 24.5746753 132.662338 24.5746753 139.587662 49.1785714 133.042208 49.1785714 127.811688 30.1558442 122.727273 49.1785714 115.275974 49.1785714"/>
-</g>
-</svg>
-<div class="header-text">
-<h1>🛠️ Preventive Maintenance Log</h1>
-<p class="subtitle">Helena Agri-Enterprises Equipment Management System</p>
-</div>
-</header>
-
-```
-<div class="nav-tabs">
-<button class="nav-tab active" data-tab="equipment">Equipment Fleet</button>
-<button class="nav-tab" data-tab="templates">Maintenance Templates</button>
-<button class="nav-tab" data-tab="schedule">Schedule</button>
-</div>
-
-<div id="equipment-tab" class="tab-content active">
-<div class="action-bar">
-<button class="btn btn-primary" onclick="openAddEquipmentModal()">+ Add Equipment</button>
-</div>
-<div class="equipment-grid" id="equipmentGrid"></div>
-</div>
-
-<div id="templates-tab" class="tab-content">
-<div class="action-bar">
-<button class="btn btn-primary" onclick="openAddTemplateModal()">+ Create Template</button>
-</div>
-<div id="templatesList"></div>
-</div>
-
-<div id="schedule-tab" class="tab-content">
-<div id="scheduleView"></div>
-</div>
-```
-
-</div>
-
-<!-- Add Equipment Modal -->
-
-<div id="addEquipmentModal" class="modal">
-<div class="modal-content">
-<div class="modal-header">
-<h2 class="modal-title">Add Equipment</h2>
-<button class="close-btn" onclick="closeModal('addEquipmentModal')">&times;</button>
-</div>
-<form id="addEquipmentForm" onsubmit="addEquipment(event)">
-<div class="form-group">
-<label for="equipmentId">Equipment ID *</label>
-<input type="text" id="equipmentId" required placeholder="e.g., FB-001">
-</div>
-<div class="form-group">
-<label for="equipmentName">Equipment Name *</label>
-<input type="text" id="equipmentName" required placeholder="e.g., John Deere Fertilizer Buggy">
-</div>
-<div class="form-group">
-<label for="equipmentType">Equipment Type *</label>
-<select id="equipmentType" required onchange="loadMaintenanceTemplates()">
-<option value="">Select Type</option>
-<option value="Equipment">Equipment</option>
-<option value="Fertilizer Buggy">Fertilizer Buggy</option>
-<option value="Flatbed">Flatbed</option>
-<option value="Forklift">Forklift</option>
-<option value="Hopper Bottom">Hopper Bottom</option>
-<option value="Nurse Trailer">Nurse Trailer</option>
-<option value="Seed Trailer">Seed Trailer</option>
-<option value="Skid Steer">Skid Steer</option>
-<option value="Tank Trailer">Tank Trailer</option>
-<option value="Tender">Tender</option>
-<option value="Tractor">Tractor</option>
-<option value="Truck">Truck</option>
-</select>
-</div>
-<div class="form-group">
-<label for="equipmentLocation">Location</label>
-<input type="text" id="equipmentLocation" placeholder="e.g., Main Yard">
-</div>
-<div id="templateLoadSection" style="display: none;">
-<div class="form-group">
-<label>Auto-Load Maintenance Items</label>
-<div id="availableTemplates"></div>
-</div>
-</div>
-<button type="submit" class="btn btn-primary" style="width: 100%;">Add Equipment</button>
-</form>
-</div>
-</div>
-
-<!-- Add Template Modal -->
-
-<div id="addTemplateModal" class="modal">
-<div class="modal-content">
-<div class="modal-header">
-<h2 class="modal-title">Create Maintenance Template</h2>
-<button class="close-btn" onclick="closeModal('addTemplateModal')">&times;</button>
-</div>
-<form id="addTemplateForm" onsubmit="addTemplate(event)">
-<div class="form-group">
-<label for="templateEquipmentType">Equipment Type *</label>
-<select id="templateEquipmentType" required>
-<option value="">Select Type</option>
-<option value="Equipment">Equipment</option>
-<option value="Fertilizer Buggy">Fertilizer Buggy</option>
-<option value="Flatbed">Flatbed</option>
-<option value="Forklift">Forklift</option>
-<option value="Hopper Bottom">Hopper Bottom</option>
-<option value="Nurse Trailer">Nurse Trailer</option>
-<option value="Seed Trailer">Seed Trailer</option>
-<option value="Skid Steer">Skid Steer</option>
-<option value="Tank Trailer">Tank Trailer</option>
-<option value="Tender">Tender</option>
-<option value="Tractor">Tractor</option>
-<option value="Truck">Truck</option>
-</select>
-</div>
-<div class="form-group">
-<label for="templateName">Maintenance Item Name *</label>
-<input type="text" id="templateName" required placeholder="e.g., Oil Change">
-</div>
-<div class="form-group">
-<label for="templateInterval">Interval (days) *</label>
-<input type="number" id="templateInterval" required min="1" placeholder="e.g., 90">
-</div>
-<div class="form-group">
-<label for="templateDescription">Description/Instructions</label>
-<textarea id="templateDescription" placeholder="Detailed instructions for this maintenance item..."></textarea>
-</div>
-<button type="submit" class="btn btn-primary" style="width: 100%;">Create Template</button>
-</form>
-</div>
-</div>
-
-<!-- Equipment Details Modal -->
-
-<div id="equipmentDetailsModal" class="modal">
-<div class="modal-content">
-<div class="modal-header">
-<h2 class="modal-title" id="detailsEquipmentName"></h2>
-<button class="close-btn" onclick="closeModal('equipmentDetailsModal')">&times;</button>
-</div>
-<div id="equipmentDetailsContent"></div>
-<div class="action-bar" style="margin-top: 2rem;">
-<button class="btn btn-primary" onclick="printReport()">📄 Print Report</button>
-<button class="btn" onclick="closeModal('equipmentDetailsModal')">Close</button>
-</div>
-</div>
-</div>
-
-<!-- Complete Maintenance Modal -->
-
-<div id="completeMaintenanceModal" class="modal">
-<div class="modal-content">
-<div class="modal-header">
-<h2 class="modal-title">Complete Maintenance</h2>
-<button class="close-btn" onclick="closeModal('completeMaintenanceModal')">&times;</button>
-</div>
-<form id="completeMaintenanceForm" onsubmit="completeMaintenance(event)">
-<input type="hidden" id="completeEquipmentId">
-<input type="hidden" id="completeMaintenanceId">
-<div class="form-group">
-<label>Maintenance Item</label>
-<p id="completeMaintenanceName" style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600;"></p>
-</div>
-<div class="form-group">
-<label for="completionDate">Completion Date *</label>
-<input type="date" id="completionDate" required>
-</div>
-<div class="form-group">
-<label for="completionNotes">Notes</label>
-<textarea id="completionNotes" placeholder="What was done? Any issues found?"></textarea>
-</div>
-<button type="submit" class="btn btn-primary" style="width: 100%;">Mark Complete</button>
-</form>
-</div>
-</div>
-
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-const firebaseConfig = {
-apiKey: "AIzaSyDVqhdUUCMcASjEewt9Yv1Nky0hr2-FTmQ",
-authDomain: "pm-log.firebaseapp.com",
-projectId: "pm-log",
-storageBucket: "pm-log.firebasestorage.app",
-messagingSenderId: "993822676610",
-appId: "1:993822676610:web:1e001809e089a6c6a0069b"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-let equipment = [];
-let templates = [];
-let currentEquipmentId = null;
-
-async function loadData() {
-try {
-const equipmentSnapshot = await getDocs(collection(db, 'equipment'));
-equipment = equipmentSnapshot.docs.map(doc => ({
-id: doc.id,
-...doc.data()
-}));
-
-const templatesSnapshot = await getDocs(collection(db, 'maintenanceTemplates'));
-templates = templatesSnapshot.docs.map(doc => ({
-id: doc.id,
-...doc.data()
-}));
-
-renderEquipment();
-renderTemplates();
-} catch (error) {
-console.error('Error loading data:', error);
-}
-}
-
-document.querySelectorAll('.nav-tab').forEach(tab => {
-tab.addEventListener('click', () => {
-const tabName = tab.dataset.tab;
-
-document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-tab.classList.add('active');
-document.getElementById(`${tabName}-tab`).classList.add('active');
-
-if (tabName === 'schedule') {
-renderSchedule();
-}
-});
-});
-
-window.openAddEquipmentModal = function() {
-document.getElementById('addEquipmentModal').classList.add('active');
-document.getElementById('templateLoadSection').style.display = 'none';
-}
-
-window.closeModal = function(modalId) {
-document.getElementById(modalId).classList.remove('active');
-}
-
-window.loadMaintenanceTemplates = function() {
-const type = document.getElementById('equipmentType').value;
-const section = document.getElementById('templateLoadSection');
-const container = document.getElementById('availableTemplates');
-
-if (!type) {
-section.style.display = 'none';
-return;
-}
-
-const typeTemplates = templates.filter(t => t.equipmentType === type);
-
-if (typeTemplates.length === 0) {
-section.style.display = 'none';
-return;
-}
-
-section.style.display = 'block';
-container.innerHTML = typeTemplates.map(t => `
-<div class="checkbox-group">
-<input type="checkbox" id="template-${t.id}" value="${t.id}" checked>
-<label for="template-${t.id}" style="margin: 0; text-transform: none; font-weight: normal; color: var(--text-primary);">
-${t.name} (Every ${t.interval} days)
-</label>
-</div>
-`).join('');
-}
-
-window.addEquipment = async function(event) {
-event.preventDefault();
-
-const type = document.getElementById('equipmentType').value;
-const selectedTemplates = Array.from(document.querySelectorAll('#availableTemplates input[type="checkbox"]:checked'))
-.map(cb => cb.value);
-
-const maintenanceItems = selectedTemplates.map(templateId => {
-const template = templates.find(t => t.id === templateId);
-return {
-id: Date.now() + Math.random(),
-name: template.name,
-interval: template.interval,
-description: template.description,
-lastCompleted: null,
-history: []
-};
-});
-
-const newEquipment = {
-equipmentId: document.getElementById('equipmentId').value,
-name: document.getElementById('equipmentName').value,
-type: type,
-location: document.getElementById('equipmentLocation').value,
-maintenanceItems: maintenanceItems,
-createdAt: new Date().toISOString()
-};
-
-try {
-await addDoc(collection(db, 'equipment'), newEquipment);
-await loadData();
-document.getElementById('addEquipmentForm').reset();
-closeModal('addEquipmentModal');
-} catch (error) {
-console.error('Error adding equipment:', error);
-alert('Error adding equipment. Please try again.');
-}
-}
-
-window.addTemplate = async function(event) {
-event.preventDefault();
-
-const newTemplate = {
-equipmentType: document.getElementById('templateEquipmentType').value,
-name: document.getElementById('templateName').value,
-interval: parseInt(document.getElementById('templateInterval').value),
-description: document.getElementById('templateDescription').value,
-createdAt: new Date().toISOString()
-};
-
-try {
-await addDoc(collection(db, 'maintenanceTemplates'), newTemplate);
-await loadData();
-document.getElementById('addTemplateForm').reset();
-closeModal('addTemplateModal');
-} catch (error) {
-console.error('Error adding template:', error);
-alert('Error adding template. Please try again.');
-}
-}
-
-function getMaintenanceStatus(item) {
-if (!item.lastCompleted) {
-return { status: 'danger', daysUntil: -999, nextDue: 'Not Set', statusText: 'Past Due' };
-}
-
-const lastDate = new Date(item.lastCompleted);
-const today = new Date();
-const nextDue = new Date(lastDate);
-nextDue.setDate(nextDue.getDate() + item.interval);
-
-const daysUntil = Math.ceil((nextDue - today) / (1000 * 60 * 60 * 24));
-
-let status = 'good';
-let statusText = 'On Schedule';
-if (daysUntil < 0) {
-status = 'danger';
-statusText = 'Past Due';
-} else if (daysUntil <= 7) {
-status = 'warning';
-statusText = 'Coming Due';
-}
-
-return {
-status,
-daysUntil,
-nextDue: nextDue.toLocaleDateString(),
-statusText
-};
-}
-
-function getEquipmentOverallStatus(eq) {
-if (!eq.maintenanceItems || eq.maintenanceItems.length === 0) {
-return { status: 'good', itemsOverdue: 0, itemsDueSoon: 0 };
-}
-
-let itemsOverdue = 0;
-let itemsDueSoon = 0;
-
-eq.maintenanceItems.forEach(item => {
-const { status } = getMaintenanceStatus(item);
-if (status === 'danger') itemsOverdue++;
-else if (status === 'warning') itemsDueSoon++;
-});
-
-let overallStatus = 'good';
-if (itemsOverdue > 0) overallStatus = 'danger';
-else if (itemsDueSoon > 0) overallStatus = 'warning';
-
-return { status: overallStatus, itemsOverdue, itemsDueSoon };
-}
-
-function renderEquipment() {
-const grid = document.getElementById('equipmentGrid');
-
-if (equipment.length === 0) {
-grid.innerHTML = `
-<div class="empty-state">
-<div class="empty-icon">🚜</div>
-<h3>No Equipment Added</h3>
-<p>Click "Add Equipment" to start tracking your fleet</p>
-</div>
-`;
-return;
-}
-
-grid.innerHTML = equipment.map((eq, index) => {
-const { status, itemsOverdue, itemsDueSoon } = getEquipmentOverallStatus(eq);
-
-let statusText = 'All Good';
-let statusClass = 'status-good';
-
-if (status === 'danger') {
-statusText = `${itemsOverdue} Overdue`;
-statusClass = 'status-danger';
-} else if (status === 'warning') {
-statusText = `${itemsDueSoon} Due Soon`;
-statusClass = 'status-warning';
-}
-
-return `
-<div class="equipment-card">
-<div class="equipment-header">
-<div>
-<div class="equipment-id">${eq.equipmentId}</div>
-<div class="equipment-name">${eq.name}</div>
-<div class="equipment-type">${eq.type}</div>
-</div>
-<span class="status-badge ${statusClass}">${statusText}</span>
-</div>
-
-<div class="equipment-stats">
-<div class="stat-item">
-<div class="stat-label">Items</div>
-<div class="stat-value">${eq.maintenanceItems ? eq.maintenanceItems.length : 0}</div>
-</div>
-<div class="stat-item">
-<div class="stat-label">Overdue</div>
-<div class="stat-value" style="color: var(--danger);">${itemsOverdue}</div>
-</div>
-<div class="stat-item">
-<div class="stat-label">Due Soon</div>
-<div class="stat-value" style="color: var(--warning);">${itemsDueSoon}</div>
-</div>
-</div>
-
-<div class="equipment-actions">
-<button class="btn btn-small btn-primary" onclick="window.viewEquipmentDetails('${eq.id}')">View Details</button>
-<button class="btn btn-small" onclick="window.deleteEquipment('${eq.id}')">Delete</button>
-</div>
-</div>
-`;
-}).join('');
-}
-
-function renderTemplates() {
-const container = document.getElementById('templatesList');
-
-if (templates.length === 0) {
-container.innerHTML = `
-<div class="empty-state">
-<div class="empty-icon">📋</div>
-<h3>No Templates Created</h3>
-<p>Create maintenance templates that will auto-load when adding equipment</p>
-</div>
-`;
-return;
-}
-
-const grouped = {};
-templates.forEach(t => {
-if (!grouped[t.equipmentType]) {
-grouped[t.equipmentType] = [];
-}
-grouped[t.equipmentType].push(t);
-});
-
-container.innerHTML = Object.keys(grouped).sort().map(type => `
-<div class="template-section">
-<h3 style="font-family: 'Roboto Condensed', sans-serif; color: var(--helena-green); margin-bottom: 1rem;">${type}</h3>
-${grouped[type].map(t => `
-<div class="template-item">
-<div class="template-info">
-<div class="template-name">${t.name}</div>
-<div class="template-desc">Every ${t.interval} days${t.description ? ' - ' + t.description : ''}</div>
-</div>
-<button class="btn btn-small" onclick="window.deleteTemplate('${t.id}')">Delete</button>
-</div>
-`).join('')}
-</div>
-`).join('');
-}
-
-window.viewEquipmentDetails = function(equipmentId) {
-const eq = equipment.find(e => e.id === equipmentId);
-if (!eq) return;
-
-currentEquipmentId = equipmentId;
-
-document.getElementById('detailsEquipmentName').textContent = `${eq.equipmentId} - ${eq.name}`;
-
-const content = document.getElementById('equipmentDetailsContent');
-
-if (!eq.maintenanceItems || eq.maintenanceItems.length === 0) {
-content.innerHTML = `
-<div class="empty-state">
-<p>No maintenance items configured for this equipment.</p>
-</div>
-`;
-} else {
-// SORT BY INTERVAL - SMALLEST TO LARGEST
-const sortedItems = [...eq.maintenanceItems].sort((a, b) => a.interval - b.interval);
-
-content.innerHTML = `
-<div class="maintenance-list">
-${sortedItems.map(item => {
-const { status, daysUntil, nextDue, statusText } = getMaintenanceStatus(item);
-
-let statusClass = 'status-good';
-let daysText = 'Up to Date';
-
-if (status === 'danger') {
-statusClass = 'status-danger';
-daysText = daysUntil === -999 ? 'Never Done' : `${Math.abs(daysUntil)} Days Overdue`;
-} else if (status === 'warning') {
-statusClass = 'status-warning';
-daysText = `Due in ${daysUntil} Days`;
-} else {
-daysText = `Due in ${daysUntil} Days`;
-}
-
-return `
-<div class="maintenance-item">
-<div class="maintenance-header">
-<div>
-<div class="maintenance-title">${item.name}</div>
-<div class="maintenance-interval">Every ${item.interval} days</div>
-</div>
-<span class="status-badge ${statusClass}">${daysText}</span>
-</div>
-${item.description ? `<div class="maintenance-description">${item.description}</div>` : ''}
-<div class="maintenance-status">
-<strong>Last Completed:</strong> ${item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never'}<br>
-<strong>Next Due:</strong> ${nextDue}<br>
-<strong>Status:</strong> ${statusText}
-</div>
-<div class="equipment-actions" style="margin-top: 1rem;">
-<button class="btn btn-small btn-primary" onclick="window.openCompleteModal('${eq.id}', '${item.id}')">Mark Complete</button>
-</div>
-</div>
-`;
-}).join('')}
-</div>
-`;
-}
-
-document.getElementById('equipmentDetailsModal').classList.add('active');
-}
-
-window.openCompleteModal = function(equipmentId, maintenanceId) {
-const eq = equipment.find(e => e.id === equipmentId);
-const item = eq.maintenanceItems.find(m => m.id == maintenanceId);
-
-document.getElementById('completeEquipmentId').value = equipmentId;
-document.getElementById('completeMaintenanceId').value = maintenanceId;
-document.getElementById('completeMaintenanceName').textContent = item.name;
-document.getElementById('completionDate').value = new Date().toISOString().split('T')[0];
-
-document.getElementById('completeMaintenanceModal').classList.add('active');
-}
-
-window.completeMaintenance = async function(event) {
-event.preventDefault();
-
-const equipmentId = document.getElementById('completeEquipmentId').value;
-const maintenanceId = document.getElementById('completeMaintenanceId').value;
-const date = document.getElementById('completionDate').value;
-const notes = document.getElementById('completionNotes').value;
-
-const eq = equipment.find(e => e.id === equipmentId);
-const item = eq.maintenanceItems.find(m => m.id == maintenanceId);
-
-if (!item.history) item.history = [];
-
-item.history.push({
-date: date,
-notes: notes,
-completedAt: new Date().toISOString()
-});
-item.lastCompleted = date;
-
-try {
-await updateDoc(doc(db, 'equipment', equipmentId), {
-maintenanceItems: eq.maintenanceItems
-});
-
-await loadData();
-document.getElementById('completeMaintenanceForm').reset();
-closeModal('completeMaintenanceModal');
-viewEquipmentDetails(equipmentId);
-} catch (error) {
-console.error('Error completing maintenance:', error);
-alert('Error saving maintenance. Please try again.');
-}
-}
-
-window.deleteEquipment = async function(equipmentId) {
-if (!confirm('Are you sure you want to delete this equipment and all its maintenance records?')) {
-return;
-}
-
-try {
-await deleteDoc(doc(db, 'equipment', equipmentId));
-await loadData();
-} catch (error) {
-console.error('Error deleting equipment:', error);
-alert('Error deleting equipment. Please try again.');
-}
-}
-
-window.deleteTemplate = async function(templateId) {
-if (!confirm('Are you sure you want to delete this template?')) {
-return;
-}
-
-try {
-await deleteDoc(doc(db, 'maintenanceTemplates', templateId));
-await loadData();
-} catch (error) {
-console.error('Error deleting template:', error);
-alert('Error deleting template. Please try again.');
-}
-}
-
-// PRINT WITH SORTED ITEMS, STATUS COLUMN, AND NOTES SECTION
-window.printReport = function() {
-const eq = equipment.find(e => e.id === currentEquipmentId);
-if (!eq || !eq.maintenanceItems || eq.maintenanceItems.length === 0) {
-alert('No maintenance items to print');
-return;
-}
-
-// SORT BY INTERVAL - SMALLEST TO LARGEST
-const sortedItems = [...eq.maintenanceItems].sort((a, b) => a.interval - b.interval);
-
-const logoSVG = '<svg width="120" height="68" viewBox="0 0 157 90" xmlns="http://www.w3.org/2000/svg"><g fill="#215530"><path d="M78.487013,73.5487013 C57.974026,73.5487013 38.6298701,69.9837662 24.0194805,63.4967532 C8.53246753,56.6006494 0,47.1331169 0,36.788961 C0,26.4155844 8.53246753,16.9480519 24.0194805,10.0519481 C38.6298701,3.56493506 57.974026,0 78.487013,0 C99,0 118.344156,3.56493506 132.954545,10.0519481 C148.441558,16.9480519 156.974026,26.4155844 156.974026,36.7597403 C156.974026,47.1038961 148.441558,56.6006494 132.954545,63.4675325 C118.373377,69.9837662 99.0292208,73.5487013 78.487013,73.5487013 Z M78.487013,6.8961039 C58.9090909,6.8961039 40.5584416,10.2564935 26.7954545,16.3636364 C14.1136364,22.0032468 6.86688312,29.4253247 6.86688312,36.788961 C6.86688312,44.1525974 14.1428571,51.5746753 26.7954545,57.2142857 C40.5292208,63.3214286 58.9090909,66.6818182 78.487013,66.6818182 C98.0649351,66.6818182 116.415584,63.3214286 130.178571,57.2142857 C142.86039,51.5746753 150.107143,44.1525974 150.107143,36.788961 C150.107143,29.4253247 142.831169,22.0032468 130.178571,16.3636364 C116.444805,10.2564935 98.0649351,6.8961039 78.487013,6.8961039 Z"/><polygon points="25.5681818 49.1785714 25.5681818 39.5357143 32.5227273 39.5357143 32.5227273 49.1785714 39.9155844 49.1785714 39.9155844 24.3116883 32.5227273 24.3116883 32.5227273 32.6980519 25.5681818 32.6980519 25.5681818 24.3116883 18.1753247 24.3116883 18.1753247 49.1785714"/><polygon points="58.8506494 49.1785714 58.8506494 43.3928571 48.7402597 43.3928571 48.7402597 39.4772727 58.0324675 39.4772727 58.0324675 33.6623377 48.7402597 33.6623377 48.7402597 30.0974026 58.4123377 30.0974026 58.4123377 24.3116883 41.3474026 24.3116883 41.3474026 49.1785714"/><polygon points="75.4188312 49.1785714 75.4188312 42.9545455 67.8798701 42.9545455 67.8798701 24.3116883 60.487013 24.3116883 60.487013 49.1785714"/><polygon points="94.1201299 49.1785714 94.1201299 43.3928571 84.0097403 43.3928571 84.0097403 39.4772727 93.3019481 39.4772727 93.3019481 33.6623377 84.0097403 33.6623377 84.0097403 30.0974026 93.6818182 30.0974026 93.6818182 24.3116883 76.6168831 24.3116883 76.6168831 49.1785714"/><polygon points="104.172078 24.3116883 95.5519481 24.3116883 95.5519481 49.1785714 102.623377 49.1785714 102.623377 41.3181818 102.331169 35.6493506 108.642857 49.1785714 117.262987 49.1785714 117.262987 24.3116883 110.220779 24.3116883 110.220779 32.2305195 110.483766 37.8993506"/><polygon points="121.87987 37.8409091 132.691558 37.8409091 132.691558 43.9188312 121.87987 43.9188312"/><polygon points="122.931818 24.5746753 132.662338 24.5746753 139.587662 49.1785714 133.042208 49.1785714 127.811688 30.1558442 122.727273 49.1785714 115.275974 49.1785714"/></g></svg>';
-
-let printHTML = '<html><head><title>Maintenance Report</title>';
-printHTML += '<style>';
-printHTML += 'body{font-family:Arial,sans-serif;padding:15px;font-size:11px;} ';
-printHTML += 'h1{color:#215530;font-size:18px;margin:0 0 5px;text-transform:uppercase;} ';
-printHTML += 'h2{color:#215530;font-size:14px;margin:15px 0 8px;border-bottom:2px solid #215530;padding-bottom:4px;} ';
-printHTML += '.header{display:flex;align-items:center;gap:15px;margin-bottom:15px;border-bottom:2px solid #215530;padding-bottom:10px;} ';
-printHTML += '.info{background:#f8f9fa;padding:8px;margin:0 0 10px;border-left:3px solid #215530;font-size:10px;} ';
-printHTML += '.info p{margin:2px 0;} ';
-printHTML += 'table{width:100%;border-collapse:collapse;font-size:10px;} ';
-printHTML += 'th{background:#215530;color:white;padding:6px 8px;text-align:left;font-size:10px;} ';
-printHTML += 'td{padding:6px 8px;border-bottom:1px solid #ddd;vertical-align:top;} ';
-printHTML += 'tr:nth-child(even) td{background:#f8f9fa;} ';
-printHTML += '.desc{font-size:9px;color:#666;margin-top:2px;} ';
-printHTML += '.notes-section{border:1px solid #ddd;padding:10px;margin-top:15px;min-height:100px;} ';
-printHTML += '.notes-title{font-weight:700;margin-bottom:5px;color:#215530;} ';
-printHTML += '.sign{border-top:1px solid #215530;margin-top:15px;padding-top:8px;font-size:10px;} ';
-printHTML += '@page{margin:0.5in;}';
-printHTML += '</style></head><body>';
-
-```
-printHTML += '<div class="header">' + logoSVG;
-printHTML += '<div><h1>Preventive Maintenance Report</h1>';
-printHTML += '<div style="font-size:10px;color:#666;">Helena Agri-Enterprises</div></div></div>';
-
-printHTML += '<div class="info">';
-printHTML += '<p><b>Equipment ID:</b> ' + eq.equipmentId + ' &nbsp;&nbsp; <b>Name:</b> ' + eq.name + '</p>';
-printHTML += '<p><b>Type:</b> ' + eq.type + ' &nbsp;&nbsp; <b>Location:</b> ' + (eq.location || 'N/A') + ' &nbsp;&nbsp; <b>Date:</b> ' + new Date().toLocaleDateString() + '</p>';
-printHTML += '</div>';
-
-printHTML += '<h2>Maintenance Schedule</h2>';
-printHTML += '<table><tr><th>Item</th><th>Interval</th><th>Last Completed</th><th>Status</th><th>Instructions</th><th>✓</th></tr>';
-
-sortedItems.forEach(item => {
-const { statusText } = getMaintenanceStatus(item);
-const last = item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never';
-printHTML += '<tr>';
-printHTML += '<td><b>' + item.name + '</b></td>';
-printHTML += '<td>' + item.interval + ' days</td>';
-printHTML += '<td>' + last + '</td>';
-printHTML += '<td><b>' + statusText + '</b></td>';
-printHTML += '<td style="font-size:9px;">' + (item.description ? item.description.substring(0,60) + (item.description.length > 60 ? '...' : '') : '') + '</td>';
-printHTML += '<td style="width:40px;">☐</td>';
-printHTML += '</tr>';
-});
-
-printHTML += '</table>';
-
-// ISSUES SECTION
-printHTML += '<div class="notes-section">';
-printHTML += '<div class="notes-title">Issues Found During Inspection:</div>';
-printHTML += '<div style="line-height:1.8;">_________________________________________________________________</div>';
-printHTML += '<div style="line-height:1.8;">_________________________________________________________________</div>';
-printHTML += '<div style="line-height:1.8;">_________________________________________________________________</div>';
-printHTML += '<div style="line-height:1.8;">_________________________________________________________________</div>';
-printHTML += '</div>';
-
-printHTML += '<div class="sign">';
-printHTML += '<table style="border:none;"><tr><td style="border:none;width:50%;"><b>Employee Signature:</b> ____________________________________</td>';
-printHTML += '<td style="border:none;width:50%;"><b>Date:</b> _________________________________</td></tr></table>';
-printHTML += '</div>';
-
-printHTML += '</body></html>';
-
-const win = window.open('', '_blank');
-win.document.write(printHTML);
-win.document.close();
-win.focus();
-setTimeout(() => win.print(), 250);
-}
-
-function renderSchedule() {
-const container = document.getElementById('scheduleView');
-const allItems = [];
-
-equipment.forEach(eq => {
-if (eq.maintenanceItems) {
-eq.maintenanceItems.forEach(item => {
-const { status, daysUntil, nextDue } = getMaintenanceStatus(item);
-allItems.push({
-equipment: eq,
-item: item,
-status: status,
-daysUntil: daysUntil,
-nextDue: nextDue
-});
-});
-}
-});
-
-allItems.sort((a, b) => a.daysUntil - b.daysUntil);
-
-if (allItems.length === 0) {
-container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><h3>No Scheduled Maintenance</h3></div>';
-return;
-}
-
-container.innerHTML = '<div class="maintenance-list">' + allItems.map((mi, i) => {
-let statusClass = mi.status === 'danger' ? 'status-danger' : mi.status === 'warning' ? 'status-warning' : 'status-good';
-let statusText = mi.daysUntil < 0 ? Math.abs(mi.daysUntil) + ' days overdue' : mi.daysUntil === 0 ? 'Due today' : 'Due in ' + mi.daysUntil + ' days';
-
-return `
-<div class="maintenance-item">
-<div class="maintenance-header">
-<div>
-<div class="equipment-id">${mi.equipment.equipmentId}</div>
-<div class="maintenance-title">${mi.item.name}</div>
-<div class="equipment-type">${mi.equipment.name} - ${mi.equipment.type}</div>
-</div>
-<span class="status-badge ${statusClass}">${statusText}</span>
-</div>
-<div class="maintenance-status">
-<strong>Next Due:</strong> ${mi.nextDue}<br>
-<strong>Interval:</strong> Every ${mi.item.interval} days
-${mi.item.description ? '<br><strong>Instructions:</strong> ' + mi.item.description : ''}
-</div>
-</div>
-`;
-}).join('') + '</div>';
-}
-
-window.openAddTemplateModal = function() {
-document.getElementById('addTemplateModal').classList.add('active');
-}
-
-loadData();
-```
-
-</script>
+  <div class="container">
+    <header>
+      <svg class="logo" viewBox="0 0 157 90" xmlns="http://www.w3.org/2000/svg">
+        <g fill="currentColor">
+          <path d="M78.487013,73.5487013 C57.974026,73.5487013 38.6298701,69.9837662 24.0194805,63.4967532 C8.53246753,56.6006494 0,47.1331169 0,36.788961 C0,26.4155844 8.53246753,16.9480519 24.0194805,10.0519481 C38.6298701,3.56493506 57.974026,0 78.487013,0 C99,0 118.344156,3.56493506 132.954545,10.0519481 C148.441558,16.9480519 156.974026,26.4155844 156.974026,36.7597403 C156.974026,47.1038961 148.441558,56.6006494 132.954545,63.4675325 C118.373377,69.9837662 99.0292208,73.5487013 78.487013,73.5487013 Z M78.487013,6.8961039 C58.9090909,6.8961039 40.5584416,10.2564935 26.7954545,16.3636364 C14.1136364,22.0032468 6.86688312,29.4253247 6.86688312,36.788961 C6.86688312,44.1525974 14.1428571,51.5746753 26.7954545,57.2142857 C40.5292208,63.3214286 58.9090909,66.6818182 78.487013,66.6818182 C98.0649351,66.6818182 116.415584,63.3214286 130.178571,57.2142857 C142.86039,51.5746753 150.107143,44.1525974 150.107143,36.788961 C150.107143,29.4253247 142.831169,22.0032468 130.178571,16.3636364 C116.444805,10.2564935 98.0649351,6.8961039 78.487013,6.8961039 Z"/>
+          <polygon points="25.5681818 49.1785714 25.5681818 39.5357143 32.5227273 39.5357143 32.5227273 49.1785714 39.9155844 49.1785714 39.9155844 24.3116883 32.5227273 24.3116883 32.5227273 32.6980519 25.5681818 32.6980519 25.5681818 24.3116883 18.1753247 24.3116883 18.1753247 49.1785714"/>
+          <polygon points="58.8506494 49.1785714 58.8506494 43.3928571 48.7402597 43.3928571 48.7402597 39.4772727 58.0324675 39.4772727 58.0324675 33.6623377 48.7402597 33.6623377 48.7402597 30.0974026 58.4123377 30.0974026 58.4123377 24.3116883 41.3474026 24.3116883 41.3474026 49.1785714"/>
+          <polygon points="75.4188312 49.1785714 75.4188312 42.9545455 67.8798701 42.9545455 67.8798701 24.3116883 60.487013 24.3116883 60.487013 49.1785714"/>
+          <polygon points="94.1201299 49.1785714 94.1201299 43.3928571 84.0097403 43.3928571 84.0097403 39.4772727 93.3019481 39.4772727 93.3019481 33.6623377 84.0097403 33.6623377 84.0097403 30.0974026 93.6818182 30.0974026 93.6818182 24.3116883 76.6168831 24.3116883 76.6168831 49.1785714"/>
+          <polygon points="104.172078 24.3116883 95.5519481 24.3116883 95.5519481 49.1785714 102.623377 49.1785714 102.623377 41.3181818 102.331169 35.6493506 108.642857 49.1785714 117.262987 49.1785714 117.262987 24.3116883 110.220779 24.3116883 110.220779 32.2305195 110.483766 37.8993506"/>
+          <polygon points="121.87987 37.8409091 132.691558 37.8409091 132.691558 43.9188312 121.87987 43.9188312"/>
+          <polygon points="122.931818 24.5746753 132.662338 24.5746753 139.587662 49.1785714 133.042208 49.1785714 127.811688 30.1558442 122.727273 49.1785714 115.275974 49.1785714"/>
+        </g>
+      </svg>
+      <div class="header-text">
+        <h1>🛠️ Preventive Maintenance Log</h1>
+        <p class="subtitle">Helena Agri-Enterprises Equipment Management System</p>
+      </div>
+    </header>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="equipment">Equipment Fleet</button>
+      <button class="nav-tab" data-tab="templates">Maintenance Templates</button>
+      <button class="nav-tab" data-tab="schedule">Schedule</button>
+    </div>
+
+    <div id="equipment-tab" class="tab-content active">
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="openAddEquipmentModal()">+ Add Equipment</button>
+      </div>
+      <div class="equipment-grid" id="equipmentGrid"></div>
+    </div>
+
+    <div id="templates-tab" class="tab-content">
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="openAddTemplateModal()">+ Create Template</button>
+      </div>
+      <div id="templatesList"></div>
+    </div>
+
+    <div id="schedule-tab" class="tab-content">
+      <div id="scheduleView"></div>
+    </div>
+  </div>
+
+  <!-- Add Equipment Modal -->
+  <div id="addEquipmentModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Equipment</h2>
+        <button class="close-btn" onclick="closeModal('addEquipmentModal')">&times;</button>
+      </div>
+      <form id="addEquipmentForm" onsubmit="addEquipment(event)">
+        <div class="form-group">
+          <label for="equipmentId">Equipment ID *</label>
+          <input type="text" id="equipmentId" required placeholder="e.g., FB-001">
+        </div>
+        <div class="form-group">
+          <label for="equipmentName">Equipment Name *</label>
+          <input type="text" id="equipmentName" required placeholder="e.g., John Deere Fertilizer Buggy">
+        </div>
+        <div class="form-group">
+          <label for="equipmentType">Equipment Type *</label>
+          <select id="equipmentType" required onchange="loadMaintenanceTemplates()">
+            <option value="">Select Type</option>
+            <option value="Equipment">Equipment</option>
+            <option value="Fertilizer Buggy">Fertilizer Buggy</option>
+            <option value="Flatbed">Flatbed</option>
+            <option value="Forklift">Forklift</option>
+            <option value="Hopper Bottom">Hopper Bottom</option>
+            <option value="Nurse Trailer">Nurse Trailer</option>
+            <option value="Seed Trailer">Seed Trailer</option>
+            <option value="Skid Steer">Skid Steer</option>
+            <option value="Tank Trailer">Tank Trailer</option>
+            <option value="Tender">Tender</option>
+            <option value="Tractor">Tractor</option>
+            <option value="Truck">Truck</option>
+
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="equipmentLocation">Location</label>
+          <input type="text" id="equipmentLocation" placeholder="e.g., Main Yard">
+        </div>
+        <div id="templateLoadSection" style="display: none;">
+          <div class="form-group">
+            <label>Auto-Load Maintenance Items</label>
+            <div id="availableTemplates"></div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Add Equipment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Template Modal -->
+  <div id="addTemplateModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Create Maintenance Template</h2>
+        <button class="close-btn" onclick="closeModal('addTemplateModal')">&times;</button>
+      </div>
+      <form id="addTemplateForm" onsubmit="addTemplate(event)">
+        <div class="form-group">
+          <label for="templateEquipmentType">Equipment Type *</label>
+          <select id="templateEquipmentType" required>
+            <option value="">Select Type</option>
+            <option value="Equipment">Equipment</option>
+            <option value="Fertilizer Buggy">Fertilizer Buggy</option>
+            <option value="Flatbed">Flatbed</option>
+            <option value="Forklift">Forklift</option>
+            <option value="Hopper Bottom">Hopper Bottom</option>
+            <option value="Nurse Trailer">Nurse Trailer</option>
+            <option value="Seed Trailer">Seed Trailer</option>
+            <option value="Skid Steer">Skid Steer</option>
+            <option value="Tank Trailer">Tank Trailer</option>
+            <option value="Tender">Tender</option>
+            <option value="Tractor">Tractor</option>
+            <option value="Truck">Truck</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="templateName">Maintenance Item Name *</label>
+          <input type="text" id="templateName" required placeholder="e.g., Oil Change">
+        </div>
+        <div class="form-group">
+          <label for="templateInterval">Interval (days) *</label>
+          <input type="number" id="templateInterval" required min="1" placeholder="e.g., 90">
+        </div>
+        <div class="form-group">
+          <label for="templateDescription">Description/Instructions</label>
+          <textarea id="templateDescription" placeholder="Detailed instructions for this maintenance item..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Create Template</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Equipment Details Modal -->
+  <div id="equipmentDetailsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="detailsEquipmentName"></h2>
+        <button class="close-btn" onclick="closeModal('equipmentDetailsModal')">&times;</button>
+      </div>
+      <div id="equipmentDetailsContent"></div>
+      <div class="action-bar" style="margin-top: 2rem;">
+        <button class="btn btn-primary" onclick="printReport()">📄 Print Report</button>
+        <button class="btn" onclick="closeModal('equipmentDetailsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complete Maintenance Modal -->
+  <div id="completeMaintenanceModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Complete Maintenance</h2>
+        <button class="close-btn" onclick="closeModal('completeMaintenanceModal')">&times;</button>
+      </div>
+      <form id="completeMaintenanceForm" onsubmit="completeMaintenance(event)">
+        <input type="hidden" id="completeEquipmentId">
+        <input type="hidden" id="completeMaintenanceId">
+        <div class="form-group">
+          <label>Maintenance Item</label>
+          <p id="completeMaintenanceName" style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600;"></p>
+        </div>
+        <div class="form-group">
+          <label for="completionDate">Completion Date *</label>
+          <input type="date" id="completionDate" required>
+        </div>
+        <div class="form-group">
+          <label for="completionNotes">Notes</label>
+          <textarea id="completionNotes" placeholder="What was done? Any issues found?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Mark Complete</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDVqhdUUCMcASjEewt9Yv1Nky0hr2-FTmQ",
+      authDomain: "pm-log.firebaseapp.com",
+      projectId: "pm-log",
+      storageBucket: "pm-log.firebasestorage.app",
+      messagingSenderId: "993822676610",
+      appId: "1:993822676610:web:1e001809e089a6c6a0069b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let equipment = [];
+    let templates = [];
+    let currentEquipmentId = null;
+
+    async function loadData() {
+      try {
+        const equipmentSnapshot = await getDocs(collection(db, 'equipment'));
+        equipment = equipmentSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        const templatesSnapshot = await getDocs(collection(db, 'maintenanceTemplates'));
+        templates = templatesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        renderEquipment();
+        renderTemplates();
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    }
+
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        tab.classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+
+        if (tabName === 'schedule') {
+          renderSchedule();
+        }
+      });
+    });
+
+    window.openAddEquipmentModal = function() {
+      document.getElementById('addEquipmentModal').classList.add('active');
+      document.getElementById('templateLoadSection').style.display = 'none';
+    }
+
+    window.closeModal = function(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    window.loadMaintenanceTemplates = function() {
+      const type = document.getElementById('equipmentType').value;
+      const section = document.getElementById('templateLoadSection');
+      const container = document.getElementById('availableTemplates');
+
+      if (!type) {
+        section.style.display = 'none';
+        return;
+      }
+
+      const typeTemplates = templates.filter(t => t.equipmentType === type);
+
+      if (typeTemplates.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = 'block';
+      container.innerHTML = typeTemplates.map(t => `
+        <div class="checkbox-group">
+          <input type="checkbox" id="template-${t.id}" value="${t.id}" checked>
+          <label for="template-${t.id}" style="margin: 0; text-transform: none; font-weight: normal; color: var(--text-primary);">
+            ${t.name} (Every ${t.interval} days)
+          </label>
+        </div>
+      `).join('');
+    }
+
+    window.addEquipment = async function(event) {
+      event.preventDefault();
+
+      const type = document.getElementById('equipmentType').value;
+      const selectedTemplates = Array.from(document.querySelectorAll('#availableTemplates input[type="checkbox"]:checked'))
+        .map(cb => cb.value);
+
+      const maintenanceItems = selectedTemplates.map(templateId => {
+        const template = templates.find(t => t.id === templateId);
+        return {
+          id: Date.now() + Math.random(),
+          name: template.name,
+          interval: template.interval,
+          description: template.description,
+          lastCompleted: null,
+          history: []
+        };
+      });
+
+      const newEquipment = {
+        equipmentId: document.getElementById('equipmentId').value,
+        name: document.getElementById('equipmentName').value,
+        type: type,
+        location: document.getElementById('equipmentLocation').value,
+        maintenanceItems: maintenanceItems,
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        await addDoc(collection(db, 'equipment'), newEquipment);
+        await loadData();
+        document.getElementById('addEquipmentForm').reset();
+        closeModal('addEquipmentModal');
+      } catch (error) {
+        console.error('Error adding equipment:', error);
+        alert('Error adding equipment. Please try again.');
+      }
+    }
+
+    window.addTemplate = async function(event) {
+      event.preventDefault();
+
+      const newTemplate = {
+        equipmentType: document.getElementById('templateEquipmentType').value,
+        name: document.getElementById('templateName').value,
+        interval: parseInt(document.getElementById('templateInterval').value),
+        description: document.getElementById('templateDescription').value,
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        await addDoc(collection(db, 'maintenanceTemplates'), newTemplate);
+        await loadData();
+        document.getElementById('addTemplateForm').reset();
+        closeModal('addTemplateModal');
+      } catch (error) {
+        console.error('Error adding template:', error);
+        alert('Error adding template. Please try again.');
+      }
+    }
+
+    function getMaintenanceStatus(item) {
+      if (!item.lastCompleted) {
+        return { status: 'danger', daysUntil: -999, nextDue: 'Not Set' };
+      }
+
+      const lastDate = new Date(item.lastCompleted);
+      const today = new Date();
+      const nextDue = new Date(lastDate);
+      nextDue.setDate(nextDue.getDate() + item.interval);
+
+      const daysUntil = Math.ceil((nextDue - today) / (1000 * 60 * 60 * 24));
+
+      let status = 'good';
+      if (daysUntil < 0) {
+        status = 'danger';
+      } else if (daysUntil <= 7) {
+        status = 'warning';
+      }
+
+      return {
+        status,
+        daysUntil,
+        nextDue: nextDue.toLocaleDateString()
+      };
+    }
+
+    function getEquipmentOverallStatus(eq) {
+      if (!eq.maintenanceItems || eq.maintenanceItems.length === 0) {
+        return { status: 'good', itemsOverdue: 0, itemsDueSoon: 0 };
+      }
+
+      let itemsOverdue = 0;
+      let itemsDueSoon = 0;
+
+      eq.maintenanceItems.forEach(item => {
+        const { status } = getMaintenanceStatus(item);
+        if (status === 'danger') itemsOverdue++;
+        else if (status === 'warning') itemsDueSoon++;
+      });
+
+      let overallStatus = 'good';
+      if (itemsOverdue > 0) overallStatus = 'danger';
+      else if (itemsDueSoon > 0) overallStatus = 'warning';
+
+      return { status: overallStatus, itemsOverdue, itemsDueSoon };
+    }
+
+    function renderEquipment() {
+      const grid = document.getElementById('equipmentGrid');
+
+      if (equipment.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🚜</div>
+            <h3>No Equipment Added</h3>
+            <p>Click "Add Equipment" to start tracking your fleet</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = equipment.map((eq, index) => {
+        const { status, itemsOverdue, itemsDueSoon } = getEquipmentOverallStatus(eq);
+
+        let statusText = 'All Good';
+        let statusClass = 'status-good';
+
+        if (status === 'danger') {
+          statusText = `${itemsOverdue} Overdue`;
+          statusClass = 'status-danger';
+        } else if (status === 'warning') {
+          statusText = `${itemsDueSoon} Due Soon`;
+          statusClass = 'status-warning';
+        }
+
+        return `
+          <div class="equipment-card">
+            <div class="equipment-header">
+              <div>
+                <div class="equipment-id">${eq.equipmentId}</div>
+                <div class="equipment-name">${eq.name}</div>
+                <div class="equipment-type">${eq.type}</div>
+              </div>
+              <span class="status-badge ${statusClass}">${statusText}</span>
+            </div>
+            
+            <div class="equipment-stats">
+              <div class="stat-item">
+                <div class="stat-label">Items</div>
+                <div class="stat-value">${eq.maintenanceItems ? eq.maintenanceItems.length : 0}</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Overdue</div>
+                <div class="stat-value" style="color: var(--danger);">${itemsOverdue}</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Due Soon</div>
+                <div class="stat-value" style="color: var(--warning);">${itemsDueSoon}</div>
+              </div>
+            </div>
+            
+            <div class="equipment-actions">
+              <button class="btn btn-small btn-primary" onclick="window.viewEquipmentDetails('${eq.id}')">View Details</button>
+              <button class="btn btn-small" onclick="window.deleteEquipment('${eq.id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTemplates() {
+      const container = document.getElementById('templatesList');
+
+      if (templates.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h3>No Templates Created</h3>
+            <p>Create maintenance templates that will auto-load when adding equipment</p>
+          </div>
+        `;
+        return;
+      }
+
+      const grouped = {};
+      templates.forEach(t => {
+        if (!grouped[t.equipmentType]) {
+          grouped[t.equipmentType] = [];
+        }
+        grouped[t.equipmentType].push(t);
+      });
+
+      container.innerHTML = Object.keys(grouped).sort().map(type => `
+        <div class="template-section">
+          <h3 style="font-family: 'Roboto Condensed', sans-serif; color: var(--helena-green); margin-bottom: 1rem;">${type}</h3>
+          ${grouped[type].map(t => `
+            <div class="template-item">
+              <div class="template-info">
+                <div class="template-name">${t.name}</div>
+                <div class="template-desc">Every ${t.interval} days${t.description ? ' - ' + t.description : ''}</div>
+              </div>
+              <button class="btn btn-small" onclick="window.deleteTemplate('${t.id}')">Delete</button>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    }
+
+    window.viewEquipmentDetails = function(equipmentId) {
+      const eq = equipment.find(e => e.id === equipmentId);
+      if (!eq) return;
+
+      currentEquipmentId = equipmentId;
+
+      document.getElementById('detailsEquipmentName').textContent = `${eq.equipmentId} - ${eq.name}`;
+
+      const content = document.getElementById('equipmentDetailsContent');
+
+      if (!eq.maintenanceItems || eq.maintenanceItems.length === 0) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <p>No maintenance items configured for this equipment.</p>
+          </div>
+        `;
+      } else {
+        content.innerHTML = `
+          <div class="maintenance-list">
+            ${eq.maintenanceItems.map(item => {
+              const { status, daysUntil, nextDue } = getMaintenanceStatus(item);
+              
+              let statusClass = 'status-good';
+              let statusText = 'Up to Date';
+              
+              if (status === 'danger') {
+                statusClass = 'status-danger';
+                statusText = daysUntil === -999 ? 'Never Done' : `${Math.abs(daysUntil)} Days Overdue`;
+              } else if (status === 'warning') {
+                statusClass = 'status-warning';
+                statusText = `Due in ${daysUntil} Days`;
+              } else {
+                statusText = `Due in ${daysUntil} Days`;
+              }
+              
+              return `
+                <div class="maintenance-item">
+                  <div class="maintenance-header">
+                    <div>
+                      <div class="maintenance-title">${item.name}</div>
+                      <div class="maintenance-interval">Every ${item.interval} days</div>
+                    </div>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                  </div>
+                  ${item.description ? `<div class="maintenance-description">${item.description}</div>` : ''}
+                  <div class="maintenance-status">
+                    <strong>Last Completed:</strong> ${item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never'}<br>
+                    <strong>Next Due:</strong> ${nextDue}
+                  </div>
+                  <div class="equipment-actions" style="margin-top: 1rem;">
+                    <button class="btn btn-small btn-primary" onclick="window.openCompleteModal('${eq.id}', '${item.id}')">Mark Complete</button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      document.getElementById('equipmentDetailsModal').classList.add('active');
+    }
+
+    window.openCompleteModal = function(equipmentId, maintenanceId) {
+      const eq = equipment.find(e => e.id === equipmentId);
+      const item = eq.maintenanceItems.find(m => m.id == maintenanceId);
+
+      document.getElementById('completeEquipmentId').value = equipmentId;
+      document.getElementById('completeMaintenanceId').value = maintenanceId;
+      document.getElementById('completeMaintenanceName').textContent = item.name;
+      document.getElementById('completionDate').value = new Date().toISOString().split('T')[0];
+
+      document.getElementById('completeMaintenanceModal').classList.add('active');
+    }
+
+    window.completeMaintenance = async function(event) {
+      event.preventDefault();
+
+      const equipmentId = document.getElementById('completeEquipmentId').value;
+      const maintenanceId = document.getElementById('completeMaintenanceId').value;
+      const date = document.getElementById('completionDate').value;
+      const notes = document.getElementById('completionNotes').value;
+
+      const eq = equipment.find(e => e.id === equipmentId);
+      const item = eq.maintenanceItems.find(m => m.id == maintenanceId);
+
+      if (!item.history) item.history = [];
+
+      item.history.push({
+        date: date,
+        notes: notes,
+        completedAt: new Date().toISOString()
+      });
+      item.lastCompleted = date;
+
+      try {
+        await updateDoc(doc(db, 'equipment', equipmentId), {
+          maintenanceItems: eq.maintenanceItems
+        });
+
+        await loadData();
+        document.getElementById('completeMaintenanceForm').reset();
+        closeModal('completeMaintenanceModal');
+        viewEquipmentDetails(equipmentId);
+      } catch (error) {
+        console.error('Error completing maintenance:', error);
+        alert('Error saving maintenance. Please try again.');
+      }
+    }
+
+    window.deleteEquipment = async function(equipmentId) {
+      if (!confirm('Are you sure you want to delete this equipment and all its maintenance records?')) {
+        return;
+      }
+
+      try {
+        await deleteDoc(doc(db, 'equipment', equipmentId));
+        await loadData();
+      } catch (error) {
+        console.error('Error deleting equipment:', error);
+        alert('Error deleting equipment. Please try again.');
+      }
+    }
+
+    window.deleteTemplate = async function(templateId) {
+      if (!confirm('Are you sure you want to delete this template?')) {
+        return;
+      }
+
+      try {
+        await deleteDoc(doc(db, 'maintenanceTemplates', templateId));
+        await loadData();
+      } catch (error) {
+        console.error('Error deleting template:', error);
+        alert('Error deleting template. Please try again.');
+      }
+    }
+
+    // COMPACT PRINT FUNCTION - ALL ITEMS ON ONE PAGE
+    window.printReport = function() {
+      const eq = equipment.find(e => e.id === currentEquipmentId);
+      if (!eq || !eq.maintenanceItems || eq.maintenanceItems.length === 0) {
+        alert('No maintenance items to print');
+        return;
+      }
+
+      const logoSVG = '<svg width="120" height="68" viewBox="0 0 157 90" xmlns="http://www.w3.org/2000/svg"><g fill="#215530"><path d="M78.487013,73.5487013 C57.974026,73.5487013 38.6298701,69.9837662 24.0194805,63.4967532 C8.53246753,56.6006494 0,47.1331169 0,36.788961 C0,26.4155844 8.53246753,16.9480519 24.0194805,10.0519481 C38.6298701,3.56493506 57.974026,0 78.487013,0 C99,0 118.344156,3.56493506 132.954545,10.0519481 C148.441558,16.9480519 156.974026,26.4155844 156.974026,36.7597403 C156.974026,47.1038961 148.441558,56.6006494 132.954545,63.4675325 C118.373377,69.9837662 99.0292208,73.5487013 78.487013,73.5487013 Z M78.487013,6.8961039 C58.9090909,6.8961039 40.5584416,10.2564935 26.7954545,16.3636364 C14.1136364,22.0032468 6.86688312,29.4253247 6.86688312,36.788961 C6.86688312,44.1525974 14.1428571,51.5746753 26.7954545,57.2142857 C40.5292208,63.3214286 58.9090909,66.6818182 78.487013,66.6818182 C98.0649351,66.6818182 116.415584,63.3214286 130.178571,57.2142857 C142.86039,51.5746753 150.107143,44.1525974 150.107143,36.788961 C150.107143,29.4253247 142.831169,22.0032468 130.178571,16.3636364 C116.444805,10.2564935 98.0649351,6.8961039 78.487013,6.8961039 Z"/><polygon points="25.5681818 49.1785714 25.5681818 39.5357143 32.5227273 39.5357143 32.5227273 49.1785714 39.9155844 49.1785714 39.9155844 24.3116883 32.5227273 24.3116883 32.5227273 32.6980519 25.5681818 32.6980519 25.5681818 24.3116883 18.1753247 24.3116883 18.1753247 49.1785714"/><polygon points="58.8506494 49.1785714 58.8506494 43.3928571 48.7402597 43.3928571 48.7402597 39.4772727 58.0324675 39.4772727 58.0324675 33.6623377 48.7402597 33.6623377 48.7402597 30.0974026 58.4123377 30.0974026 58.4123377 24.3116883 41.3474026 24.3116883 41.3474026 49.1785714"/><polygon points="75.4188312 49.1785714 75.4188312 42.9545455 67.8798701 42.9545455 67.8798701 24.3116883 60.487013 24.3116883 60.487013 49.1785714"/><polygon points="94.1201299 49.1785714 94.1201299 43.3928571 84.0097403 43.3928571 84.0097403 39.4772727 93.3019481 39.4772727 93.3019481 33.6623377 84.0097403 33.6623377 84.0097403 30.0974026 93.6818182 30.0974026 93.6818182 24.3116883 76.6168831 24.3116883 76.6168831 49.1785714"/><polygon points="104.172078 24.3116883 95.5519481 24.3116883 95.5519481 49.1785714 102.623377 49.1785714 102.623377 41.3181818 102.331169 35.6493506 108.642857 49.1785714 117.262987 49.1785714 117.262987 24.3116883 110.220779 24.3116883 110.220779 32.2305195 110.483766 37.8993506"/><polygon points="121.87987 37.8409091 132.691558 37.8409091 132.691558 43.9188312 121.87987 43.9188312"/><polygon points="122.931818 24.5746753 132.662338 24.5746753 139.587662 49.1785714 133.042208 49.1785714 127.811688 30.1558442 122.727273 49.1785714 115.275974 49.1785714"/></g></svg>';
+
+      let printHTML = '<html><head><title>Maintenance Report</title>';
+      printHTML += '<style>';
+      printHTML += 'body{font-family:Arial,sans-serif;padding:15px;font-size:11px;} ';
+      printHTML += 'h1{color:#215530;font-size:18px;margin:0 0 5px;text-transform:uppercase;} ';
+      printHTML += 'h2{color:#215530;font-size:14px;margin:15px 0 8px;border-bottom:2px solid #215530;padding-bottom:4px;} ';
+      printHTML += '.header{display:flex;align-items:center;gap:15px;margin-bottom:15px;border-bottom:2px solid #215530;padding-bottom:10px;} ';
+      printHTML += '.info{background:#f8f9fa;padding:8px;margin:0 0 10px;border-left:3px solid #215530;font-size:10px;} ';
+      printHTML += '.info p{margin:2px 0;} ';
+      printHTML += 'table{width:100%;border-collapse:collapse;font-size:10px;} ';
+      printHTML += 'th{background:#215530;color:white;padding:6px 8px;text-align:left;font-size:10px;} ';
+      printHTML += 'td{padding:6px 8px;border-bottom:1px solid #ddd;vertical-align:top;} ';
+      printHTML += 'tr:nth-child(even) td{background:#f8f9fa;} ';
+      printHTML += '.desc{font-size:9px;color:#666;margin-top:2px;} ';
+      printHTML += '.sign{border-top:1px solid #215530;margin-top:15px;padding-top:8px;font-size:10px;} ';
+      printHTML += '@page{margin:0.5in;}';
+      printHTML += '</style></head><body>';
+
+      printHTML += '<div class="header">' + logoSVG;
+      printHTML += '<div><h1>Preventive Maintenance Report</h1>';
+      printHTML += '<div style="font-size:10px;color:#666;">Helena Agri-Enterprises</div></div></div>';
+
+      printHTML += '<div class="info">';
+      printHTML += '<p><b>Equipment ID:</b> ' + eq.equipmentId + ' &nbsp;&nbsp; <b>Name:</b> ' + eq.name + '</p>';
+      printHTML += '<p><b>Type:</b> ' + eq.type + ' &nbsp;&nbsp; <b>Location:</b> ' + (eq.location || 'N/A') + ' &nbsp;&nbsp; <b>Date:</b> ' + new Date().toLocaleDateString() + '</p>';
+      printHTML += '</div>';
+
+      printHTML += '<h2>Maintenance Schedule</h2>';
+      printHTML += '<table><tr><th>Item</th><th>Interval</th><th>Last Completed</th><th>Instructions</th><th>Completed</th></tr>';
+
+      eq.maintenanceItems.forEach(item => {
+        const last = item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never';
+        printHTML += '<tr>';
+        printHTML += '<td><b>' + item.name + '</b></td>';
+        printHTML += '<td>' + item.interval + ' days</td>';
+        printHTML += '<td>' + last + '</td>';
+        printHTML += '<td style="font-size:9px;">' + (item.description ? item.description.substring(0,80) + (item.description.length > 80 ? '...' : '') : '') + '</td>';
+        printHTML += '<td style="width:60px;">☐</td>';
+        printHTML += '</tr>';
+      });
+
+      printHTML += '</table>';
+      printHTML += '<div class="sign">';
+      printHTML += '<table style="border:none;"><tr><td style="border:none;width:50%;"><b>Employee Signature:</b> ____________________________________</td>';
+      printHTML += '<td style="border:none;width:50%;"><b>Date:</b> _________________________________</td></tr></table>';
+      printHTML += '</div>';
+
+      printHTML += '</body></html>';
+
+      const win = window.open('', '_blank');
+      win.document.write(printHTML);
+      win.document.close();
+      win.focus();
+      setTimeout(() => win.print(), 250);
+    }
+
+    function renderSchedule() {
+      const container = document.getElementById('scheduleView');
+      const allItems = [];
+
+      equipment.forEach(eq => {
+        if (eq.maintenanceItems) {
+          eq.maintenanceItems.forEach(item => {
+            const { status, daysUntil, nextDue } = getMaintenanceStatus(item);
+            allItems.push({
+              equipment: eq,
+              item: item,
+              status: status,
+              daysUntil: daysUntil,
+              nextDue: nextDue
+            });
+          });
+        }
+      });
+
+      allItems.sort((a, b) => a.daysUntil - b.daysUntil);
+
+      if (allItems.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><h3>No Scheduled Maintenance</h3></div>';
+        return;
+      }
+
+      container.innerHTML = '<div class="maintenance-list">' + allItems.map((mi, i) => {
+        let statusClass = mi.status === 'danger' ? 'status-danger' : mi.status === 'warning' ? 'status-warning' : 'status-good';
+        let statusText = mi.daysUntil < 0 ? Math.abs(mi.daysUntil) + ' days overdue' : mi.daysUntil === 0 ? 'Due today' : 'Due in ' + mi.daysUntil + ' days';
+
+        return `
+          <div class="maintenance-item">
+            <div class="maintenance-header">
+              <div>
+                <div class="equipment-id">${mi.equipment.equipmentId}</div>
+                <div class="maintenance-title">${mi.item.name}</div>
+                <div class="equipment-type">${mi.equipment.name} - ${mi.equipment.type}</div>
+              </div>
+              <span class="status-badge ${statusClass}">${statusText}</span>
+            </div>
+            <div class="maintenance-status">
+              <strong>Next Due:</strong> ${mi.nextDue}<br>
+              <strong>Interval:</strong> Every ${mi.item.interval} days
+              ${mi.item.description ? '<br><strong>Instructions:</strong> ' + mi.item.description : ''}
+            </div>
+          </div>
+        `;
+      }).join('') + '</div>';
+    }
+
+    window.openAddTemplateModal = function() {
+      document.getElementById('addTemplateModal').classList.add('active');
+    }
+
+    loadData();
+  </script>
 </body>
 </html>

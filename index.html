@@ -510,6 +510,101 @@
       cursor: pointer;
     }
     
+    /* Calendar Styles */
+    .calendar-container {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .calendar-title {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--helena-green);
+    }
+    
+    .calendar-nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .calendar-day-header {
+      text-align: center;
+      font-weight: 700;
+      color: var(--helena-green);
+      padding: 0.5rem;
+      font-size: 0.85rem;
+    }
+    
+    .calendar-day {
+      aspect-ratio: 1;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .calendar-day:hover {
+      border-color: var(--helena-green);
+      background: rgba(33, 85, 48, 0.05);
+    }
+    
+    .calendar-day.other-month {
+      opacity: 0.3;
+    }
+    
+    .calendar-day.today {
+      border: 2px solid var(--helena-green);
+      background: rgba(33, 85, 48, 0.1);
+    }
+    
+    .calendar-day.has-schedule {
+      background: rgba(33, 85, 48, 0.05);
+    }
+    
+    .calendar-day-number {
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .calendar-events {
+      font-size: 0.65rem;
+      overflow: hidden;
+    }
+    
+    .calendar-event {
+      background: var(--helena-green);
+      color: white;
+      padding: 0.15rem 0.25rem;
+      border-radius: 2px;
+      margin-bottom: 0.15rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
     @media (max-width: 768px) {
       h1 { font-size: 1.75rem; }
       header { flex-direction: column; text-align: center; }
@@ -560,6 +655,22 @@
     </div>
     
     <div id="schedule-tab" class="tab-content">
+      <div class="action-bar">
+        <select id="scheduleEquipmentFilter" onchange="renderScheduleCalendar()">
+          <option value="">All Equipment</option>
+        </select>
+      </div>
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <h3 class="calendar-title" id="calendarMonth"></h3>
+          <div class="calendar-nav">
+            <button class="btn btn-small" onclick="previousMonth()">« Prev</button>
+            <button class="btn btn-small" onclick="goToToday()">Today</button>
+            <button class="btn btn-small" onclick="nextMonth()">Next »</button>
+          </div>
+        </div>
+        <div class="calendar-grid" id="calendar"></div>
+      </div>
       <div id="scheduleView"></div>
     </div>
   </div>
@@ -699,6 +810,31 @@
     </div>
   </div>
   
+  <!-- Schedule Maintenance Modal -->
+  <div id="scheduleMaintenanceModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Schedule Maintenance</h2>
+        <button class="close-btn" onclick="closeModal('scheduleMaintenanceModal')">&times;</button>
+      </div>
+      <form id="scheduleMaintenanceForm" onsubmit="scheduleMaintenance(event)">
+        <div class="form-group">
+          <label for="scheduleEquipment">Equipment *</label>
+          <select id="scheduleEquipment" required></select>
+        </div>
+        <div class="form-group">
+          <label for="scheduleDate">Scheduled Date *</label>
+          <input type="date" id="scheduleDate" required>
+        </div>
+        <div class="form-group">
+          <label for="scheduleNotes">Maintenance Notes</label>
+          <textarea id="scheduleNotes" placeholder="What maintenance is scheduled?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Schedule Maintenance</button>
+      </form>
+    </div>
+  </div>
+  
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -717,7 +853,10 @@
     
     let equipment = [];
     let templates = [];
+    let schedules = [];
     let currentEquipmentId = null;
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
     
     async function loadData() {
       try {
@@ -733,10 +872,34 @@
           ...doc.data()
         }));
         
+        const schedulesSnapshot = await getDocs(collection(db, 'schedules'));
+        schedules = schedulesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
         renderEquipment();
         renderTemplates();
+        populateEquipmentSelects();
       } catch (error) {
         console.error('Error loading data:', error);
+      }
+    }
+    
+    function populateEquipmentSelects() {
+      const scheduleEquipmentSelect = document.getElementById('scheduleEquipment');
+      const scheduleFilterSelect = document.getElementById('scheduleEquipmentFilter');
+      
+      const options = equipment.map(eq => 
+        `<option value="${eq.id}">${eq.equipmentId} - ${eq.name}</option>`
+      ).join('');
+      
+      if (scheduleEquipmentSelect) {
+        scheduleEquipmentSelect.innerHTML = '<option value="">Select Equipment</option>' + options;
+      }
+      
+      if (scheduleFilterSelect) {
+        scheduleFilterSelect.innerHTML = '<option value="">All Equipment</option>' + options;
       }
     }
     
@@ -751,7 +914,7 @@
         document.getElementById(`${tabName}-tab`).classList.add('active');
         
         if (tabName === 'schedule') {
-          renderSchedule();
+          renderScheduleCalendar();
         }
       });
     });
@@ -1229,6 +1392,126 @@
       setTimeout(() => win.print(), 250);
     }
     
+    // CALENDAR FUNCTIONS
+    window.renderScheduleCalendar = function() {
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      
+      document.getElementById('calendarMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+      
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+      
+      const filterEquipment = document.getElementById('scheduleEquipmentFilter').value;
+      
+      let calendarHTML = '';
+      
+      // Day headers
+      daysOfWeek.forEach(day => {
+        calendarHTML += `<div class="calendar-day-header">${day}</div>`;
+      });
+      
+      const today = new Date();
+      const isCurrentMonth = today.getMonth() === currentMonth && today.getFullYear() === currentYear;
+      
+      // Previous month days
+      for (let i = firstDay - 1; i >= 0; i--) {
+        calendarHTML += `<div class="calendar-day other-month"><div class="calendar-day-number">${daysInPrevMonth - i}</div></div>`;
+      }
+      
+      // Current month days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        let daySchedules = schedules.filter(s => s.date === dateStr);
+        
+        if (filterEquipment) {
+          daySchedules = daySchedules.filter(s => s.equipmentId === filterEquipment);
+        }
+        
+        const isToday = isCurrentMonth && day === today.getDate();
+        const hasSchedule = daySchedules.length > 0;
+        
+        calendarHTML += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasSchedule ? 'has-schedule' : ''}" onclick="openScheduleModal('${dateStr}')">`;
+        calendarHTML += `<div class="calendar-day-number">${day}</div>`;
+        if (daySchedules.length > 0) {
+          calendarHTML += '<div class="calendar-events">';
+          daySchedules.slice(0, 2).forEach(s => {
+            const eq = equipment.find(e => e.id === s.equipmentId);
+            if (eq) {
+              calendarHTML += `<div class="calendar-event">${eq.equipmentId}</div>`;
+            }
+          });
+          if (daySchedules.length > 2) {
+            calendarHTML += `<div class="calendar-event">+${daySchedules.length - 2} more</div>`;
+          }
+          calendarHTML += '</div>';
+        }
+        calendarHTML += '</div>';
+      }
+      
+      // Next month days
+      const remainingDays = 42 - (firstDay + daysInMonth);
+      for (let day = 1; day <= remainingDays; day++) {
+        calendarHTML += `<div class="calendar-day other-month"><div class="calendar-day-number">${day}</div></div>`;
+      }
+      
+      document.getElementById('calendar').innerHTML = calendarHTML;
+      renderSchedule();
+    }
+    
+    window.previousMonth = function() {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderScheduleCalendar();
+    }
+    
+    window.nextMonth = function() {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderScheduleCalendar();
+    }
+    
+    window.goToToday = function() {
+      const today = new Date();
+      currentMonth = today.getMonth();
+      currentYear = today.getFullYear();
+      renderScheduleCalendar();
+    }
+    
+    window.openScheduleModal = function(dateStr) {
+      document.getElementById('scheduleDate').value = dateStr;
+      document.getElementById('scheduleMaintenanceModal').classList.add('active');
+    }
+    
+    window.scheduleMaintenance = async function(event) {
+      event.preventDefault();
+      
+      const newSchedule = {
+        equipmentId: document.getElementById('scheduleEquipment').value,
+        date: document.getElementById('scheduleDate').value,
+        notes: document.getElementById('scheduleNotes').value,
+        createdAt: new Date().toISOString()
+      };
+      
+      try {
+        await addDoc(collection(db, 'schedules'), newSchedule);
+        await loadData();
+        document.getElementById('scheduleMaintenanceForm').reset();
+        closeModal('scheduleMaintenanceModal');
+        renderScheduleCalendar();
+      } catch (error) {
+        console.error('Error scheduling maintenance:', error);
+        alert('Error scheduling maintenance. Please try again.');
+      }
+    }
+    
     function renderSchedule() {
       const container = document.getElementById('scheduleView');
       const allItems = [];
@@ -1286,4 +1569,4 @@
     loadData();
   </script>
 </body>
-</htm
+</html

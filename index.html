@@ -622,6 +622,10 @@
       transition: all 0.3s ease;
     }
     
+    .issue-card.critical {
+      border-left-color: var(--danger);
+    }
+    
     .issue-card.completed {
       border-left-color: var(--success);
       opacity: 0.7;
@@ -673,6 +677,26 @@
       display: flex;
       gap: 0.5rem;
       margin-top: 1rem;
+    }
+    
+    .severity-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-left: 0.5rem;
+    }
+    
+    .severity-critical {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .severity-minor {
+      background: var(--warning);
+      color: white;
     }
     
     .equipment-card.has-issues {
@@ -955,10 +979,50 @@
           <input type="text" id="issueTitle" required placeholder="e.g., Hydraulic Leak">
         </div>
         <div class="form-group">
+          <label for="issueSeverity">Severity *</label>
+          <select id="issueSeverity" required>
+            <option value="Minor">Minor - Equipment can still be used</option>
+            <option value="Critical">Critical - Equipment is out of service</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label for="issueNotes">Issue Description/Notes *</label>
           <textarea id="issueNotes" required placeholder="Describe the issue in detail..."></textarea>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Log Issue</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Edit Issue Modal -->
+  <div id="editIssueModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Equipment Issue</h2>
+        <button class="close-btn" onclick="closeModal('editIssueModal')">&times;</button>
+      </div>
+      <form id="editIssueForm" onsubmit="updateIssue(event)">
+        <input type="hidden" id="editIssueId">
+        <div class="form-group">
+          <label for="editIssueEquipment">Equipment *</label>
+          <select id="editIssueEquipment" required></select>
+        </div>
+        <div class="form-group">
+          <label for="editIssueTitle">Issue Title *</label>
+          <input type="text" id="editIssueTitle" required placeholder="e.g., Hydraulic Leak">
+        </div>
+        <div class="form-group">
+          <label for="editIssueSeverity">Severity *</label>
+          <select id="editIssueSeverity" required>
+            <option value="Minor">Minor - Equipment can still be used</option>
+            <option value="Critical">Critical - Equipment is out of service</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editIssueNotes">Issue Description/Notes *</label>
+          <textarea id="editIssueNotes" required placeholder="Describe the issue in detail..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Issue</button>
       </form>
     </div>
   </div>
@@ -1025,26 +1089,60 @@
       const scheduleEquipmentSelect = document.getElementById('scheduleEquipment');
       const scheduleFilterSelect = document.getElementById('scheduleEquipmentFilter');
       const issueEquipmentSelect = document.getElementById('issueEquipment');
+      const editIssueEquipmentSelect = document.getElementById('editIssueEquipment');
       const issueFilterSelect = document.getElementById('issuesEquipmentFilter');
       
-      const options = equipment.map(eq => 
+      // Group equipment by type
+      const grouped = {};
+      equipment.forEach(eq => {
+        if (!grouped[eq.type]) {
+          grouped[eq.type] = [];
+        }
+        grouped[eq.type].push(eq);
+      });
+      
+      // Create grouped options HTML
+      let groupedOptions = '';
+      Object.keys(grouped).sort().forEach(type => {
+        groupedOptions += `<optgroup label="${type}">`;
+        grouped[type].forEach(eq => {
+          groupedOptions += `<option value="${eq.id}">${eq.equipmentId} - ${eq.name}</option>`;
+        });
+        groupedOptions += '</optgroup>';
+      });
+      
+      // Create flat options for filters
+      const flatOptions = equipment.map(eq => 
         `<option value="${eq.id}">${eq.equipmentId} - ${eq.name}</option>`
       ).join('');
       
       if (scheduleEquipmentSelect) {
-        scheduleEquipmentSelect.innerHTML = '<option value="">Select Equipment</option>' + options;
+        scheduleEquipmentSelect.innerHTML = '<option value="">Select Equipment</option>' + groupedOptions;
       }
       
       if (scheduleFilterSelect) {
-        scheduleFilterSelect.innerHTML = '<option value="">All Equipment</option>' + options;
+        scheduleFilterSelect.innerHTML = '<option value="">All Equipment</option>' + flatOptions;
       }
       
       if (issueEquipmentSelect) {
-        issueEquipmentSelect.innerHTML = '<option value="">Select Equipment</option>' + options;
+        issueEquipmentSelect.innerHTML = '<option value="">Select Equipment</option>' + groupedOptions;
+      }
+      
+      if (editIssueEquipmentSelect) {
+        editIssueEquipmentSelect.innerHTML = '<option value="">Select Equipment</option>' + groupedOptions;
       }
       
       if (issueFilterSelect) {
-        issueFilterSelect.innerHTML = '<option value="">All Equipment</option>' + options;
+        // Group filters by equipment type
+        let filterGroupedOptions = '<option value="">All Equipment</option>';
+        Object.keys(grouped).sort().forEach(type => {
+          filterGroupedOptions += `<optgroup label="${type}">`;
+          grouped[type].forEach(eq => {
+            filterGroupedOptions += `<option value="${eq.id}">${eq.equipmentId} - ${eq.name}</option>`;
+          });
+          filterGroupedOptions += '</optgroup>';
+        });
+        issueFilterSelect.innerHTML = filterGroupedOptions;
       }
     }
     
@@ -1724,6 +1822,7 @@
       const newIssue = {
         equipmentId: document.getElementById('issueEquipment').value,
         title: document.getElementById('issueTitle').value,
+        severity: document.getElementById('issueSeverity').value,
         notes: document.getElementById('issueNotes').value,
         status: 'Pending',
         createdAt: new Date().toISOString(),
@@ -1753,7 +1852,14 @@
         return matchesEquipment && matchesStatus;
       });
       
-      filteredIssues.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      // Sort: Critical first, then by created date (newest first)
+      filteredIssues.sort((a, b) => {
+        // Critical issues always come first
+        if (a.severity === 'Critical' && b.severity !== 'Critical') return -1;
+        if (a.severity !== 'Critical' && b.severity === 'Critical') return 1;
+        // Then sort by date
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
       
       if (filteredIssues.length === 0) {
         container.innerHTML = `
@@ -1769,13 +1875,17 @@
       container.innerHTML = filteredIssues.map(issue => {
         const eq = equipment.find(e => e.id === issue.equipmentId);
         const isCompleted = issue.status === 'Completed';
+        const isCritical = issue.severity === 'Critical';
         
         return `
-          <div class="issue-card ${isCompleted ? 'completed' : ''}">
+          <div class="issue-card ${isCompleted ? 'completed' : ''} ${isCritical ? 'critical' : ''}">
             <div class="issue-header">
               <div>
                 <div class="issue-equipment">${eq ? `${eq.equipmentId} - ${eq.name}` : 'Unknown'}</div>
-                <div class="issue-title">${issue.title}</div>
+                <div class="issue-title">
+                  ${issue.title}
+                  <span class="severity-badge severity-${issue.severity.toLowerCase()}">${issue.severity}</span>
+                </div>
               </div>
               <span class="status-badge ${isCompleted ? 'status-good' : 'status-warning'}">${issue.status}</span>
             </div>
@@ -1785,6 +1895,7 @@
               ${isCompleted ? `<span><strong>Completed:</strong> ${new Date(issue.completedAt).toLocaleDateString()}</span>` : ''}
             </div>
             <div class="issue-actions">
+              ${!isCompleted ? `<button class="btn btn-small" onclick="window.openEditIssueModal('${issue.id}')">Edit</button>` : ''}
               ${!isCompleted ? `<button class="btn btn-small btn-primary" onclick="window.completeIssue('${issue.id}')">Mark Complete</button>` : ''}
               <button class="btn btn-small" onclick="window.deleteIssue('${issue.id}')">Delete</button>
             </div>
@@ -1805,6 +1916,43 @@
       } catch (error) {
         console.error('Error completing issue:', error);
         alert('Error completing issue. Please try again.');
+      }
+    }
+    
+    window.openEditIssueModal = function(issueId) {
+      const issue = issues.find(i => i.id === issueId);
+      if (!issue) return;
+      
+      document.getElementById('editIssueId').value = issueId;
+      document.getElementById('editIssueEquipment').value = issue.equipmentId;
+      document.getElementById('editIssueTitle').value = issue.title;
+      document.getElementById('editIssueSeverity').value = issue.severity;
+      document.getElementById('editIssueNotes').value = issue.notes;
+      
+      document.getElementById('editIssueModal').classList.add('active');
+    }
+    
+    window.updateIssue = async function(event) {
+      event.preventDefault();
+      
+      const issueId = document.getElementById('editIssueId').value;
+      
+      const updatedIssue = {
+        equipmentId: document.getElementById('editIssueEquipment').value,
+        title: document.getElementById('editIssueTitle').value,
+        severity: document.getElementById('editIssueSeverity').value,
+        notes: document.getElementById('editIssueNotes').value
+      };
+      
+      try {
+        await updateDoc(doc(db, 'issues', issueId), updatedIssue);
+        await loadData();
+        document.getElementById('editIssueForm').reset();
+        closeModal('editIssueModal');
+        renderIssues();
+      } catch (error) {
+        console.error('Error updating issue:', error);
+        alert('Error updating issue. Please try again.');
       }
     }
     

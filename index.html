@@ -1186,6 +1186,8 @@
         
         if (tabName === 'schedule') {
           renderScheduleCalendar();
+        } else if (tabName === 'issues') {
+          renderIssues();
         }
       });
     });
@@ -1357,55 +1359,79 @@
         return;
       }
       
-      grid.innerHTML = equipment.map((eq, index) => {
-        const { status, itemsOverdue, itemsDueSoon } = getEquipmentOverallStatus(eq);
-        const pendingIssues = hasActiveIssues(eq.id);
-        
-        let statusText = 'All Good';
-        let statusClass = 'status-good';
-        
-        if (status === 'danger') {
-          statusText = `${itemsOverdue} Overdue`;
-          statusClass = 'status-danger';
-        } else if (status === 'warning') {
-          statusText = `${itemsDueSoon} Due Soon`;
-          statusClass = 'status-warning';
+      // Group equipment by type
+      const grouped = {};
+      equipment.forEach(eq => {
+        if (!grouped[eq.type]) {
+          grouped[eq.type] = [];
         }
-        
-        return `
-          <div class="equipment-card ${pendingIssues > 0 ? 'has-issues' : ''}">
-            ${pendingIssues > 0 ? `<div class="repair-badge">⚠ ${pendingIssues} Issue${pendingIssues > 1 ? 's' : ''}</div>` : ''}
-            <div class="equipment-header">
-              <div>
-                <div class="equipment-id">${eq.equipmentId}</div>
-                <div class="equipment-name">${eq.name}</div>
-                <div class="equipment-type">${eq.type}</div>
-              </div>
-              <span class="status-badge ${statusClass}">${statusText}</span>
-            </div>
-            
-            <div class="equipment-stats">
-              <div class="stat-item">
-                <div class="stat-label">Items</div>
-                <div class="stat-value">${eq.maintenanceItems ? eq.maintenanceItems.length : 0}</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-label">Overdue</div>
-                <div class="stat-value" style="color: var(--danger);">${itemsOverdue}</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-label">Due Soon</div>
-                <div class="stat-value" style="color: var(--warning);">${itemsDueSoon}</div>
-              </div>
-            </div>
-            
-            <div class="equipment-actions">
-              <button class="btn btn-small btn-primary" onclick="window.viewEquipmentDetails('${eq.id}')">View Details</button>
-              <button class="btn btn-small" onclick="window.deleteEquipment('${eq.id}')">Delete</button>
-            </div>
+        grouped[eq.type].push(eq);
+      });
+      
+      // Render grouped equipment
+      let html = '';
+      Object.keys(grouped).sort().forEach(type => {
+        html += `
+          <div style="grid-column: 1 / -1; margin-top: 2rem;">
+            <h2 style="font-family: 'Roboto Condensed', sans-serif; color: var(--helena-green); font-size: 1.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--helena-green);">
+              ${type}
+            </h2>
           </div>
         `;
-      }).join('');
+        
+        grouped[type].forEach(eq => {
+          const { status, itemsOverdue, itemsDueSoon } = getEquipmentOverallStatus(eq);
+          const pendingIssues = hasActiveIssues(eq.id);
+          const hasCriticalIssue = issues.filter(i => i.equipmentId === eq.id && i.status === 'Pending' && i.severity === 'Critical').length > 0;
+          
+          let statusText = 'All Good';
+          let statusClass = 'status-good';
+          
+          if (status === 'danger') {
+            statusText = `${itemsOverdue} Overdue`;
+            statusClass = 'status-danger';
+          } else if (status === 'warning') {
+            statusText = `${itemsDueSoon} Due Soon`;
+            statusClass = 'status-warning';
+          }
+          
+          html += `
+            <div class="equipment-card ${pendingIssues > 0 ? 'has-issues' : ''}">
+              ${pendingIssues > 0 ? `<div class="repair-badge" style="${hasCriticalIssue ? 'background: var(--danger);' : ''}">⚠ ${pendingIssues} Issue${pendingIssues > 1 ? 's' : ''}</div>` : ''}
+              <div class="equipment-header">
+                <div>
+                  <div class="equipment-id">${eq.equipmentId}</div>
+                  <div class="equipment-name">${eq.name}</div>
+                  <div class="equipment-type">${eq.type}</div>
+                </div>
+                <span class="status-badge ${statusClass}">${statusText}</span>
+              </div>
+              
+              <div class="equipment-stats">
+                <div class="stat-item">
+                  <div class="stat-label">Items</div>
+                  <div class="stat-value">${eq.maintenanceItems ? eq.maintenanceItems.length : 0}</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-label">Overdue</div>
+                  <div class="stat-value" style="color: var(--danger);">${itemsOverdue}</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-label">Due Soon</div>
+                  <div class="stat-value" style="color: var(--warning);">${itemsDueSoon}</div>
+                </div>
+              </div>
+              
+              <div class="equipment-actions">
+                <button class="btn btn-small btn-primary" onclick="window.viewEquipmentDetails('${eq.id}')">View Details</button>
+                <button class="btn btn-small" onclick="window.deleteEquipment('${eq.id}')">Delete</button>
+              </div>
+            </div>
+          `;
+        });
+      });
+      
+      grid.innerHTML = html;
     }
     
     function renderTemplates() {

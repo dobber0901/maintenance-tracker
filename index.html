@@ -505,98 +505,6 @@
       font-size: 0.9rem;
     }
     
-    .print-report {
-      background: white;
-      color: black;
-      padding: 2rem;
-      max-width: 210mm;
-      margin: 0 auto;
-      font-family: Arial, sans-serif;
-    }
-    
-    .print-header {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 3px solid #ff6b35;
-    }
-    
-    .print-title {
-      font-family: Arial, sans-serif;
-      font-size: 2rem;
-      font-weight: 900;
-      color: #ff6b35;
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-    }
-    
-    .print-equipment-info {
-      background: #f5f5f5;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      border-left: 4px solid #ff6b35;
-    }
-    
-    .print-info-row {
-      display: flex;
-      margin-bottom: 0.5rem;
-    }
-    
-    .print-label {
-      font-weight: 700;
-      width: 150px;
-      color: #333;
-    }
-    
-    .print-value {
-      color: #666;
-    }
-    
-    .print-maintenance-list {
-      margin-top: 2rem;
-    }
-    
-    .print-maintenance-item {
-      border: 1px solid #ddd;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      page-break-inside: avoid;
-    }
-    
-    .print-item-header {
-      background: #ff6b35;
-      color: white;
-      padding: 0.5rem 1rem;
-      margin: -1rem -1rem 1rem -1rem;
-      font-weight: 700;
-    }
-    
-    @media print {
-      .container, .bg-pattern {
-        display: none !important;
-      }
-      
-      #printReport {
-        display: block !important;
-      }
-      
-      .print-report {
-        display: block !important;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-      }
-      
-      .btn {
-        display: none !important;
-      }
-      
-      @page {
-        margin: 1cm;
-      }
-    }
-    
     .empty-state {
       text-align: center;
       padding: 4rem 2rem;
@@ -873,23 +781,9 @@
     </div>
   </div>
   
-  <!-- Print Report Container -->
-  <div id="printReport" style="display: none;">
-    <div class="print-report">
-      <div class="print-header">
-        <h1 class="print-title">MAINTENANCE REPORT</h1>
-        <p>Generated: <span id="printDate"></span></p>
-      </div>
-      <div class="print-equipment-info" id="printEquipmentInfo"></div>
-      <h2 style="font-family: 'Orbitron', sans-serif; color: #ff6b35; margin-bottom: 1rem;">Maintenance Items</h2>
-      <div class="print-maintenance-list" id="printMaintenanceList"></div>
-    </div>
-  </div>
-  
   <script type="module">
-    // Firebase configuration - USER WILL REPLACE THIS
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyDVqhdUUCMcASjEewt9Yv1Nky0hr2-FTmQ",
@@ -900,26 +794,21 @@
       appId: "1:993822676610:web:1e001809e089a6c6a0069b"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // Global state
     let equipment = [];
     let templates = [];
     let currentEquipmentId = null;
     
-    // Load all data
     async function loadData() {
       try {
-        // Load equipment
         const equipmentSnapshot = await getDocs(collection(db, 'equipment'));
         equipment = equipmentSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
         
-        // Load templates
         const templatesSnapshot = await getDocs(collection(db, 'maintenanceTemplates'));
         templates = templatesSnapshot.docs.map(doc => ({
           id: doc.id,
@@ -933,7 +822,6 @@
       }
     }
     
-    // Tab switching
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const tabName = tab.dataset.tab;
@@ -1172,7 +1060,6 @@
         return;
       }
       
-      // Group by equipment type
       const grouped = {};
       templates.forEach(t => {
         if (!grouped[t.equipmentType]) {
@@ -1334,81 +1221,64 @@
       }
     }
     
+    // SIMPLE PRINT FUNCTION
     window.printReport = function() {
       const eq = equipment.find(e => e.id === currentEquipmentId);
-      if (!eq) {
-        alert('Equipment not found');
+      if (!eq || !eq.maintenanceItems || eq.maintenanceItems.length === 0) {
+        alert('No maintenance items to print');
         return;
       }
       
-      if (!eq.maintenanceItems || eq.maintenanceItems.length === 0) {
-        alert('No maintenance items to print for this equipment');
-        return;
-      }
+      let printHTML = '<html><head><title>Maintenance Report</title>';
+      printHTML += '<style>';
+      printHTML += 'body{font-family:Arial;padding:20px;} ';
+      printHTML += 'h1{color:#ff6b35;} ';
+      printHTML += '.info{background:#f5f5f5;padding:15px;margin:20px 0;border-left:4px solid #ff6b35;} ';
+      printHTML += '.item{border:1px solid #ddd;padding:15px;margin:10px 0;page-break-inside:avoid;} ';
+      printHTML += '.header{background:#ff6b35;color:white;padding:8px;margin:-15px -15px 10px;font-weight:bold;}';
+      printHTML += '</style></head><body>';
       
-      // Build print content
-      let printHTML = `
-        <html>
-        <head>
-          <title>Maintenance Report</title>
-          <style>
-            body { font-family: Arial; padding: 20px; }
-            h1 { color: #ff6b35; }
-            .info { background: #f5f5f5; padding: 15px; margin: 20px 0; }
-            .item { border: 1px solid #ddd; padding: 15px; margin: 10px 0; page-break-inside: avoid; }
-            .item-header { background: #ff6b35; color: white; padding: 8px; margin: -15px -15px 10px -15px; }
-          </style>
-        </head>
-        <body>
-          <h1>MAINTENANCE REPORT</h1>
-          <p>Generated: ${new Date().toLocaleDateString()}</p>
-          
-          <div class="info">
-            <p><strong>Equipment ID:</strong> ${eq.equipmentId}</p>
-            <p><strong>Name:</strong> ${eq.name}</p>
-            <p><strong>Type:</strong> ${eq.type}</p>
-            <p><strong>Location:</strong> ${eq.location || 'N/A'}</p>
-          </div>
-          
-          <h2>Maintenance Items</h2>
-      `;
+      printHTML += '<h1>MAINTENANCE REPORT</h1>';
+      printHTML += '<p>Date: ' + new Date().toLocaleDateString() + '</p>';
+      printHTML += '<div class="info">';
+      printHTML += '<p><b>Equipment ID:</b> ' + eq.equipmentId + '</p>';
+      printHTML += '<p><b>Name:</b> ' + eq.name + '</p>';
+      printHTML += '<p><b>Type:</b> ' + eq.type + '</p>';
+      printHTML += '<p><b>Location:</b> ' + (eq.location || 'N/A') + '</p>';
+      printHTML += '</div><h2>Maintenance Items</h2>';
       
       eq.maintenanceItems.forEach(item => {
-        const lastComp = item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never';
-        printHTML += `
-          <div class="item">
-            <div class="item-header">${item.name}</div>
-            <p><strong>Interval:</strong> Every ${item.interval} days</p>
-            <p><strong>Last Completed:</strong> ${lastComp}</p>
-            ${item.description ? `<p><strong>Instructions:</strong> ${item.description}</p>` : ''}
-            <p style="margin-top:15px;border-top:1px solid #ddd;padding-top:10px">
-              ☐ Task completed<br>
-              ☐ Parts replaced<br>
-              ☐ Signed: _________ Date: _______
-            </p>
-          </div>
-        `;
+        const last = item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never';
+        printHTML += '<div class="item">';
+        printHTML += '<div class="header">' + item.name + '</div>';
+        printHTML += '<p><b>Interval:</b> Every ' + item.interval + ' days</p>';
+        printHTML += '<p><b>Last Completed:</b> ' + last + '</p>';
+        if (item.description) {
+          printHTML += '<p><b>Instructions:</b> ' + item.description + '</p>';
+        }
+        printHTML += '<p style="margin-top:15px;border-top:1px solid #ddd;padding-top:10px">';
+        printHTML += '☐ Completed<br>☐ Parts replaced<br>☐ Signed: ______ Date: _____</p>';
+        printHTML += '</div>';
       });
       
       printHTML += '</body></html>';
       
-      const printWin = window.open('', '_blank');
-      printWin.document.write(printHTML);
-      printWin.document.close();
-      printWin.focus();
-      setTimeout(() => printWin.print(), 500);
+      const win = window.open('', '_blank');
+      win.document.write(printHTML);
+      win.document.close();
+      win.focus();
+      setTimeout(() => win.print(), 250);
     }
     
     function renderSchedule() {
       const container = document.getElementById('scheduleView');
-      
-      const allMaintenanceItems = [];
+      const allItems = [];
       
       equipment.forEach(eq => {
         if (eq.maintenanceItems) {
           eq.maintenanceItems.forEach(item => {
             const { status, daysUntil, nextDue } = getMaintenanceStatus(item);
-            allMaintenanceItems.push({
+            allItems.push({
               equipment: eq,
               item: item,
               status: status,
@@ -1419,61 +1289,41 @@
         }
       });
       
-      allMaintenanceItems.sort((a, b) => a.daysUntil - b.daysUntil);
+      allItems.sort((a, b) => a.daysUntil - b.daysUntil);
       
-      if (allMaintenanceItems.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">📅</div>
-            <h3>No Scheduled Maintenance</h3>
-          </div>
-        `;
+      if (allItems.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><h3>No Scheduled Maintenance</h3></div>';
         return;
       }
       
-      container.innerHTML = `
-        <div class="maintenance-list">
-          ${allMaintenanceItems.map((mi, index) => {
-            let statusClass = 'status-good';
-            if (mi.status === 'danger') statusClass = 'status-danger';
-            else if (mi.status === 'warning') statusClass = 'status-warning';
-            
-            let statusText = '';
-            if (mi.daysUntil < 0) {
-              statusText = `${Math.abs(mi.daysUntil)} days overdue`;
-            } else if (mi.daysUntil === 0) {
-              statusText = 'Due today';
-            } else {
-              statusText = `Due in ${mi.daysUntil} days`;
-            }
-            
-            return `
-              <div class="maintenance-item" style="animation-delay: ${index * 0.05}s;">
-                <div class="maintenance-header">
-                  <div>
-                    <div class="equipment-id">${mi.equipment.equipmentId}</div>
-                    <div class="maintenance-title">${mi.item.name}</div>
-                    <div class="equipment-type">${mi.equipment.name} - ${mi.equipment.type}</div>
-                  </div>
-                  <span class="status-badge ${statusClass}">${statusText}</span>
-                </div>
-                <div class="maintenance-status">
-                  <strong>Next Due:</strong> ${mi.nextDue}<br>
-                  <strong>Interval:</strong> Every ${mi.item.interval} days
-                  ${mi.item.description ? `<br><strong>Instructions:</strong> ${mi.item.description}` : ''}
-                </div>
+      container.innerHTML = '<div class="maintenance-list">' + allItems.map((mi, i) => {
+        let statusClass = mi.status === 'danger' ? 'status-danger' : mi.status === 'warning' ? 'status-warning' : 'status-good';
+        let statusText = mi.daysUntil < 0 ? Math.abs(mi.daysUntil) + ' days overdue' : mi.daysUntil === 0 ? 'Due today' : 'Due in ' + mi.daysUntil + ' days';
+        
+        return `
+          <div class="maintenance-item" style="animation-delay:${i*0.05}s">
+            <div class="maintenance-header">
+              <div>
+                <div class="equipment-id">${mi.equipment.equipmentId}</div>
+                <div class="maintenance-title">${mi.item.name}</div>
+                <div class="equipment-type">${mi.equipment.name} - ${mi.equipment.type}</div>
               </div>
-            `;
-          }).join('')}
-        </div>
-      `;
+              <span class="status-badge ${statusClass}">${statusText}</span>
+            </div>
+            <div class="maintenance-status">
+              <strong>Next Due:</strong> ${mi.nextDue}<br>
+              <strong>Interval:</strong> Every ${mi.item.interval} days
+              ${mi.item.description ? '<br><strong>Instructions:</strong> ' + mi.item.description : ''}
+            </div>
+          </div>
+        `;
+      }).join('') + '</div>';
     }
     
     window.openAddTemplateModal = function() {
       document.getElementById('addTemplateModal').classList.add('active');
     }
     
-    // Initialize
     loadData();
   </script>
 </body>

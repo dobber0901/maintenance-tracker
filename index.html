@@ -1829,6 +1829,8 @@
         completedAt: null
       };
       
+      console.log('Adding issue:', newIssue);
+      
       try {
         await addDoc(collection(db, 'issues'), newIssue);
         await loadData();
@@ -1837,7 +1839,8 @@
         renderIssues();
       } catch (error) {
         console.error('Error adding issue:', error);
-        alert('Error adding issue. Please try again.');
+        console.error('Error details:', error.message, error.code);
+        alert('Error adding issue: ' + error.message + '. Please try again.');
       }
     }
     
@@ -1854,9 +1857,13 @@
       
       // Sort: Critical first, then by created date (newest first)
       filteredIssues.sort((a, b) => {
+        // Default to Minor if severity doesn't exist
+        const aSeverity = a.severity || 'Minor';
+        const bSeverity = b.severity || 'Minor';
+        
         // Critical issues always come first
-        if (a.severity === 'Critical' && b.severity !== 'Critical') return -1;
-        if (a.severity !== 'Critical' && b.severity === 'Critical') return 1;
+        if (aSeverity === 'Critical' && bSeverity !== 'Critical') return -1;
+        if (aSeverity !== 'Critical' && bSeverity === 'Critical') return 1;
         // Then sort by date
         return new Date(b.createdAt) - new Date(a.createdAt);
       });
@@ -1875,7 +1882,8 @@
       container.innerHTML = filteredIssues.map(issue => {
         const eq = equipment.find(e => e.id === issue.equipmentId);
         const isCompleted = issue.status === 'Completed';
-        const isCritical = issue.severity === 'Critical';
+        const severity = issue.severity || 'Minor'; // Default to Minor if not set
+        const isCritical = severity === 'Critical';
         
         return `
           <div class="issue-card ${isCompleted ? 'completed' : ''} ${isCritical ? 'critical' : ''}">
@@ -1884,7 +1892,7 @@
                 <div class="issue-equipment">${eq ? `${eq.equipmentId} - ${eq.name}` : 'Unknown'}</div>
                 <div class="issue-title">
                   ${issue.title}
-                  <span class="severity-badge severity-${issue.severity.toLowerCase()}">${issue.severity}</span>
+                  <span class="severity-badge severity-${severity.toLowerCase()}">${severity}</span>
                 </div>
               </div>
               <span class="status-badge ${isCompleted ? 'status-good' : 'status-warning'}">${issue.status}</span>

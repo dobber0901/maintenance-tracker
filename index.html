@@ -937,7 +937,7 @@
     <!-- Item Location Tab -->
     <div id="location-tab" class="tab-content">
       <div class="action-bar">
-        <button class="btn btn-primary" onclick="openCheckOutModal()">+ Check Out Equipment</button>
+        <button class="btn btn-primary" onclick="window.openCheckOutModal()">+ Check Out Equipment</button>
         <select id="locationEquipmentFilter" onchange="renderLocations()">
           <option value="">All Equipment</option>
         </select>
@@ -1274,7 +1274,7 @@
         <h2 class="modal-title">Check Out Equipment</h2>
         <button class="close-btn" onclick="closeModal('checkOutModal')">&times;</button>
       </div>
-      <form id="checkOutForm" onsubmit="checkOutEquipment(event)">
+      <form id="checkOutForm" onsubmit="window.checkOutEquipment(event)">
         <div class="form-group">
           <label for="checkOutEquipment">Equipment *</label>
           <select id="checkOutEquipment" required></select>

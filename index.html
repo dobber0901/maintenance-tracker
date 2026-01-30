@@ -838,9 +838,148 @@
       .logo { width: 100px; }
       .equipment-grid { grid-template-columns: 1fr; }
     }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid var(--border);
+      border-top: 4px solid var(--helena-green);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      margin-top: 1rem;
+      font-family: 'Roboto Condensed', sans-serif;
+      color: var(--helena-green);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 4000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .toast {
+      background: white;
+      border-radius: 6px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 280px;
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .toast.error {
+      border-left: 4px solid var(--danger);
+    }
+
+    .toast.warning {
+      border-left: 4px solid var(--warning);
+    }
+
+    .toast-icon {
+      font-size: 1.25rem;
+    }
+
+    .toast-message {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    /* Search Box */
+    .search-box {
+      flex: 1;
+      max-width: 300px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--helena-green);
+      outline: none;
+    }
+
+    .search-box::before {
+      content: '🔍';
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      opacity: 0.5;
+    }
+
+    /* SN/VIN Display */
+    .equipment-snvin {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-top: 0.15rem;
+    }
   </style>
 </head>
 <body>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">Loading...</div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <div class="container">
     <header>
       <svg class="logo" viewBox="0 0 157 90" xmlns="http://www.w3.org/2000/svg">
@@ -879,6 +1018,9 @@
     <div id="equipment-tab" class="tab-content active">
       <div class="action-bar">
         <button class="btn btn-primary" onclick="openAddEquipmentModal()">+ Add Equipment</button>
+        <div class="search-box">
+          <input type="text" id="equipmentSearch" placeholder="Search equipment..." oninput="window.filterEquipment()">
+        </div>
       </div>
       <div class="equipment-grid" id="equipmentGrid"></div>
     </div>
@@ -1318,6 +1460,32 @@
     </div>
   </div>
   
+  <!-- Edit Maintenance Item Modal -->
+  <div id="editMaintenanceItemModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Maintenance Item</h2>
+        <button class="close-btn" onclick="closeModal('editMaintenanceItemModal')">&times;</button>
+      </div>
+      <form id="editMaintenanceItemForm" onsubmit="window.updateMaintenanceItem(event)">
+        <input type="hidden" id="editMaintenanceItemId">
+        <div class="form-group">
+          <label for="editMaintenanceItemName">Maintenance Item Name *</label>
+          <input type="text" id="editMaintenanceItemName" required placeholder="e.g., Oil Change">
+        </div>
+        <div class="form-group">
+          <label for="editMaintenanceItemInterval">Interval (days) *</label>
+          <input type="number" id="editMaintenanceItemInterval" required min="1" placeholder="e.g., 90">
+        </div>
+        <div class="form-group">
+          <label for="editMaintenanceItemDescription">Description/Instructions</label>
+          <textarea id="editMaintenanceItemDescription" placeholder="Detailed instructions for this maintenance item..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Maintenance Item</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Check Out Equipment Modal -->
   <div id="checkOutModal" class="modal">
     <div class="modal-content">
@@ -1369,44 +1537,85 @@
     let currentEquipmentId = null;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
-    
-    async function loadData() {
+
+    // Loading overlay functions
+    function showLoading(message = 'Loading...') {
+      document.getElementById('loadingText').textContent = message;
+      document.getElementById('loadingOverlay').classList.add('active');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.remove('active');
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+
+      let icon = '✓';
+      if (type === 'error') icon = '✕';
+      if (type === 'warning') icon = '⚠';
+
+      toast.innerHTML = `
+        <span class="toast-icon">${icon}</span>
+        <span class="toast-message">${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      // Trigger animation
+      setTimeout(() => toast.classList.add('show'), 10);
+
+      // Remove after 3 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    async function loadData(showLoadingIndicator = true) {
+      if (showLoadingIndicator) showLoading('Loading data...');
       try {
         const equipmentSnapshot = await getDocs(collection(db, 'equipment'));
         equipment = equipmentSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        
+
         const templatesSnapshot = await getDocs(collection(db, 'maintenanceTemplates'));
         templates = templatesSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        
+
         const schedulesSnapshot = await getDocs(collection(db, 'schedules'));
         schedules = schedulesSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        
+
         const issuesSnapshot = await getDocs(collection(db, 'issues'));
         issues = issuesSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        
+
         const locationsSnapshot = await getDocs(collection(db, 'locations'));
         locations = locationsSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        
+
         renderEquipment();
         renderTemplates();
         populateEquipmentSelects();
       } catch (error) {
         console.error('Error loading data:', error);
+        showToast('Error loading data. Please refresh the page.', 'error');
+      } finally {
+        if (showLoadingIndicator) hideLoading();
       }
     }
     
@@ -1573,11 +1782,22 @@
     
     window.addEquipment = async function(event) {
       event.preventDefault();
-      
+
+      const equipmentIdValue = document.getElementById('equipmentId').value.trim();
+
+      // Check for duplicate Equipment ID
+      const existingEquipment = equipment.find(eq =>
+        eq.equipmentId.toLowerCase() === equipmentIdValue.toLowerCase()
+      );
+      if (existingEquipment) {
+        showToast(`Equipment ID "${equipmentIdValue}" already exists. Please use a unique ID.`, 'error');
+        return;
+      }
+
       const type = document.getElementById('equipmentType').value;
       const selectedTemplates = Array.from(document.querySelectorAll('#availableTemplates input[type="checkbox"]:checked'))
         .map(cb => cb.value);
-      
+
       const maintenanceItems = selectedTemplates.map(templateId => {
         const template = templates.find(t => t.id === templateId);
         return {
@@ -1589,9 +1809,9 @@
           history: []
         };
       });
-      
+
       const newEquipment = {
-        equipmentId: document.getElementById('equipmentId').value,
+        equipmentId: equipmentIdValue,
         name: document.getElementById('equipmentName').value,
         snvin: document.getElementById('equipmentSNVIN').value,
         type: type,
@@ -1599,21 +1819,26 @@
         maintenanceItems: maintenanceItems,
         createdAt: new Date().toISOString()
       };
-      
+
+      showLoading('Adding equipment...');
+
       try {
         await addDoc(collection(db, 'equipment'), newEquipment);
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Equipment added successfully');
         document.getElementById('addEquipmentForm').reset();
         closeModal('addEquipmentModal');
       } catch (error) {
         console.error('Error adding equipment:', error);
-        alert('Error adding equipment. Please try again.');
+        hideLoading();
+        showToast('Error adding equipment. Please try again.', 'error');
       }
     }
     
     window.addTemplate = async function(event) {
       event.preventDefault();
-      
+
       const newTemplate = {
         equipmentType: document.getElementById('templateEquipmentType').value,
         name: document.getElementById('templateName').value,
@@ -1621,15 +1846,20 @@
         description: document.getElementById('templateDescription').value,
         createdAt: new Date().toISOString()
       };
-      
+
+      showLoading('Creating template...');
+
       try {
         await addDoc(collection(db, 'maintenanceTemplates'), newTemplate);
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Template created successfully');
         document.getElementById('addTemplateForm').reset();
         closeModal('addTemplateModal');
       } catch (error) {
         console.error('Error adding template:', error);
-        alert('Error adding template. Please try again.');
+        hideLoading();
+        showToast('Error adding template. Please try again.', 'error');
       }
     }
     
@@ -1692,23 +1922,37 @@
       return locations.filter(l => l.equipmentId === equipmentId && l.status === 'Checked Out').length > 0;
     }
     
-    function renderEquipment() {
+    function renderEquipment(searchTerm = '') {
       const grid = document.getElementById('equipmentGrid');
-      
-      if (equipment.length === 0) {
+      const searchInput = document.getElementById('equipmentSearch');
+      const term = searchTerm || (searchInput ? searchInput.value.toLowerCase().trim() : '');
+
+      // Filter equipment based on search term
+      let filteredEquipment = equipment;
+      if (term) {
+        filteredEquipment = equipment.filter(eq =>
+          eq.equipmentId.toLowerCase().includes(term) ||
+          eq.name.toLowerCase().includes(term) ||
+          eq.type.toLowerCase().includes(term) ||
+          (eq.snvin && eq.snvin.toLowerCase().includes(term)) ||
+          (eq.location && eq.location.toLowerCase().includes(term))
+        );
+      }
+
+      if (filteredEquipment.length === 0) {
         grid.innerHTML = `
           <div class="empty-state">
-            <div class="empty-icon">🚜</div>
-            <h3>No Equipment Added</h3>
-            <p>Click "Add Equipment" to start tracking your fleet</p>
+            <div class="empty-icon">${term ? '🔍' : '🚜'}</div>
+            <h3>${term ? 'No Equipment Found' : 'No Equipment Added'}</h3>
+            <p>${term ? 'Try a different search term' : 'Click "Add Equipment" to start tracking your fleet'}</p>
           </div>
         `;
         return;
       }
-      
+
       // Group equipment by type
       const grouped = {};
-      equipment.forEach(eq => {
+      filteredEquipment.forEach(eq => {
         if (!grouped[eq.type]) {
           grouped[eq.type] = [];
         }
@@ -1751,6 +1995,7 @@
                   <div class="equipment-id">${eq.equipmentId}</div>
                   <div class="equipment-name">${eq.name}</div>
                   <div class="equipment-type">${eq.type}</div>
+                  ${eq.snvin ? `<div class="equipment-snvin">SN/VIN: ${eq.snvin}</div>` : ''}
                 </div>
                 <span class="status-badge ${statusClass}">${statusText}</span>
               </div>
@@ -1821,18 +2066,34 @@
       `).join('');
     }
     
+    // Equipment search/filter function
+    window.filterEquipment = function() {
+      renderEquipment();
+    }
+
     window.viewEquipmentDetails = function(equipmentId) {
       const eq = equipment.find(e => e.id === equipmentId);
       if (!eq) return;
-      
+
       currentEquipmentId = equipmentId;
-      
+
       document.getElementById('detailsEquipmentName').textContent = `${eq.equipmentId} - ${eq.name}`;
       
       const content = document.getElementById('equipmentDetailsContent');
-      
+
+      // Equipment info section
+      let infoHTML = `
+        <div style="background: var(--bg-primary); padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div><strong>Type:</strong> ${eq.type}</div>
+            <div><strong>Location:</strong> ${eq.location || 'Not specified'}</div>
+            ${eq.snvin ? `<div><strong>SN/VIN:</strong> ${eq.snvin}</div>` : ''}
+          </div>
+        </div>
+      `;
+
       if (!eq.maintenanceItems || eq.maintenanceItems.length === 0) {
-        content.innerHTML = `
+        content.innerHTML = infoHTML + `
           <div class="empty-state">
             <p>No maintenance items configured for this equipment.</p>
           </div>
@@ -1841,14 +2102,14 @@
         // CHANGE 1: SORT BY INTERVAL - SMALLEST TO LARGEST
         const sortedItems = [...eq.maintenanceItems].sort((a, b) => a.interval - b.interval);
         
-        content.innerHTML = `
+        content.innerHTML = infoHTML + `
           <div class="maintenance-list">
             ${sortedItems.map(item => {
               const { status, daysUntil, nextDue, statusText } = getMaintenanceStatus(item);
-              
+
               let statusClass = 'status-good';
               let statusBadgeText = 'Up to Date';
-              
+
               if (status === 'danger') {
                 statusClass = 'status-danger';
                 statusBadgeText = daysUntil === -999 ? 'Never Done' : `${Math.abs(daysUntil)} Days Overdue`;
@@ -1858,7 +2119,7 @@
               } else {
                 statusBadgeText = `Due in ${daysUntil} Days`;
               }
-              
+
               return `
                 <div class="maintenance-item">
                   <div class="maintenance-header">
@@ -1876,6 +2137,7 @@
                   </div>
                   <div class="equipment-actions" style="margin-top: 1rem;">
                     <button class="btn btn-small btn-primary" onclick="window.openCompleteModal('${eq.id}', '${item.id}')">Mark Complete</button>
+                    <button class="btn btn-small" onclick="window.openEditMaintenanceItemModal('${eq.id}', '${item.id}')">Edit</button>
                     <button class="btn btn-small" onclick="window.deleteMaintenanceItem('${eq.id}', '${item.id}')">Delete</button>
                   </div>
                 </div>
@@ -1902,36 +2164,41 @@
     
     window.completeMaintenance = async function(event) {
       event.preventDefault();
-      
+
       const equipmentId = document.getElementById('completeEquipmentId').value;
       const maintenanceId = document.getElementById('completeMaintenanceId').value;
       const date = document.getElementById('completionDate').value;
       const notes = document.getElementById('completionNotes').value;
-      
+
       const eq = equipment.find(e => e.id === equipmentId);
       const item = eq.maintenanceItems.find(m => m.id == maintenanceId);
-      
+
       if (!item.history) item.history = [];
-      
+
       item.history.push({
         date: date,
         notes: notes,
         completedAt: new Date().toISOString()
       });
       item.lastCompleted = date;
-      
+
+      showLoading('Saving maintenance record...');
+
       try {
         await updateDoc(doc(db, 'equipment', equipmentId), {
           maintenanceItems: eq.maintenanceItems
         });
-        
-        await loadData();
+
+        await loadData(false);
+        hideLoading();
+        showToast('Maintenance marked complete');
         document.getElementById('completeMaintenanceForm').reset();
         closeModal('completeMaintenanceModal');
         viewEquipmentDetails(equipmentId);
       } catch (error) {
         console.error('Error completing maintenance:', error);
-        alert('Error saving maintenance. Please try again.');
+        hideLoading();
+        showToast('Error saving maintenance. Please try again.', 'error');
       }
     }
     
@@ -1939,27 +2206,37 @@
       if (!confirm('Are you sure you want to delete this equipment and all its maintenance records?')) {
         return;
       }
-      
+
+      showLoading('Deleting equipment...');
+
       try {
         await deleteDoc(doc(db, 'equipment', equipmentId));
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Equipment deleted successfully');
       } catch (error) {
         console.error('Error deleting equipment:', error);
-        alert('Error deleting equipment. Please try again.');
+        hideLoading();
+        showToast('Error deleting equipment. Please try again.', 'error');
       }
     }
-    
+
     window.deleteTemplate = async function(templateId) {
       if (!confirm('Are you sure you want to delete this template?')) {
         return;
       }
-      
+
+      showLoading('Deleting template...');
+
       try {
         await deleteDoc(doc(db, 'maintenanceTemplates', templateId));
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Template deleted successfully');
       } catch (error) {
         console.error('Error deleting template:', error);
-        alert('Error deleting template. Please try again.');
+        hideLoading();
+        showToast('Error deleting template. Please try again.', 'error');
       }
     }
     
@@ -2145,23 +2422,28 @@
     
     window.scheduleMaintenance = async function(event) {
       event.preventDefault();
-      
+
       const newSchedule = {
         equipmentId: document.getElementById('scheduleEquipment').value,
         date: document.getElementById('scheduleDate').value,
         notes: document.getElementById('scheduleNotes').value,
         createdAt: new Date().toISOString()
       };
-      
+
+      showLoading('Scheduling maintenance...');
+
       try {
         await addDoc(collection(db, 'schedules'), newSchedule);
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Maintenance scheduled successfully');
         document.getElementById('scheduleMaintenanceForm').reset();
         closeModal('scheduleMaintenanceModal');
         renderScheduleCalendar();
       } catch (error) {
         console.error('Error scheduling maintenance:', error);
-        alert('Error scheduling maintenance. Please try again.');
+        hideLoading();
+        showToast('Error scheduling maintenance. Please try again.', 'error');
       }
     }
     
@@ -2179,37 +2461,47 @@
     
     window.updateSchedule = async function(event) {
       event.preventDefault();
-      
+
       const scheduleId = document.getElementById('editScheduleId').value;
-      
+
       const updatedSchedule = {
         equipmentId: document.getElementById('editScheduleEquipment').value,
         date: document.getElementById('editScheduleDate').value,
         notes: document.getElementById('editScheduleNotes').value
       };
-      
+
+      showLoading('Updating schedule...');
+
       try {
         await updateDoc(doc(db, 'schedules', scheduleId), updatedSchedule);
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Schedule updated successfully');
         document.getElementById('editScheduleForm').reset();
         closeModal('editScheduleModal');
         renderScheduleCalendar();
       } catch (error) {
         console.error('Error updating schedule:', error);
-        alert('Error updating schedule. Please try again.');
+        hideLoading();
+        showToast('Error updating schedule. Please try again.', 'error');
       }
     }
-    
+
     window.deleteSchedule = async function(scheduleId) {
       if (!confirm('Delete this scheduled maintenance?')) return;
-      
+
+      showLoading('Deleting schedule...');
+
       try {
         await deleteDoc(doc(db, 'schedules', scheduleId));
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Schedule deleted successfully');
         renderScheduleCalendar();
       } catch (error) {
         console.error('Error deleting schedule:', error);
-        alert('Error deleting schedule. Please try again.');
+        hideLoading();
+        showToast('Error deleting schedule. Please try again.', 'error');
       }
     }
     
@@ -2278,9 +2570,9 @@
     
     window.addIssue = async function(event) {
       event.preventDefault();
-      
+
       const costValue = document.getElementById('issueCost').value;
-      
+
       const newIssue = {
         equipmentId: document.getElementById('issueEquipment').value,
         title: document.getElementById('issueTitle').value,
@@ -2291,19 +2583,21 @@
         createdAt: new Date().toISOString(),
         completedAt: null
       };
-      
-      console.log('Adding issue:', newIssue);
-      
+
+      showLoading('Logging issue...');
+
       try {
         await addDoc(collection(db, 'issues'), newIssue);
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Issue logged successfully');
         document.getElementById('addIssueForm').reset();
         closeModal('addIssueModal');
         renderIssues();
       } catch (error) {
         console.error('Error adding issue:', error);
-        console.error('Error details:', error.message, error.code);
-        alert('Error adding issue: ' + error.message + '. Please try again.');
+        hideLoading();
+        showToast('Error adding issue. Please try again.', 'error');
       }
     }
     
@@ -2377,17 +2671,22 @@
     }
     
     window.completeIssue = async function(issueId) {
+      showLoading('Completing issue...');
+
       try {
         await updateDoc(doc(db, 'issues', issueId), {
           status: 'Completed',
           completedAt: new Date().toISOString()
         });
-        
-        await loadData();
+
+        await loadData(false);
+        hideLoading();
+        showToast('Issue marked as complete');
         renderIssues();
       } catch (error) {
         console.error('Error completing issue:', error);
-        alert('Error completing issue. Please try again.');
+        hideLoading();
+        showToast('Error completing issue. Please try again.', 'error');
       }
     }
     
@@ -2408,11 +2707,11 @@
     
     window.updateIssue = async function(event) {
       event.preventDefault();
-      
+
       const issueId = document.getElementById('editIssueId').value;
       const reportedDate = document.getElementById('editIssueReportedDate').value;
       const costValue = document.getElementById('editIssueCost').value;
-      
+
       const updatedIssue = {
         equipmentId: document.getElementById('editIssueEquipment').value,
         title: document.getElementById('editIssueTitle').value,
@@ -2421,29 +2720,39 @@
         notes: document.getElementById('editIssueNotes').value,
         createdAt: new Date(reportedDate).toISOString()
       };
-      
+
+      showLoading('Updating issue...');
+
       try {
         await updateDoc(doc(db, 'issues', issueId), updatedIssue);
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Issue updated successfully');
         document.getElementById('editIssueForm').reset();
         closeModal('editIssueModal');
         renderIssues();
       } catch (error) {
         console.error('Error updating issue:', error);
-        alert('Error updating issue. Please try again.');
+        hideLoading();
+        showToast('Error updating issue. Please try again.', 'error');
       }
     }
     
     window.deleteIssue = async function(issueId) {
       if (!confirm('Delete this issue?')) return;
-      
+
+      showLoading('Deleting issue...');
+
       try {
         await deleteDoc(doc(db, 'issues', issueId));
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Issue deleted successfully');
         renderIssues();
       } catch (error) {
         console.error('Error deleting issue:', error);
-        alert('Error deleting issue. Please try again.');
+        hideLoading();
+        showToast('Error deleting issue. Please try again.', 'error');
       }
     }
     
@@ -2458,18 +2767,18 @@
     
     window.addMaintenanceItem = async function(event) {
       event.preventDefault();
-      
+
       if (!currentEquipmentId) {
-        alert('No equipment selected');
+        showToast('No equipment selected', 'error');
         return;
       }
-      
+
       const eq = equipment.find(e => e.id === currentEquipmentId);
       if (!eq) {
-        alert('Equipment not found');
+        showToast('Equipment not found', 'error');
         return;
       }
-      
+
       const newItem = {
         id: Date.now() + Math.random(),
         name: document.getElementById('maintenanceItemName').value,
@@ -2478,49 +2787,119 @@
         lastCompleted: null,
         history: []
       };
-      
+
       if (!eq.maintenanceItems) {
         eq.maintenanceItems = [];
       }
-      
+
       eq.maintenanceItems.push(newItem);
-      
+
+      showLoading('Adding maintenance item...');
+
       try {
         await updateDoc(doc(db, 'equipment', currentEquipmentId), {
           maintenanceItems: eq.maintenanceItems
         });
-        
-        await loadData();
+
+        await loadData(false);
+        hideLoading();
+        showToast('Maintenance item added successfully');
         document.getElementById('addMaintenanceItemForm').reset();
         closeModal('addMaintenanceItemModal');
         viewEquipmentDetails(currentEquipmentId);
       } catch (error) {
         console.error('Error adding maintenance item:', error);
-        alert('Error adding maintenance item. Please try again.');
+        hideLoading();
+        showToast('Error adding maintenance item. Please try again.', 'error');
       }
     }
     
     window.deleteMaintenanceItem = async function(equipmentId, itemId) {
       if (!confirm('Are you sure you want to delete this maintenance item?')) return;
-      
+
       const eq = equipment.find(e => e.id === equipmentId);
       if (!eq) {
-        alert('Equipment not found');
+        showToast('Equipment not found', 'error');
         return;
       }
-      
+
+      showLoading('Deleting maintenance item...');
       eq.maintenanceItems = eq.maintenanceItems.filter(item => item.id != itemId);
-      
+
       try {
         await updateDoc(doc(db, 'equipment', equipmentId), {
           maintenanceItems: eq.maintenanceItems
         });
-        
-        await loadData();
+
+        await loadData(false);
+        hideLoading();
+        showToast('Maintenance item deleted successfully');
         viewEquipmentDetails(equipmentId);
       } catch (error) {
         console.error('Error deleting maintenance item:', error);
-        alert('Error deleting maintenance item. Please try again.');
+        hideLoading();
+        showToast('Error deleting maintenance item. Please try again.', 'error');
+      }
+    }
+
+    // Edit maintenance item functions
+    window.openEditMaintenanceItemModal = function(equipmentId, itemId) {
+      const eq = equipment.find(e => e.id === equipmentId);
+      if (!eq) return;
+
+      const item = eq.maintenanceItems.find(m => m.id == itemId);
+      if (!item) return;
+
+      document.getElementById('editMaintenanceItemId').value = itemId;
+      document.getElementById('editMaintenanceItemName').value = item.name;
+      document.getElementById('editMaintenanceItemInterval').value = item.interval;
+      document.getElementById('editMaintenanceItemDescription').value = item.description || '';
+
+      document.getElementById('editMaintenanceItemModal').classList.add('active');
+    }
+
+    window.updateMaintenanceItem = async function(event) {
+      event.preventDefault();
+
+      if (!currentEquipmentId) {
+        showToast('No equipment selected', 'error');
+        return;
+      }
+
+      const eq = equipment.find(e => e.id === currentEquipmentId);
+      if (!eq) {
+        showToast('Equipment not found', 'error');
+        return;
+      }
+
+      const itemId = document.getElementById('editMaintenanceItemId').value;
+      const item = eq.maintenanceItems.find(m => m.id == itemId);
+      if (!item) {
+        showToast('Maintenance item not found', 'error');
+        return;
+      }
+
+      showLoading('Updating maintenance item...');
+
+      item.name = document.getElementById('editMaintenanceItemName').value;
+      item.interval = parseInt(document.getElementById('editMaintenanceItemInterval').value);
+      item.description = document.getElementById('editMaintenanceItemDescription').value;
+
+      try {
+        await updateDoc(doc(db, 'equipment', currentEquipmentId), {
+          maintenanceItems: eq.maintenanceItems
+        });
+
+        await loadData(false);
+        hideLoading();
+        showToast('Maintenance item updated successfully');
+        document.getElementById('editMaintenanceItemForm').reset();
+        closeModal('editMaintenanceItemModal');
+        viewEquipmentDetails(currentEquipmentId);
+      } catch (error) {
+        console.error('Error updating maintenance item:', error);
+        hideLoading();
+        showToast('Error updating maintenance item. Please try again.', 'error');
       }
     }
     
@@ -2540,24 +2919,39 @@
     
     window.updateEquipment = async function(event) {
       event.preventDefault();
-      
-      const equipmentId = document.getElementById('editEquipmentDbId').value;
-      
+
+      const equipmentDbId = document.getElementById('editEquipmentDbId').value;
+      const newEquipmentId = document.getElementById('editEquipmentId').value.trim();
+
+      // Check for duplicate Equipment ID (excluding current equipment)
+      const existingEquipment = equipment.find(eq =>
+        eq.equipmentId.toLowerCase() === newEquipmentId.toLowerCase() && eq.id !== equipmentDbId
+      );
+      if (existingEquipment) {
+        showToast(`Equipment ID "${newEquipmentId}" already exists. Please use a unique ID.`, 'error');
+        return;
+      }
+
       const updatedEquipment = {
-        equipmentId: document.getElementById('editEquipmentId').value,
+        equipmentId: newEquipmentId,
         name: document.getElementById('editEquipmentName').value,
         snvin: document.getElementById('editEquipmentSNVIN').value,
         location: document.getElementById('editEquipmentLocation').value
       };
-      
+
+      showLoading('Updating equipment...');
+
       try {
-        await updateDoc(doc(db, 'equipment', equipmentId), updatedEquipment);
-        await loadData();
+        await updateDoc(doc(db, 'equipment', equipmentDbId), updatedEquipment);
+        await loadData(false);
+        hideLoading();
+        showToast('Equipment updated successfully');
         document.getElementById('editEquipmentForm').reset();
         closeModal('editEquipmentModal');
       } catch (error) {
         console.error('Error updating equipment:', error);
-        alert('Error updating equipment. Please try again.');
+        hideLoading();
+        showToast('Error updating equipment. Please try again.', 'error');
       }
     }
     
@@ -2734,22 +3128,16 @@
     
     window.checkOutEquipment = async function(event) {
       event.preventDefault();
-      
-      console.log('Checking out equipment...');
-      
+
       const equipmentId = document.getElementById('checkOutEquipment').value;
       const customer = document.getElementById('checkOutCustomer').value;
       const checkOutDate = document.getElementById('checkOutDate').value;
-      
-      console.log('Equipment ID:', equipmentId);
-      console.log('Customer:', customer);
-      console.log('Check Out Date:', checkOutDate);
-      
+
       if (!equipmentId || !customer || !checkOutDate) {
-        alert('Please fill in all required fields');
+        showToast('Please fill in all required fields', 'warning');
         return;
       }
-      
+
       const newLocation = {
         equipmentId: equipmentId,
         customer: customer,
@@ -2758,43 +3146,34 @@
         status: 'Checked Out',
         createdAt: new Date().toISOString()
       };
-      
-      console.log('New location object:', newLocation);
-      
+
+      showLoading('Checking out equipment...');
+
       try {
-        const docRef = await addDoc(collection(db, 'locations'), newLocation);
-        console.log('Location added with ID:', docRef.id);
-        await loadData();
-        console.log('Data reloaded, locations:', locations);
+        await addDoc(collection(db, 'locations'), newLocation);
+        await loadData(false);
+        hideLoading();
+        showToast('Equipment checked out successfully');
         document.getElementById('checkOutForm').reset();
         closeModal('checkOutModal');
         renderLocations();
-        console.log('Location check-out complete');
       } catch (error) {
         console.error('Error checking out equipment:', error);
-        console.error('Error details:', error.message, error.code);
-        alert('Error checking out equipment: ' + error.message);
+        hideLoading();
+        showToast('Error checking out equipment. Please try again.', 'error');
       }
     }
     
     window.renderLocations = function() {
-      console.log('Rendering locations...');
-      console.log('Total locations:', locations.length);
-      
       const container = document.getElementById('locationsList');
       const filterEquipment = document.getElementById('locationEquipmentFilter').value;
       const showReturned = document.getElementById('showReturnedItems').checked;
-      
-      console.log('Filter equipment:', filterEquipment);
-      console.log('Show returned:', showReturned);
-      
+
       let filteredLocations = locations.filter(l => {
         const matchesEquipment = !filterEquipment || l.equipmentId === filterEquipment;
         const matchesStatus = showReturned || l.status === 'Checked Out';
         return matchesEquipment && matchesStatus;
       });
-      
-      console.log('Filtered locations:', filteredLocations.length);
       
       // Sort: Checked Out first, then by check out date (newest first)
       filteredLocations.sort((a, b) => {
@@ -2838,35 +3217,43 @@
           </div>
         `;
       }).join('');
-      
-      console.log('Locations rendered');
     }
-    
+
     window.returnEquipment = async function(locationId) {
+      showLoading('Returning equipment...');
+
       try {
         await updateDoc(doc(db, 'locations', locationId), {
           status: 'Returned',
           returnDate: new Date().toISOString()
         });
-        
-        await loadData();
+
+        await loadData(false);
+        hideLoading();
+        showToast('Equipment returned successfully');
         renderLocations();
       } catch (error) {
         console.error('Error returning equipment:', error);
-        alert('Error returning equipment. Please try again.');
+        hideLoading();
+        showToast('Error returning equipment. Please try again.', 'error');
       }
     }
-    
+
     window.deleteLocation = async function(locationId) {
       if (!confirm('Delete this location record?')) return;
-      
+
+      showLoading('Deleting record...');
+
       try {
         await deleteDoc(doc(db, 'locations', locationId));
-        await loadData();
+        await loadData(false);
+        hideLoading();
+        showToast('Location record deleted');
         renderLocations();
       } catch (error) {
         console.error('Error deleting location:', error);
-        alert('Error deleting location. Please try again.');
+        hideLoading();
+        showToast('Error deleting location. Please try again.', 'error');
       }
     }
     

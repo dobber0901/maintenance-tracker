@@ -611,6 +611,48 @@
       border-left: 3px solid #ff9800;
     }
 
+    /* Calendar View Toggle */
+    .calendar-view-toggle {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-right: 1rem;
+    }
+
+    .calendar-view-toggle button {
+      padding: 0.4rem 0.75rem;
+      border: none;
+      background: white;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .calendar-view-toggle button:hover {
+      background: var(--bg-primary);
+    }
+
+    .calendar-view-toggle button.active {
+      background: var(--helena-green);
+      color: white;
+    }
+
+    /* Week View Styles */
+    .calendar-grid.week-view {
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .calendar-grid.week-view .calendar-day {
+      aspect-ratio: auto;
+      min-height: 150px;
+    }
+
+    .calendar-grid.week-view .calendar-day-header {
+      padding: 0.75rem;
+    }
+
     .calendar-day-number {
       font-weight: 700;
       font-size: 0.9rem;
@@ -1528,10 +1570,16 @@
       <div class="calendar-container">
         <div class="calendar-header">
           <h3 class="calendar-title" id="calendarMonth"></h3>
-          <div class="calendar-nav">
-            <button class="btn btn-small" onclick="previousMonth()">« Prev</button>
-            <button class="btn btn-small" onclick="goToToday()">Today</button>
-            <button class="btn btn-small" onclick="nextMonth()">Next »</button>
+          <div style="display: flex; align-items: center;">
+            <div class="calendar-view-toggle">
+              <button id="weekViewBtn" onclick="setCalendarView('week')">Week</button>
+              <button id="monthViewBtn" class="active" onclick="setCalendarView('month')">Month</button>
+            </div>
+            <div class="calendar-nav">
+              <button class="btn btn-small" onclick="previousPeriod()">« Prev</button>
+              <button class="btn btn-small" onclick="goToToday()">Today</button>
+              <button class="btn btn-small" onclick="nextPeriod()">Next »</button>
+            </div>
           </div>
         </div>
         <div class="calendar-grid" id="calendar"></div>
@@ -1771,6 +1819,35 @@
     </div>
   </div>
   
+  <!-- Bulk Complete Maintenance Modal -->
+  <div id="bulkCompleteModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Complete Multiple Items</h2>
+        <button class="close-btn" onclick="closeModal('bulkCompleteModal')">&times;</button>
+      </div>
+      <form id="bulkCompleteForm" onsubmit="bulkCompleteMaintenance(event)">
+        <div class="form-group">
+          <label>Items to Complete</label>
+          <div id="bulkCompleteItemsList" style="background: var(--bg-primary); padding: 1rem; border-radius: 6px; max-height: 200px; overflow-y: auto;"></div>
+        </div>
+        <div class="form-group">
+          <label for="bulkCompletionDate">Completion Date *</label>
+          <input type="date" id="bulkCompletionDate" required>
+        </div>
+        <div class="form-group">
+          <label for="bulkCompletionHours">Current Hour Meter / Odometer</label>
+          <input type="number" id="bulkCompletionHours" min="0" step="0.1" placeholder="Record current hours/miles at completion">
+        </div>
+        <div class="form-group">
+          <label for="bulkCompletionNotes">Notes (applies to all items)</label>
+          <textarea id="bulkCompletionNotes" placeholder="What was done?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Complete All Selected</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Schedule Maintenance Modal -->
   <div id="scheduleMaintenanceModal" class="modal">
     <div class="modal-content">
@@ -2065,6 +2142,16 @@
     let currentEquipmentId = null;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
+    let calendarViewMode = 'month'; // 'month' or 'week'
+    let currentWeekStart = getWeekStart(new Date());
+
+    function getWeekStart(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      d.setDate(d.getDate() - day);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
 
     // Loading overlay functions
     function showLoading(message = 'Loading...') {
@@ -2709,7 +2796,21 @@
           return aStatus.daysUntil - bStatus.daysUntil;
         });
 
-        content.innerHTML = infoHTML + `
+        // Bulk complete header
+        let bulkActionsHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.75rem; background: var(--bg-primary); border-radius: 6px;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin: 0;">
+                <input type="checkbox" id="selectAllMaintenance" onchange="window.toggleAllMaintenance(this.checked)" style="width: 18px; height: 18px;">
+                <span style="font-weight: 600;">Select All</span>
+              </label>
+              <span id="selectedCount" style="color: var(--text-secondary); font-size: 0.85rem;">(0 selected)</span>
+            </div>
+            <button class="btn btn-small btn-primary" onclick="window.openBulkCompleteModal('${eq.id}')" id="bulkCompleteBtn" disabled>Complete Selected</button>
+          </div>
+        `;
+
+        content.innerHTML = infoHTML + bulkActionsHTML + `
           <div class="maintenance-list">
             ${sortedItems.map(item => {
               const { status, daysUntil, hoursUntil, nextDue, statusText } = getMaintenanceStatus(item, eq);
@@ -2734,25 +2835,30 @@
               if (item.hourInterval) intervalStr += `${item.hourInterval} hours`;
 
               return `
-                <div class="maintenance-item">
-                  <div class="maintenance-header">
-                    <div>
-                      <div class="maintenance-title">${item.name}</div>
-                      <div class="maintenance-interval">Every ${intervalStr}</div>
+                <div class="maintenance-item" style="position: relative;">
+                  <div style="position: absolute; top: 1rem; left: 1rem;">
+                    <input type="checkbox" class="maintenance-checkbox" data-item-id="${item.id}" data-item-name="${item.name}" onchange="window.updateSelectedCount()" style="width: 18px; height: 18px; cursor: pointer;">
+                  </div>
+                  <div style="margin-left: 2rem;">
+                    <div class="maintenance-header">
+                      <div>
+                        <div class="maintenance-title">${item.name}</div>
+                        <div class="maintenance-interval">Every ${intervalStr}</div>
+                      </div>
+                      <span class="status-badge ${statusClass}">${statusBadgeText}</span>
                     </div>
-                    <span class="status-badge ${statusClass}">${statusBadgeText}</span>
-                  </div>
-                  ${item.description ? `<div class="maintenance-description">${item.description}</div>` : ''}
-                  <div class="maintenance-status">
-                    <strong>Last Completed:</strong> ${item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never'}
-                    ${item.lastCompletedHours ? ` @ ${item.lastCompletedHours.toLocaleString()} hrs` : ''}<br>
-                    <strong>Next Due:</strong> ${nextDue}<br>
-                    <strong>Status:</strong> ${statusText}
-                  </div>
-                  <div class="equipment-actions" style="margin-top: 1rem;">
-                    <button class="btn btn-small btn-primary" onclick="window.openCompleteModal('${eq.id}', '${item.id}')">Mark Complete</button>
-                    <button class="btn btn-small" onclick="window.openEditMaintenanceItemModal('${eq.id}', '${item.id}')">Edit</button>
-                    <button class="btn btn-small" onclick="window.deleteMaintenanceItem('${eq.id}', '${item.id}')">Delete</button>
+                    ${item.description ? `<div class="maintenance-description">${item.description}</div>` : ''}
+                    <div class="maintenance-status">
+                      <strong>Last Completed:</strong> ${item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never'}
+                      ${item.lastCompletedHours ? ` @ ${item.lastCompletedHours.toLocaleString()} hrs` : ''}<br>
+                      <strong>Next Due:</strong> ${nextDue}<br>
+                      <strong>Status:</strong> ${statusText}
+                    </div>
+                    <div class="equipment-actions" style="margin-top: 1rem;">
+                      <button class="btn btn-small btn-primary" onclick="window.openCompleteModal('${eq.id}', '${item.id}')">Mark Complete</button>
+                      <button class="btn btn-small" onclick="window.openEditMaintenanceItemModal('${eq.id}', '${item.id}')">Edit</button>
+                      <button class="btn btn-small" onclick="window.deleteMaintenanceItem('${eq.id}', '${item.id}')">Delete</button>
+                    </div>
                   </div>
                 </div>
               `;
@@ -2840,7 +2946,128 @@
         showToast('Error saving maintenance. Please try again.', 'error');
       }
     }
-    
+
+    // Bulk maintenance completion functions
+    window.toggleAllMaintenance = function(checked) {
+      const checkboxes = document.querySelectorAll('.maintenance-checkbox');
+      checkboxes.forEach(cb => cb.checked = checked);
+      updateSelectedCount();
+    }
+
+    window.updateSelectedCount = function() {
+      const checkboxes = document.querySelectorAll('.maintenance-checkbox:checked');
+      const count = checkboxes.length;
+      document.getElementById('selectedCount').textContent = `(${count} selected)`;
+      document.getElementById('bulkCompleteBtn').disabled = count === 0;
+
+      // Update select all checkbox state
+      const allCheckboxes = document.querySelectorAll('.maintenance-checkbox');
+      const selectAll = document.getElementById('selectAllMaintenance');
+      if (count === 0) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+      } else if (count === allCheckboxes.length) {
+        selectAll.checked = true;
+        selectAll.indeterminate = false;
+      } else {
+        selectAll.checked = false;
+        selectAll.indeterminate = true;
+      }
+    }
+
+    window.openBulkCompleteModal = function(equipmentId) {
+      const checkboxes = document.querySelectorAll('.maintenance-checkbox:checked');
+      if (checkboxes.length === 0) {
+        showToast('Please select at least one item', 'error');
+        return;
+      }
+
+      // Store equipment ID for bulk completion
+      document.getElementById('bulkCompleteForm').dataset.equipmentId = equipmentId;
+
+      // Build list of selected items
+      const itemsList = document.getElementById('bulkCompleteItemsList');
+      let itemsHTML = '';
+      checkboxes.forEach(cb => {
+        const itemName = cb.dataset.itemName;
+        const itemId = cb.dataset.itemId;
+        itemsHTML += `<div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);" data-item-id="${itemId}">✓ ${itemName}</div>`;
+      });
+      itemsList.innerHTML = itemsHTML;
+
+      // Set default date
+      document.getElementById('bulkCompletionDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('bulkCompletionHours').value = '';
+      document.getElementById('bulkCompletionNotes').value = '';
+
+      document.getElementById('bulkCompleteModal').classList.add('active');
+    }
+
+    window.bulkCompleteMaintenance = async function(event) {
+      event.preventDefault();
+
+      const equipmentId = document.getElementById('bulkCompleteForm').dataset.equipmentId;
+      const date = document.getElementById('bulkCompletionDate').value;
+      const hoursValue = document.getElementById('bulkCompletionHours').value;
+      const notes = document.getElementById('bulkCompletionNotes').value;
+
+      const eq = equipment.find(e => e.id === equipmentId);
+      if (!eq) return;
+
+      // Get selected item IDs from the list
+      const selectedItems = document.querySelectorAll('#bulkCompleteItemsList > div');
+      const itemIds = Array.from(selectedItems).map(div => div.dataset.itemId);
+
+      showLoading(`Completing ${itemIds.length} maintenance items...`);
+
+      try {
+        // Update each selected maintenance item
+        itemIds.forEach(itemId => {
+          const item = eq.maintenanceItems.find(m => m.id == itemId);
+          if (item) {
+            if (!item.history) item.history = [];
+
+            const historyEntry = {
+              date: date,
+              notes: notes,
+              completedAt: new Date().toISOString()
+            };
+
+            if (hoursValue) {
+              historyEntry.hours = parseFloat(hoursValue);
+              item.lastCompletedHours = parseFloat(hoursValue);
+            }
+
+            item.history.push(historyEntry);
+            item.lastCompleted = date;
+          }
+        });
+
+        const updateData = {
+          maintenanceItems: eq.maintenanceItems
+        };
+
+        // Update hour meter if provided
+        if (hoursValue) {
+          updateData.hourMeter = parseFloat(hoursValue);
+          eq.hourMeter = parseFloat(hoursValue);
+        }
+
+        await updateDoc(doc(db, 'equipment', equipmentId), updateData);
+
+        await loadData(false);
+        hideLoading();
+        showToast(`${itemIds.length} maintenance items marked complete`);
+        document.getElementById('bulkCompleteForm').reset();
+        closeModal('bulkCompleteModal');
+        viewEquipmentDetails(equipmentId);
+      } catch (error) {
+        console.error('Error completing bulk maintenance:', error);
+        hideLoading();
+        showToast('Error saving maintenance. Please try again.', 'error');
+      }
+    }
+
     window.deleteEquipment = async function(equipmentId) {
       if (!confirm('Are you sure you want to delete this equipment and all its maintenance records?')) {
         return;
@@ -2962,33 +3189,54 @@
     }
     
     // CALENDAR FUNCTIONS
+    window.setCalendarView = function(view) {
+      calendarViewMode = view;
+      document.getElementById('weekViewBtn').classList.toggle('active', view === 'week');
+      document.getElementById('monthViewBtn').classList.toggle('active', view === 'month');
+
+      if (view === 'week') {
+        // Set week start to current month's first day's week if switching
+        currentWeekStart = getWeekStart(new Date(currentYear, currentMonth, 1));
+      }
+      renderScheduleCalendar();
+    }
+
     window.renderScheduleCalendar = function() {
+      if (calendarViewMode === 'week') {
+        renderWeekView();
+      } else {
+        renderMonthView();
+      }
+    }
+
+    function renderMonthView() {
       const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      
+
       document.getElementById('calendarMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
-      
+      document.getElementById('calendar').classList.remove('week-view');
+
       const firstDay = new Date(currentYear, currentMonth, 1).getDay();
       const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
       const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
-      
+
       const filterEquipment = document.getElementById('scheduleEquipmentFilter').value;
-      
+
       let calendarHTML = '';
-      
+
       // Day headers
       daysOfWeek.forEach(day => {
         calendarHTML += `<div class="calendar-day-header">${day}</div>`;
       });
-      
+
       const today = new Date();
       const isCurrentMonth = today.getMonth() === currentMonth && today.getFullYear() === currentYear;
-      
+
       // Previous month days
       for (let i = firstDay - 1; i >= 0; i--) {
         calendarHTML += `<div class="calendar-day other-month"><div class="calendar-day-number">${daysInPrevMonth - i}</div></div>`;
       }
-      
+
       // Current month days
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -3040,39 +3288,133 @@
         }
         calendarHTML += '</div>';
       }
-      
+
       // Next month days
       const remainingDays = 42 - (firstDay + daysInMonth);
       for (let day = 1; day <= remainingDays; day++) {
         calendarHTML += `<div class="calendar-day other-month"><div class="calendar-day-number">${day}</div></div>`;
       }
-      
+
       document.getElementById('calendar').innerHTML = calendarHTML;
       renderSchedule();
     }
-    
-    window.previousMonth = function() {
-      currentMonth--;
-      if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
+
+    function renderWeekView() {
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+      const weekEnd = new Date(currentWeekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+
+      // Format title: "Jan 5 - Jan 11, 2025" or "Jan 28 - Feb 3, 2025"
+      const startMonth = monthNames[currentWeekStart.getMonth()].substring(0, 3);
+      const endMonth = monthNames[weekEnd.getMonth()].substring(0, 3);
+      let titleText = `${startMonth} ${currentWeekStart.getDate()}`;
+      if (startMonth !== endMonth) {
+        titleText += ` - ${endMonth} ${weekEnd.getDate()}, ${weekEnd.getFullYear()}`;
+      } else {
+        titleText += ` - ${weekEnd.getDate()}, ${currentWeekStart.getFullYear()}`;
+      }
+
+      document.getElementById('calendarMonth').textContent = titleText;
+      document.getElementById('calendar').classList.add('week-view');
+
+      const filterEquipment = document.getElementById('scheduleEquipmentFilter').value;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      let calendarHTML = '';
+
+      // Day headers with dates
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(currentWeekStart);
+        date.setDate(date.getDate() + i);
+        calendarHTML += `<div class="calendar-day-header">${daysOfWeek[i].substring(0, 3)} ${date.getDate()}</div>`;
+      }
+
+      // Week days
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(currentWeekStart);
+        date.setDate(date.getDate() + i);
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+        let daySchedules = schedules.filter(s => s.date === dateStr);
+        if (filterEquipment) {
+          daySchedules = daySchedules.filter(s => s.equipmentId === filterEquipment);
+        }
+
+        const isToday = date.getTime() === today.getTime();
+        const hasSchedule = daySchedules.length > 0;
+        const weather = getWeatherForDate(dateStr);
+
+        calendarHTML += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasSchedule ? 'has-schedule' : ''} ${weather && weather.isWindy ? 'windy-day' : ''}" onclick="openScheduleModal('${dateStr}')">`;
+
+        // Weather section
+        if (weather) {
+          calendarHTML += `<div style="font-size: 0.75rem; color: var(--text-secondary); text-align: center; margin-bottom: 0.5rem;">`;
+          calendarHTML += `<span style="font-size: 1.2rem;">${weather.icon}</span><br>`;
+          calendarHTML += `${weather.high}°/${weather.low}°`;
+          let windInfo = ` • ${weather.windDir} ${weather.windSpeed}`;
+          if (weather.windGust > weather.windSpeed + 5) {
+            windInfo += `/${weather.windGust}`;
+          }
+          windInfo += ' mph';
+          calendarHTML += `<br><span style="color: ${weather.isWindy ? 'var(--danger)' : 'inherit'}">${weather.isWindy ? '💨' : ''}${windInfo}</span>`;
+          calendarHTML += `</div>`;
+        }
+
+        // Scheduled items - show all in week view
+        if (daySchedules.length > 0) {
+          calendarHTML += '<div class="calendar-events" style="max-height: none;">';
+          daySchedules.forEach(s => {
+            const eq = equipment.find(e => e.id === s.equipmentId);
+            if (eq) {
+              calendarHTML += `<div class="calendar-event" style="white-space: normal;">${eq.equipmentId} - ${eq.name}</div>`;
+            }
+          });
+          calendarHTML += '</div>';
+        } else {
+          calendarHTML += `<div style="color: var(--text-secondary); font-size: 0.75rem; text-align: center; margin-top: 0.5rem;">No scheduled maintenance</div>`;
+        }
+
+        calendarHTML += '</div>';
+      }
+
+      document.getElementById('calendar').innerHTML = calendarHTML;
+      renderSchedule();
+    }
+
+    window.previousPeriod = function() {
+      if (calendarViewMode === 'week') {
+        currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+      } else {
+        currentMonth--;
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear--;
+        }
       }
       renderScheduleCalendar();
     }
-    
-    window.nextMonth = function() {
-      currentMonth++;
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
+
+    window.nextPeriod = function() {
+      if (calendarViewMode === 'week') {
+        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+      } else {
+        currentMonth++;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear++;
+        }
       }
       renderScheduleCalendar();
     }
-    
+
     window.goToToday = function() {
       const today = new Date();
       currentMonth = today.getMonth();
       currentYear = today.getFullYear();
+      currentWeekStart = getWeekStart(today);
       renderScheduleCalendar();
     }
     

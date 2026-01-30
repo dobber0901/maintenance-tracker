@@ -779,7 +779,7 @@
       padding: 1rem;
       margin-bottom: 1rem;
       display: grid;
-      grid-template-columns: 150px 150px 1fr 1fr 150px;
+      grid-template-columns: 120px 120px 1fr 1fr 100px;
       gap: 1rem;
       align-items: start;
     }
@@ -1090,12 +1090,12 @@
         <h2 class="modal-title" id="detailsEquipmentName"></h2>
         <button class="close-btn" onclick="closeModal('equipmentDetailsModal')">&times;</button>
       </div>
-      <div style="margin-bottom: 1rem;">
+      <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
         <button class="btn btn-primary" onclick="openAddMaintenanceItemModal()">+ Add Maintenance Item</button>
+        <button class="btn" onclick="printReport()">📄 Print Report</button>
       </div>
       <div id="equipmentDetailsContent"></div>
       <div class="action-bar" style="margin-top: 2rem;">
-        <button class="btn btn-primary" onclick="printReport()">📄 Print Report</button>
         <button class="btn" onclick="closeModal('equipmentDetailsModal')">Close</button>
       </div>
     </div>
@@ -1203,6 +1203,10 @@
           </select>
         </div>
         <div class="form-group">
+          <label for="issueCost">Estimated Repair Cost</label>
+          <input type="number" id="issueCost" step="0.01" min="0" placeholder="e.g., 250.00">
+        </div>
+        <div class="form-group">
           <label for="issueNotes">Issue Description/Notes *</label>
           <textarea id="issueNotes" required placeholder="Describe the issue in detail..."></textarea>
         </div>
@@ -1238,6 +1242,10 @@
         <div class="form-group">
           <label for="editIssueReportedDate">Reported Date *</label>
           <input type="date" id="editIssueReportedDate" required>
+        </div>
+        <div class="form-group">
+          <label for="editIssueCost">Estimated Repair Cost</label>
+          <input type="number" id="editIssueCost" step="0.01" min="0" placeholder="e.g., 250.00">
         </div>
         <div class="form-group">
           <label for="editIssueNotes">Issue Description/Notes *</label>
@@ -2216,10 +2224,13 @@
     window.addIssue = async function(event) {
       event.preventDefault();
       
+      const costValue = document.getElementById('issueCost').value;
+      
       const newIssue = {
         equipmentId: document.getElementById('issueEquipment').value,
         title: document.getElementById('issueTitle').value,
         severity: document.getElementById('issueSeverity').value,
+        cost: costValue ? parseFloat(costValue) : null,
         notes: document.getElementById('issueNotes').value,
         status: 'Pending',
         createdAt: new Date().toISOString(),
@@ -2297,6 +2308,7 @@
             <div class="issue-notes">${issue.notes}</div>
             <div class="issue-meta">
               <span><strong>Reported:</strong> ${new Date(issue.createdAt).toLocaleDateString()}</span>
+              ${issue.cost ? `<span><strong>Estimated Cost:</strong> $${parseFloat(issue.cost).toFixed(2)}</span>` : ''}
               ${isCompleted ? `<span><strong>Completed:</strong> ${new Date(issue.completedAt).toLocaleDateString()}</span>` : ''}
             </div>
             <div class="issue-actions">
@@ -2333,6 +2345,7 @@
       document.getElementById('editIssueTitle').value = issue.title;
       document.getElementById('editIssueSeverity').value = issue.severity || 'Minor';
       document.getElementById('editIssueReportedDate').value = issue.createdAt ? issue.createdAt.split('T')[0] : new Date().toISOString().split('T')[0];
+      document.getElementById('editIssueCost').value = issue.cost || '';
       document.getElementById('editIssueNotes').value = issue.notes;
       
       document.getElementById('editIssueModal').classList.add('active');
@@ -2343,11 +2356,13 @@
       
       const issueId = document.getElementById('editIssueId').value;
       const reportedDate = document.getElementById('editIssueReportedDate').value;
+      const costValue = document.getElementById('editIssueCost').value;
       
       const updatedIssue = {
         equipmentId: document.getElementById('editIssueEquipment').value,
         title: document.getElementById('editIssueTitle').value,
         severity: document.getElementById('editIssueSeverity').value,
+        cost: costValue ? parseFloat(costValue) : null,
         notes: document.getElementById('editIssueNotes').value,
         createdAt: new Date(reportedDate).toISOString()
       };

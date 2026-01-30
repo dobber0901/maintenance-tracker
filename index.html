@@ -2262,8 +2262,9 @@
       }, 3000);
     }
 
-    // Compress image to reduce size for Firestore storage (1MB limit per document)
-    function compressImage(file, maxWidth = 1200, quality = 0.7) {
+    // Compress image to ensure it's under target size for Firestore storage
+    // Target ~200KB per image to allow multiple photos while staying under 1MB document limit
+    function compressImage(file, targetSizeKB = 200) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -2272,22 +2273,49 @@
             const canvas = document.createElement('canvas');
             let width = img.width;
             let height = img.height;
+            let maxWidth = 1200;
+            let quality = 0.8;
 
-            // Scale down if needed
-            if (width > maxWidth) {
-              height = (height * maxWidth) / width;
-              width = maxWidth;
+            // Function to compress with current settings
+            function tryCompress() {
+              // Scale down if needed
+              if (width > maxWidth) {
+                const ratio = maxWidth / width;
+                width = maxWidth;
+                height = height * ratio;
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+
+              // Convert to compressed JPEG
+              const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+
+              // Check size (base64 is ~33% larger than binary)
+              const sizeKB = (compressedDataUrl.length * 0.75) / 1024;
+
+              if (sizeKB <= targetSizeKB || quality <= 0.1) {
+                // Either we're under target or at minimum quality
+                resolve(compressedDataUrl);
+              } else {
+                // Reduce quality and/or size and try again
+                if (quality > 0.3) {
+                  quality -= 0.1;
+                } else {
+                  // At low quality, also reduce dimensions
+                  maxWidth = Math.max(400, maxWidth - 200);
+                  width = img.width;
+                  height = img.height;
+                  quality = Math.max(0.1, quality - 0.05);
+                }
+                tryCompress();
+              }
             }
 
-            canvas.width = width;
-            canvas.height = height;
-
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-
-            // Convert to compressed JPEG
-            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-            resolve(compressedDataUrl);
+            tryCompress();
           };
           img.onerror = reject;
           img.src = e.target.result;

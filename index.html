@@ -1298,6 +1298,76 @@
       transform: scale(1.02);
     }
 
+    /* Multiple Photo Preview Styles */
+    .photo-previews-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .photo-preview-item {
+      position: relative;
+      display: inline-block;
+    }
+
+    .photo-preview-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .photo-preview-item img:hover {
+      border-color: var(--helena-green);
+    }
+
+    .photo-preview-item .remove-photo {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .photo-preview-item .remove-photo:hover {
+      background: #c0392b;
+    }
+
+    .issue-photos-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .issue-photos-gallery img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      border: 1px solid var(--border);
+    }
+
+    .issue-photos-gallery img:hover {
+      transform: scale(1.05);
+      border-color: var(--helena-green);
+    }
+
     /* Email Digest Styles */
     .email-config {
       background: var(--bg-primary);
@@ -1931,18 +2001,18 @@
           <textarea id="issueNotes" required placeholder="Describe the issue in detail..."></textarea>
         </div>
         <div class="form-group">
-          <label>Photo (optional)</label>
+          <label>Photos (optional)</label>
           <div class="photo-upload-area" id="issuePhotoArea" onclick="document.getElementById('issuePhoto').click()">
-            <div id="issuePhotoPlaceholder">📷 Click to add photo</div>
-            <img id="issuePhotoPreview" class="photo-preview" style="display: none;">
-            <input type="file" id="issuePhoto" accept="image/*" style="display: none;" onchange="window.previewIssuePhoto(this)">
+            <div id="issuePhotoPlaceholder">📷 Click to add photos</div>
+            <input type="file" id="issuePhoto" accept="image/*" multiple style="display: none;" onchange="window.previewIssuePhotos(this)">
           </div>
+          <div id="issuePhotoPreviews" class="photo-previews-container"></div>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Log Issue</button>
       </form>
     </div>
   </div>
-  
+
   <!-- Edit Issue Modal -->
   <div id="editIssueModal" class="modal">
     <div class="modal-content">
@@ -1980,14 +2050,13 @@
           <textarea id="editIssueNotes" required placeholder="Describe the issue in detail..."></textarea>
         </div>
         <div class="form-group">
-          <label>Photo</label>
-          <div id="editIssueCurrentPhoto" style="margin-bottom: 0.5rem;"></div>
+          <label>Photos</label>
+          <div id="editIssueCurrentPhotos" class="photo-previews-container" style="margin-bottom: 0.5rem;"></div>
           <div class="photo-upload-area" id="editIssuePhotoArea" onclick="document.getElementById('editIssuePhoto').click()">
-            <div id="editIssuePhotoPlaceholder">📷 Click to add/change photo</div>
-            <img id="editIssuePhotoPreview" class="photo-preview" style="display: none;">
-            <input type="file" id="editIssuePhoto" accept="image/*" style="display: none;" onchange="window.previewEditIssuePhoto(this)">
+            <div id="editIssuePhotoPlaceholder">📷 Click to add more photos</div>
+            <input type="file" id="editIssuePhoto" accept="image/*" multiple style="display: none;" onchange="window.previewEditIssuePhotos(this)">
           </div>
-          <button type="button" class="btn btn-small" style="margin-top: 0.5rem;" onclick="window.removeEditIssuePhoto()">Remove Photo</button>
+          <div id="editIssueNewPhotos" class="photo-previews-container"></div>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Update Issue</button>
       </form>
@@ -2144,7 +2213,9 @@
     let currentYear = new Date().getFullYear();
     let calendarViewMode = 'month'; // 'month' or 'week'
     let currentWeekStart = getWeekStart(new Date());
-    let currentIssuePhoto = null;
+    let currentIssuePhotos = [];
+    let editIssueExistingPhotos = [];
+    let editIssueNewPhotos = [];
 
     function getWeekStart(date) {
       const d = new Date(date);
@@ -3569,11 +3640,23 @@
     
     // ISSUES FUNCTIONS
     window.openAddIssueModal = function() {
+      // Reset photo state
+      currentIssuePhotos = [];
+      document.getElementById('issuePhotoPreviews').innerHTML = '';
+      document.getElementById('issuePhotoPlaceholder').textContent = '📷 Click to add photos';
+      document.getElementById('issuePhotoArea').classList.remove('has-photo');
+      document.getElementById('addIssueForm').reset();
       document.getElementById('addIssueModal').classList.add('active');
     }
-    
+
     // Quick log issue from equipment card
     window.quickLogIssue = function(equipmentId) {
+      // Reset photo state
+      currentIssuePhotos = [];
+      document.getElementById('issuePhotoPreviews').innerHTML = '';
+      document.getElementById('issuePhotoPlaceholder').textContent = '📷 Click to add photos';
+      document.getElementById('issuePhotoArea').classList.remove('has-photo');
+      document.getElementById('addIssueForm').reset();
       document.getElementById('issueEquipment').value = equipmentId;
       document.getElementById('addIssueModal').classList.add('active');
     }
@@ -3589,7 +3672,7 @@
         severity: document.getElementById('issueSeverity').value,
         cost: costValue ? parseFloat(costValue) : null,
         notes: document.getElementById('issueNotes').value,
-        photo: currentIssuePhoto || null,
+        photos: currentIssuePhotos.length > 0 ? currentIssuePhotos : [],
         status: 'Pending',
         createdAt: new Date().toISOString(),
         completedAt: null
@@ -3603,8 +3686,8 @@
         hideLoading();
         showToast('Issue logged successfully');
         // Reset photo state
-        currentIssuePhoto = null;
-        document.getElementById('issuePhotoPreview').style.display = 'none';
+        currentIssuePhotos = [];
+        document.getElementById('issuePhotoPreviews').innerHTML = '';
         document.getElementById('issuePhotoPlaceholder').style.display = 'block';
         document.getElementById('issuePhotoArea').classList.remove('has-photo');
         document.getElementById('addIssueForm').reset();
@@ -3617,6 +3700,26 @@
       }
     }
     
+    // Helper function to render issue photos (supports both old 'photo' and new 'photos' fields)
+    function renderIssuePhotosHTML(issue) {
+      let photos = [];
+      if (issue.photos && issue.photos.length > 0) {
+        photos = issue.photos;
+      } else if (issue.photo) {
+        photos = [issue.photo];
+      }
+
+      if (photos.length === 0) return '';
+
+      if (photos.length === 1) {
+        return `<img src="${photos[0]}" class="issue-photo" onclick="window.viewPhoto('${photos[0]}')" alt="Issue photo">`;
+      }
+
+      return `<div class="issue-photos-gallery">${photos.map(photo =>
+        `<img src="${photo}" onclick="window.viewPhoto('${photo}')" alt="Issue photo">`
+      ).join('')}</div>`;
+    }
+
     window.renderIssues = function() {
       const container = document.getElementById('issuesList');
       const filterEquipment = document.getElementById('issuesEquipmentFilter').value;
@@ -3671,7 +3774,7 @@
               <span class="status-badge ${isCompleted ? 'status-good' : 'status-warning'}">${issue.status}</span>
             </div>
             <div class="issue-notes">${issue.notes}</div>
-            ${issue.photo ? `<img src="${issue.photo}" class="issue-photo" onclick="window.viewPhoto('${issue.photo}')" alt="Issue photo">` : ''}
+            ${renderIssuePhotosHTML(issue)}
             <div class="issue-meta">
               <span><strong>Reported:</strong> ${new Date(issue.createdAt).toLocaleDateString()}</span>
               ${issue.cost ? `<span><strong>Estimated Cost:</strong> $${parseFloat(issue.cost).toFixed(2)}</span>` : ''}
@@ -3707,34 +3810,58 @@
       }
     }
     
-    // Edit issue photo handling
-    let editIssuePhoto = null;
-    let editIssuePhotoRemoved = false;
-
-    window.previewEditIssuePhoto = function(input) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          editIssuePhoto = e.target.result;
-          editIssuePhotoRemoved = false;
-          document.getElementById('editIssuePhotoPreview').src = e.target.result;
-          document.getElementById('editIssuePhotoPreview').style.display = 'block';
-          document.getElementById('editIssuePhotoPlaceholder').style.display = 'none';
-          document.getElementById('editIssuePhotoArea').classList.add('has-photo');
-          document.getElementById('editIssueCurrentPhoto').innerHTML = '';
-        };
-        reader.readAsDataURL(input.files[0]);
+    // Edit issue photo handling - multiple photos
+    window.previewEditIssuePhotos = function(input) {
+      if (input.files && input.files.length > 0) {
+        Array.from(input.files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            editIssueNewPhotos.push(e.target.result);
+            renderEditIssueNewPhotos();
+          };
+          reader.readAsDataURL(file);
+        });
+        input.value = ''; // Reset input to allow selecting same files again
       }
     }
 
-    window.removeEditIssuePhoto = function() {
-      editIssuePhoto = null;
-      editIssuePhotoRemoved = true;
-      document.getElementById('editIssuePhotoPreview').style.display = 'none';
-      document.getElementById('editIssuePhotoPlaceholder').style.display = 'block';
-      document.getElementById('editIssuePhotoArea').classList.remove('has-photo');
-      document.getElementById('editIssueCurrentPhoto').innerHTML = '';
-      document.getElementById('editIssuePhoto').value = '';
+    function renderEditIssueExistingPhotos() {
+      const container = document.getElementById('editIssueCurrentPhotos');
+      if (editIssueExistingPhotos.length === 0) {
+        container.innerHTML = '<span style="color: var(--text-secondary); font-size: 0.85rem;">No existing photos</span>';
+        return;
+      }
+      container.innerHTML = editIssueExistingPhotos.map((photo, index) => `
+        <div class="photo-preview-item">
+          <img src="${photo}" onclick="window.viewPhoto('${photo}')" title="Click to view">
+          <button type="button" class="remove-photo" onclick="window.removeEditIssueExistingPhoto(${index})" title="Remove">×</button>
+        </div>
+      `).join('');
+    }
+
+    function renderEditIssueNewPhotos() {
+      const container = document.getElementById('editIssueNewPhotos');
+      if (editIssueNewPhotos.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+      container.innerHTML = '<div style="font-size: 0.85rem; color: var(--text-secondary); width: 100%; margin-bottom: 0.25rem;">New photos to add:</div>' +
+        editIssueNewPhotos.map((photo, index) => `
+        <div class="photo-preview-item">
+          <img src="${photo}" onclick="window.viewPhoto('${photo}')" title="Click to view">
+          <button type="button" class="remove-photo" onclick="window.removeEditIssueNewPhoto(${index})" title="Remove">×</button>
+        </div>
+      `).join('');
+    }
+
+    window.removeEditIssueExistingPhoto = function(index) {
+      editIssueExistingPhotos.splice(index, 1);
+      renderEditIssueExistingPhotos();
+    }
+
+    window.removeEditIssueNewPhoto = function(index) {
+      editIssueNewPhotos.splice(index, 1);
+      renderEditIssueNewPhotos();
     }
 
     window.openEditIssueModal = function(issueId) {
@@ -3742,8 +3869,16 @@
       if (!issue) return;
 
       // Reset photo state
-      editIssuePhoto = null;
-      editIssuePhotoRemoved = false;
+      editIssueExistingPhotos = [];
+      editIssueNewPhotos = [];
+
+      // Load existing photos (support both old 'photo' field and new 'photos' array)
+      if (issue.photos && issue.photos.length > 0) {
+        editIssueExistingPhotos = [...issue.photos];
+      } else if (issue.photo) {
+        // Backwards compatibility with single photo
+        editIssueExistingPhotos = [issue.photo];
+      }
 
       document.getElementById('editIssueId').value = issueId;
       document.getElementById('editIssueEquipment').value = issue.equipmentId;
@@ -3753,29 +3888,13 @@
       document.getElementById('editIssueCost').value = issue.cost || '';
       document.getElementById('editIssueNotes').value = issue.notes;
 
-      // Show current photo if exists
-      const currentPhotoDiv = document.getElementById('editIssueCurrentPhoto');
-      const photoPreview = document.getElementById('editIssuePhotoPreview');
-      const photoPlaceholder = document.getElementById('editIssuePhotoPlaceholder');
-      const photoArea = document.getElementById('editIssuePhotoArea');
-
-      if (issue.photo) {
-        currentPhotoDiv.innerHTML = `<img src="${issue.photo}" class="photo-preview" style="display: block; margin-bottom: 0.5rem;" onclick="window.viewPhoto('${issue.photo}')"><small style="color: var(--text-secondary);">Current photo (click to view)</small>`;
-        photoPreview.style.display = 'none';
-        photoPlaceholder.textContent = '📷 Click to replace photo';
-        photoPlaceholder.style.display = 'block';
-        photoArea.classList.remove('has-photo');
-      } else {
-        currentPhotoDiv.innerHTML = '';
-        photoPreview.style.display = 'none';
-        photoPlaceholder.textContent = '📷 Click to add photo';
-        photoPlaceholder.style.display = 'block';
-        photoArea.classList.remove('has-photo');
-      }
+      // Render existing photos
+      renderEditIssueExistingPhotos();
+      renderEditIssueNewPhotos();
 
       document.getElementById('editIssueModal').classList.add('active');
     }
-    
+
     window.updateIssue = async function(event) {
       event.preventDefault();
 
@@ -3783,27 +3902,18 @@
       const reportedDate = document.getElementById('editIssueReportedDate').value;
       const costValue = document.getElementById('editIssueCost').value;
 
+      // Combine existing and new photos
+      const allPhotos = [...editIssueExistingPhotos, ...editIssueNewPhotos];
+
       const updatedIssue = {
         equipmentId: document.getElementById('editIssueEquipment').value,
         title: document.getElementById('editIssueTitle').value,
         severity: document.getElementById('editIssueSeverity').value,
         cost: costValue ? parseFloat(costValue) : null,
         notes: document.getElementById('editIssueNotes').value,
-        createdAt: new Date(reportedDate).toISOString()
+        createdAt: new Date(reportedDate).toISOString(),
+        photos: allPhotos
       };
-
-      // Handle photo updates
-      const existingIssue = issues.find(i => i.id === issueId);
-      if (editIssuePhoto) {
-        // New photo was added
-        updatedIssue.photo = editIssuePhoto;
-      } else if (editIssuePhotoRemoved) {
-        // Photo was removed
-        updatedIssue.photo = null;
-      } else if (existingIssue && existingIssue.photo) {
-        // Keep existing photo
-        updatedIssue.photo = existingIssue.photo;
-      }
 
       showLoading('Updating issue...');
 
@@ -4854,19 +4964,42 @@
       if (tabName === 'dashboard') renderDashboard();
     }
 
-    // PHOTO HANDLING FUNCTIONS
-    window.previewIssuePhoto = function(input) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          currentIssuePhoto = e.target.result;
-          document.getElementById('issuePhotoPreview').src = e.target.result;
-          document.getElementById('issuePhotoPreview').style.display = 'block';
-          document.getElementById('issuePhotoPlaceholder').style.display = 'none';
-          document.getElementById('issuePhotoArea').classList.add('has-photo');
-        };
-        reader.readAsDataURL(input.files[0]);
+    // PHOTO HANDLING FUNCTIONS - Multiple photos support
+    window.previewIssuePhotos = function(input) {
+      if (input.files && input.files.length > 0) {
+        Array.from(input.files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            currentIssuePhotos.push(e.target.result);
+            renderIssuePhotoPreviews();
+          };
+          reader.readAsDataURL(file);
+        });
+        input.value = ''; // Reset to allow selecting same files
+        document.getElementById('issuePhotoPlaceholder').textContent = '📷 Click to add more photos';
+        document.getElementById('issuePhotoArea').classList.add('has-photo');
       }
+    }
+
+    function renderIssuePhotoPreviews() {
+      const container = document.getElementById('issuePhotoPreviews');
+      if (currentIssuePhotos.length === 0) {
+        container.innerHTML = '';
+        document.getElementById('issuePhotoPlaceholder').textContent = '📷 Click to add photos';
+        document.getElementById('issuePhotoArea').classList.remove('has-photo');
+        return;
+      }
+      container.innerHTML = currentIssuePhotos.map((photo, index) => `
+        <div class="photo-preview-item">
+          <img src="${photo}" onclick="window.viewPhoto('${photo}')" title="Click to view">
+          <button type="button" class="remove-photo" onclick="window.removeIssuePhoto(${index})" title="Remove">×</button>
+        </div>
+      `).join('');
+    }
+
+    window.removeIssuePhoto = function(index) {
+      currentIssuePhotos.splice(index, 1);
+      renderIssuePhotoPreviews();
     }
 
     window.viewPhoto = function(photoData) {
@@ -5056,13 +5189,20 @@
       // Issues
       const equipmentIssues = issues.filter(i => i.equipmentId === equipmentId);
       equipmentIssues.forEach(issue => {
+        // Support both old 'photo' and new 'photos' fields
+        let photos = [];
+        if (issue.photos && issue.photos.length > 0) {
+          photos = issue.photos;
+        } else if (issue.photo) {
+          photos = [issue.photo];
+        }
         events.push({
           type: issue.severity === 'Critical' ? 'critical' : 'issue',
           date: new Date(issue.createdAt),
           title: issue.title,
           description: issue.notes,
           status: issue.status,
-          photo: issue.photo || null
+          photos: photos
         });
         if (issue.completedAt) {
           events.push({
@@ -5106,6 +5246,12 @@
         timelineHTML += '<p style="color: var(--text-secondary);">No history recorded yet.</p>';
       } else {
         events.forEach(event => {
+          let photosHTML = '';
+          if (event.photos && event.photos.length > 0) {
+            photosHTML = `<div class="timeline-photo" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+              ${event.photos.map(photo => `<img src="${photo}" alt="Issue photo" onclick="window.viewPhoto('${photo}')" style="max-width: 100px; max-height: 75px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid var(--border);">`).join('')}
+            </div>`;
+          }
           timelineHTML += `
             <div class="timeline-item ${event.type}">
               <div class="timeline-date">${event.date.toLocaleDateString()} ${event.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
@@ -5114,7 +5260,7 @@
                 ${event.description ? `<div class="timeline-description">${event.description}</div>` : ''}
                 ${event.hours ? `<div class="timeline-description">Hours: ${event.hours}</div>` : ''}
                 ${event.status ? `<div class="timeline-description">Status: ${event.status}</div>` : ''}
-                ${event.photo ? `<div class="timeline-photo"><img src="${event.photo}" alt="Issue photo" onclick="window.viewPhoto('${event.photo}')" style="max-width: 200px; max-height: 150px; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; border: 1px solid var(--border);"></div>` : ''}
+                ${photosHTML}
               </div>
             </div>
           `;

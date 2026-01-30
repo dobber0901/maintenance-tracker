@@ -1203,6 +1203,19 @@
       color: var(--text-secondary);
     }
 
+    .timeline-photo {
+      margin-top: 0.5rem;
+    }
+
+    .timeline-photo img {
+      transition: transform 0.2s;
+    }
+
+    .timeline-photo img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
     /* Photo Attachment Styles */
     .photo-upload-area {
       border: 2px dashed var(--border);
@@ -1888,6 +1901,16 @@
         <div class="form-group">
           <label for="editIssueNotes">Issue Description/Notes *</label>
           <textarea id="editIssueNotes" required placeholder="Describe the issue in detail..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Photo</label>
+          <div id="editIssueCurrentPhoto" style="margin-bottom: 0.5rem;"></div>
+          <div class="photo-upload-area" id="editIssuePhotoArea" onclick="document.getElementById('editIssuePhoto').click()">
+            <div id="editIssuePhotoPlaceholder">📷 Click to add/change photo</div>
+            <img id="editIssuePhotoPreview" class="photo-preview" style="display: none;">
+            <input type="file" id="editIssuePhoto" accept="image/*" style="display: none;" onchange="window.previewEditIssuePhoto(this)">
+          </div>
+          <button type="button" class="btn btn-small" style="margin-top: 0.5rem;" onclick="window.removeEditIssuePhoto()">Remove Photo</button>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Update Issue</button>
       </form>
@@ -3341,10 +3364,44 @@
       }
     }
     
+    // Edit issue photo handling
+    let editIssuePhoto = null;
+    let editIssuePhotoRemoved = false;
+
+    window.previewEditIssuePhoto = function(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          editIssuePhoto = e.target.result;
+          editIssuePhotoRemoved = false;
+          document.getElementById('editIssuePhotoPreview').src = e.target.result;
+          document.getElementById('editIssuePhotoPreview').style.display = 'block';
+          document.getElementById('editIssuePhotoPlaceholder').style.display = 'none';
+          document.getElementById('editIssuePhotoArea').classList.add('has-photo');
+          document.getElementById('editIssueCurrentPhoto').innerHTML = '';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    window.removeEditIssuePhoto = function() {
+      editIssuePhoto = null;
+      editIssuePhotoRemoved = true;
+      document.getElementById('editIssuePhotoPreview').style.display = 'none';
+      document.getElementById('editIssuePhotoPlaceholder').style.display = 'block';
+      document.getElementById('editIssuePhotoArea').classList.remove('has-photo');
+      document.getElementById('editIssueCurrentPhoto').innerHTML = '';
+      document.getElementById('editIssuePhoto').value = '';
+    }
+
     window.openEditIssueModal = function(issueId) {
       const issue = issues.find(i => i.id === issueId);
       if (!issue) return;
-      
+
+      // Reset photo state
+      editIssuePhoto = null;
+      editIssuePhotoRemoved = false;
+
       document.getElementById('editIssueId').value = issueId;
       document.getElementById('editIssueEquipment').value = issue.equipmentId;
       document.getElementById('editIssueTitle').value = issue.title;
@@ -3352,7 +3409,27 @@
       document.getElementById('editIssueReportedDate').value = issue.createdAt ? issue.createdAt.split('T')[0] : new Date().toISOString().split('T')[0];
       document.getElementById('editIssueCost').value = issue.cost || '';
       document.getElementById('editIssueNotes').value = issue.notes;
-      
+
+      // Show current photo if exists
+      const currentPhotoDiv = document.getElementById('editIssueCurrentPhoto');
+      const photoPreview = document.getElementById('editIssuePhotoPreview');
+      const photoPlaceholder = document.getElementById('editIssuePhotoPlaceholder');
+      const photoArea = document.getElementById('editIssuePhotoArea');
+
+      if (issue.photo) {
+        currentPhotoDiv.innerHTML = `<img src="${issue.photo}" class="photo-preview" style="display: block; margin-bottom: 0.5rem;" onclick="window.viewPhoto('${issue.photo}')"><small style="color: var(--text-secondary);">Current photo (click to view)</small>`;
+        photoPreview.style.display = 'none';
+        photoPlaceholder.textContent = '📷 Click to replace photo';
+        photoPlaceholder.style.display = 'block';
+        photoArea.classList.remove('has-photo');
+      } else {
+        currentPhotoDiv.innerHTML = '';
+        photoPreview.style.display = 'none';
+        photoPlaceholder.textContent = '📷 Click to add photo';
+        photoPlaceholder.style.display = 'block';
+        photoArea.classList.remove('has-photo');
+      }
+
       document.getElementById('editIssueModal').classList.add('active');
     }
     
@@ -3371,6 +3448,19 @@
         notes: document.getElementById('editIssueNotes').value,
         createdAt: new Date(reportedDate).toISOString()
       };
+
+      // Handle photo updates
+      const existingIssue = issues.find(i => i.id === issueId);
+      if (editIssuePhoto) {
+        // New photo was added
+        updatedIssue.photo = editIssuePhoto;
+      } else if (editIssuePhotoRemoved) {
+        // Photo was removed
+        updatedIssue.photo = null;
+      } else if (existingIssue && existingIssue.photo) {
+        // Keep existing photo
+        updatedIssue.photo = existingIssue.photo;
+      }
 
       showLoading('Updating issue...');
 
@@ -4630,7 +4720,8 @@
           date: new Date(issue.createdAt),
           title: issue.title,
           description: issue.notes,
-          status: issue.status
+          status: issue.status,
+          photo: issue.photo || null
         });
         if (issue.completedAt) {
           events.push({
@@ -4682,6 +4773,7 @@
                 ${event.description ? `<div class="timeline-description">${event.description}</div>` : ''}
                 ${event.hours ? `<div class="timeline-description">Hours: ${event.hours}</div>` : ''}
                 ${event.status ? `<div class="timeline-description">Status: ${event.status}</div>` : ''}
+                ${event.photo ? `<div class="timeline-photo"><img src="${event.photo}" alt="Issue photo" onclick="window.viewPhoto('${event.photo}')" style="max-width: 200px; max-height: 150px; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; border: 1px solid var(--border);"></div>` : ''}
               </div>
             </div>
           `;

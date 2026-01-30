@@ -886,8 +886,14 @@
           <div class="stat-card-value" id="dashMinorIssuesCount">0</div>
           <div class="stat-card-label">Minor Issues</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="color: #2196F3;">📍</div>
+          <div class="stat-card-value" id="dashCheckedOutCount">0</div>
+          <div class="stat-card-label">Checked Out</div>
+        </div>
       </div>
       
+      <div id="dashboardCheckedOut"></div>
       <div id="dashboardCriticalIssues"></div>
       <div id="dashboardMinorIssues"></div>
     </div>
@@ -1619,6 +1625,10 @@
       return issues.filter(i => i.equipmentId === equipmentId && i.status === 'Pending').length;
     }
     
+    function isCheckedOut(equipmentId) {
+      return locations.filter(l => l.equipmentId === equipmentId && l.status === 'Checked Out').length > 0;
+    }
+    
     function renderEquipment() {
       const grid = document.getElementById('equipmentGrid');
       
@@ -1657,6 +1667,7 @@
           const { status, itemsOverdue, itemsDueSoon } = getEquipmentOverallStatus(eq);
           const pendingIssues = hasActiveIssues(eq.id);
           const hasCriticalIssue = issues.filter(i => i.equipmentId === eq.id && i.status === 'Pending' && i.severity === 'Critical').length > 0;
+          const checkedOut = isCheckedOut(eq.id);
           
           let statusText = 'All Good';
           let statusClass = 'status-good';
@@ -1671,7 +1682,7 @@
           
           html += `
             <div class="equipment-card ${pendingIssues > 0 ? 'has-issues' : ''}">
-              ${pendingIssues > 0 ? `<div class="repair-badge" style="${hasCriticalIssue ? 'background: var(--danger);' : ''}">⚠ ${pendingIssues} Issue${pendingIssues > 1 ? 's' : ''}</div>` : ''}
+              ${pendingIssues > 0 ? `<div class="repair-badge" style="${hasCriticalIssue ? 'background: var(--danger);' : ''}">${checkedOut ? '📍 ' : ''}⚠ ${pendingIssues} Issue${pendingIssues > 1 ? 's' : ''}</div>` : checkedOut ? `<div class="repair-badge" style="background: #2196F3;">📍 Checked Out</div>` : ''}
               <div class="equipment-header">
                 <div>
                   <div class="equipment-id">${eq.equipmentId}</div>
@@ -2505,11 +2516,56 @@
       
       const criticalIssues = issues.filter(i => i.status === 'Pending' && i.severity === 'Critical');
       const minorIssues = issues.filter(i => i.status === 'Pending' && i.severity === 'Minor');
+      const checkedOutItems = locations.filter(l => l.status === 'Checked Out');
       
       document.getElementById('dashOverdueCount').textContent = overdueCount;
       document.getElementById('dashUpToDateCount').textContent = upToDateCount;
       document.getElementById('dashOutOfServiceCount').textContent = criticalIssues.length;
       document.getElementById('dashMinorIssuesCount').textContent = minorIssues.length;
+      document.getElementById('dashCheckedOutCount').textContent = checkedOutItems.length;
+      
+      // Render Checked Out Equipment Section
+      const checkedOutContainer = document.getElementById('dashboardCheckedOut');
+      if (checkedOutItems.length > 0) {
+        checkedOutContainer.innerHTML = `
+          <div class="dashboard-section">
+            <h3 class="dashboard-section-title">📍 Equipment Checked Out</h3>
+            ${checkedOutItems.map(location => {
+              const eq = equipment.find(e => e.id === location.equipmentId);
+              const checkOutDate = new Date(location.checkOutDate);
+              const today = new Date();
+              const daysOut = Math.floor((today - checkOutDate) / (1000 * 60 * 60 * 24));
+              
+              return `
+                <div class="dashboard-issue-item" style="border-left-color: #2196F3;">
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Equipment ID</div>
+                    <div class="dashboard-issue-field-value">${eq ? eq.equipmentId : 'Unknown'}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Equipment Type</div>
+                    <div class="dashboard-issue-field-value">${eq ? eq.type : 'Unknown'}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Customer</div>
+                    <div class="dashboard-issue-field-value">${location.customer}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Checked Out Date</div>
+                    <div class="dashboard-issue-field-value">${checkOutDate.toLocaleDateString()}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Days Out</div>
+                    <div class="days-down" style="color: #2196F3;">${daysOut}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        checkedOutContainer.innerHTML = '';
+      }
       
       // Render Critical Issues Section
       const criticalContainer = document.getElementById('dashboardCriticalIssues');

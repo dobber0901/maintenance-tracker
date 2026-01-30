@@ -706,7 +706,7 @@
     .repair-badge {
       position: absolute;
       top: 10px;
-      right: 10px;
+      left: 10px;
       background: var(--warning);
       color: white;
       padding: 0.3rem 0.6rem;
@@ -854,6 +854,7 @@
       <button class="nav-tab" data-tab="schedule">Schedule</button>
       <button class="nav-tab" data-tab="issues">Equipment Issues</button>
       <button class="nav-tab" data-tab="location">Item Location</button>
+      <button class="nav-tab" data-tab="costrepair">Cost Repair</button>
     </div>
     
     <div id="equipment-tab" class="tab-content active">
@@ -953,6 +954,23 @@
         </label>
       </div>
       <div id="locationsList"></div>
+    </div>
+    
+    <!-- Cost Repair Tab -->
+    <div id="costrepair-tab" class="tab-content">
+      <div class="action-bar">
+        <select id="costRepairEquipmentFilter" onchange="renderCostRepair()">
+          <option value="">Select Equipment</option>
+        </select>
+        <button class="btn btn-primary" onclick="printCostRepairReport()" id="printCostRepairBtn" style="display: none;">📄 Print Cost Analysis Report</button>
+      </div>
+      
+      <div id="costRepairChart" style="display: none; background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="font-family: 'Roboto Condensed', sans-serif; color: var(--helena-green); margin-bottom: 1rem;">Repair Costs by Year</h3>
+        <canvas id="costChartCanvas" style="max-height: 300px;"></canvas>
+      </div>
+      
+      <div id="costRepairList"></div>
     </div>
   </div>
   
@@ -1306,6 +1324,8 @@
     </div>
   </div>
   
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -1455,6 +1475,20 @@
         });
         locationFilterSelect.innerHTML = locationFilterGroupedOptions;
       }
+      
+      // Cost Repair tab select
+      const costRepairFilterSelect = document.getElementById('costRepairEquipmentFilter');
+      if (costRepairFilterSelect) {
+        let costRepairFilterGroupedOptions = '<option value="">Select Equipment</option>';
+        Object.keys(grouped).sort().forEach(type => {
+          costRepairFilterGroupedOptions += `<optgroup label="${type}">`;
+          grouped[type].forEach(eq => {
+            costRepairFilterGroupedOptions += `<option value="${eq.id}">${eq.equipmentId} - ${eq.name}</option>`;
+          });
+          costRepairFilterGroupedOptions += '</optgroup>';
+        });
+        costRepairFilterSelect.innerHTML = costRepairFilterGroupedOptions;
+      }
     }
     
     document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -1475,6 +1509,8 @@
           renderDashboard();
         } else if (tabName === 'location') {
           renderLocations();
+        } else if (tabName === 'costrepair') {
+          renderCostRepair();
         }
       });
     });
@@ -2813,6 +2849,276 @@
         console.error('Error deleting location:', error);
         alert('Error deleting location. Please try again.');
       }
+    }
+    
+    // COST REPAIR ANALYSIS FUNCTIONS
+    let costChart = null;
+    
+    window.renderCostRepair = function() {
+      const selectedEquipmentId = document.getElementById('costRepairEquipmentFilter').value;
+      const listContainer = document.getElementById('costRepairList');
+      const chartContainer = document.getElementById('costRepairChart');
+      const printBtn = document.getElementById('printCostRepairBtn');
+      
+      if (!selectedEquipmentId) {
+        listContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">💰</div>
+            <h3>Select Equipment</h3>
+            <p>Choose equipment from the dropdown to view repair cost analysis</p>
+          </div>
+        `;
+        chartContainer.style.display = 'none';
+        printBtn.style.display = 'none';
+        return;
+      }
+      
+      const eq = equipment.find(e => e.id === selectedEquipmentId);
+      const equipmentIssues = issues.filter(i => i.equipmentId === selectedEquipmentId);
+      
+      if (equipmentIssues.length === 0) {
+        listContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">✅</div>
+            <h3>No Repair Costs</h3>
+            <p>${eq ? eq.equipmentId : 'This equipment'} has no recorded repair issues</p>
+          </div>
+        `;
+        chartContainer.style.display = 'none';
+        printBtn.style.display = 'none';
+        return;
+      }
+      
+      printBtn.style.display = 'inline-block';
+      
+      // Calculate costs by year
+      const costsByYear = {};
+      let totalCost = 0;
+      
+      equipmentIssues.forEach(issue => {
+        if (issue.cost) {
+          const year = new Date(issue.createdAt).getFullYear();
+          if (!costsByYear[year]) {
+            costsByYear[year] = 0;
+          }
+          costsByYear[year] += parseFloat(issue.cost);
+          totalCost += parseFloat(issue.cost);
+        }
+      });
+      
+      // Render chart
+      const years = Object.keys(costsByYear).sort();
+      const costs = years.map(year => costsByYear[year]);
+      
+      if (years.length > 0) {
+        chartContainer.style.display = 'block';
+        
+        const ctx = document.getElementById('costChartCanvas').getContext('2d');
+        
+        if (costChart) {
+          costChart.destroy();
+        }
+        
+        costChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: years,
+            datasets: [{
+              label: 'Repair Costs ($)',
+              data: costs,
+              backgroundColor: '#215530',
+              borderColor: '#215530',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: false
+              },
+              title: {
+                display: true,
+                text: `${eq ? eq.equipmentId : 'Equipment'} - Total Repair Costs by Year`,
+                font: {
+                  size: 16,
+                  weight: 'bold',
+                  family: "'Roboto Condensed', sans-serif"
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return '$' + value.toFixed(0);
+                  }
+                }
+              }
+            }
+          }
+        });
+      } else {
+        chartContainer.style.display = 'none';
+      }
+      
+      // Render issue list with costs
+      listContainer.innerHTML = `
+        <div style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem;">
+          <h3 style="font-family: 'Roboto Condensed', sans-serif; color: var(--helena-green); margin-bottom: 1rem;">
+            ${eq ? `${eq.equipmentId} - ${eq.name}` : 'Equipment'} Repair History
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="text-align: center; padding: 1rem; background: var(--bg-primary); border-radius: 6px;">
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Total Issues</div>
+              <div style="font-size: 2rem; font-weight: 700; color: var(--helena-green);">${equipmentIssues.length}</div>
+            </div>
+            <div style="text-align: center; padding: 1rem; background: var(--bg-primary); border-radius: 6px;">
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Issues with Cost</div>
+              <div style="font-size: 2rem; font-weight: 700; color: var(--helena-green);">${equipmentIssues.filter(i => i.cost).length}</div>
+            </div>
+            <div style="text-align: center; padding: 1rem; background: var(--bg-primary); border-radius: 6px;">
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Total Cost</div>
+              <div style="font-size: 2rem; font-weight: 700; color: var(--danger);">$${totalCost.toFixed(2)}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 8px;">
+          <h4 style="font-family: 'Roboto Condensed', sans-serif; color: var(--helena-green); margin-bottom: 1rem;">Detailed Issue List</h4>
+          ${equipmentIssues.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(issue => {
+            const severity = issue.severity || 'Minor';
+            return `
+              <div style="border: 1px solid var(--border); border-left: 4px solid ${severity === 'Critical' ? 'var(--danger)' : 'var(--warning)'}; border-radius: 6px; padding: 1rem; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                  <div>
+                    <div style="font-weight: 700; color: var(--text-primary);">${issue.title}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                      <span class="severity-badge severity-${severity.toLowerCase()}">${severity}</span>
+                      <span style="margin-left: 0.5rem;">Reported: ${new Date(issue.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-size: 1.25rem; font-weight: 700; color: ${issue.cost ? 'var(--danger)' : 'var(--text-secondary)'};">
+                      ${issue.cost ? '$' + parseFloat(issue.cost).toFixed(2) : 'No Cost'}
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">${issue.status}</div>
+                  </div>
+                </div>
+                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">${issue.notes}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+    
+    window.printCostRepairReport = function() {
+      const selectedEquipmentId = document.getElementById('costRepairEquipmentFilter').value;
+      if (!selectedEquipmentId) {
+        alert('Please select equipment first');
+        return;
+      }
+      
+      const eq = equipment.find(e => e.id === selectedEquipmentId);
+      const equipmentIssues = issues.filter(i => i.equipmentId === selectedEquipmentId);
+      
+      // Calculate costs by year
+      const costsByYear = {};
+      let totalCost = 0;
+      
+      equipmentIssues.forEach(issue => {
+        if (issue.cost) {
+          const year = new Date(issue.createdAt).getFullYear();
+          if (!costsByYear[year]) {
+            costsByYear[year] = 0;
+          }
+          costsByYear[year] += parseFloat(issue.cost);
+          totalCost += parseFloat(issue.cost);
+        }
+      });
+      
+      const years = Object.keys(costsByYear).sort();
+      
+      const logoSVG = '<svg width="120" height="68" viewBox="0 0 157 90" xmlns="http://www.w3.org/2000/svg"><g fill="#215530"><path d="M78.487013,73.5487013 C57.974026,73.5487013 38.6298701,69.9837662 24.0194805,63.4967532 C8.53246753,56.6006494 0,47.1331169 0,36.788961 C0,26.4155844 8.53246753,16.9480519 24.0194805,10.0519481 C38.6298701,3.56493506 57.974026,0 78.487013,0 C99,0 118.344156,3.56493506 132.954545,10.0519481 C148.441558,16.9480519 156.974026,26.4155844 156.974026,36.7597403 C156.974026,47.1038961 148.441558,56.6006494 132.954545,63.4675325 C118.373377,69.9837662 99.0292208,73.5487013 78.487013,73.5487013 Z M78.487013,6.8961039 C58.9090909,6.8961039 40.5584416,10.2564935 26.7954545,16.3636364 C14.1136364,22.0032468 6.86688312,29.4253247 6.86688312,36.788961 C6.86688312,44.1525974 14.1428571,51.5746753 26.7954545,57.2142857 C40.5292208,63.3214286 58.9090909,66.6818182 78.487013,66.6818182 C98.0649351,66.6818182 116.415584,63.3214286 130.178571,57.2142857 C142.86039,51.5746753 150.107143,44.1525974 150.107143,36.788961 C150.107143,29.4253247 142.831169,22.0032468 130.178571,16.3636364 C116.444805,10.2564935 98.0649351,6.8961039 78.487013,6.8961039 Z"/><polygon points="25.5681818 49.1785714 25.5681818 39.5357143 32.5227273 39.5357143 32.5227273 49.1785714 39.9155844 49.1785714 39.9155844 24.3116883 32.5227273 24.3116883 32.5227273 32.6980519 25.5681818 32.6980519 25.5681818 24.3116883 18.1753247 24.3116883 18.1753247 49.1785714"/><polygon points="58.8506494 49.1785714 58.8506494 43.3928571 48.7402597 43.3928571 48.7402597 39.4772727 58.0324675 39.4772727 58.0324675 33.6623377 48.7402597 33.6623377 48.7402597 30.0974026 58.4123377 30.0974026 58.4123377 24.3116883 41.3474026 24.3116883 41.3474026 49.1785714"/><polygon points="75.4188312 49.1785714 75.4188312 42.9545455 67.8798701 42.9545455 67.8798701 24.3116883 60.487013 24.3116883 60.487013 49.1785714"/><polygon points="94.1201299 49.1785714 94.1201299 43.3928571 84.0097403 43.3928571 84.0097403 39.4772727 93.3019481 39.4772727 93.3019481 33.6623377 84.0097403 33.6623377 84.0097403 30.0974026 93.6818182 30.0974026 93.6818182 24.3116883 76.6168831 24.3116883 76.6168831 49.1785714"/><polygon points="104.172078 24.3116883 95.5519481 24.3116883 95.5519481 49.1785714 102.623377 49.1785714 102.623377 41.3181818 102.331169 35.6493506 108.642857 49.1785714 117.262987 49.1785714 117.262987 24.3116883 110.220779 24.3116883 110.220779 32.2305195 110.483766 37.8993506"/><polygon points="121.87987 37.8409091 132.691558 37.8409091 132.691558 43.9188312 121.87987 43.9188312"/><polygon points="122.931818 24.5746753 132.662338 24.5746753 139.587662 49.1785714 133.042208 49.1785714 127.811688 30.1558442 122.727273 49.1785714 115.275974 49.1785714"/></g></svg>';
+      
+      let printHTML = '<html><head><title>Cost Analysis Report</title>';
+      printHTML += '<style>';
+      printHTML += 'body{font-family:Arial,sans-serif;padding:15px;font-size:11px;} ';
+      printHTML += 'h1{color:#215530;font-size:20px;margin:0 0 5px;text-transform:uppercase;} ';
+      printHTML += 'h2{color:#215530;font-size:16px;margin:15px 0 8px;border-bottom:2px solid #215530;padding-bottom:4px;} ';
+      printHTML += 'h3{color:#215530;font-size:14px;margin:10px 0 6px;} ';
+      printHTML += '.header{display:flex;align-items:center;gap:15px;margin-bottom:15px;border-bottom:2px solid #215530;padding-bottom:10px;} ';
+      printHTML += '.info{background:#f8f9fa;padding:8px;margin:0 0 10px;border-left:3px solid #215530;font-size:10px;} ';
+      printHTML += '.info p{margin:2px 0;} ';
+      printHTML += '.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0;} ';
+      printHTML += '.summary-box{background:#f8f9fa;padding:10px;text-align:center;border-radius:4px;} ';
+      printHTML += '.summary-label{font-size:9px;color:#666;margin-bottom:4px;} ';
+      printHTML += '.summary-value{font-size:18px;font-weight:700;color:#215530;} ';
+      printHTML += 'table{width:100%;border-collapse:collapse;font-size:10px;margin:10px 0;} ';
+      printHTML += 'th{background:#215530;color:white;padding:6px 8px;text-align:left;font-size:10px;} ';
+      printHTML += 'td{padding:6px 8px;border-bottom:1px solid #ddd;vertical-align:top;} ';
+      printHTML += 'tr:nth-child(even) td{background:#f8f9fa;} ';
+      printHTML += '.critical{border-left:3px solid #dc3545;} ';
+      printHTML += '.minor{border-left:3px solid #ffc107;} ';
+      printHTML += '@page{margin:0.5in;}';
+      printHTML += '</style></head><body>';
+      
+      printHTML += '<div class="header">' + logoSVG;
+      printHTML += '<div><h1>Equipment Repair Cost Analysis</h1>';
+      printHTML += '<div style="font-size:10px;color:#666;">Helena Agri-Enterprises</div></div></div>';
+      
+      printHTML += '<div class="info">';
+      printHTML += '<p><b>Equipment ID:</b> ' + eq.equipmentId + ' &nbsp;&nbsp; <b>Name:</b> ' + eq.name + '</p>';
+      printHTML += '<p><b>Type:</b> ' + eq.type + ' &nbsp;&nbsp; <b>Report Date:</b> ' + new Date().toLocaleDateString() + '</p>';
+      printHTML += '</div>';
+      
+      printHTML += '<div class="summary">';
+      printHTML += '<div class="summary-box"><div class="summary-label">Total Issues</div><div class="summary-value">' + equipmentIssues.length + '</div></div>';
+      printHTML += '<div class="summary-box"><div class="summary-label">Issues with Cost Data</div><div class="summary-value">' + equipmentIssues.filter(i => i.cost).length + '</div></div>';
+      printHTML += '<div class="summary-box"><div class="summary-label">Total Repair Cost</div><div class="summary-value" style="color:#dc3545;">$' + totalCost.toFixed(2) + '</div></div>';
+      printHTML += '</div>';
+      
+      if (years.length > 0) {
+        printHTML += '<h2>Cost Summary by Year</h2>';
+        printHTML += '<table><tr><th>Year</th><th>Total Cost</th><th>Number of Issues</th><th>Average Cost per Issue</th></tr>';
+        years.forEach(year => {
+          const yearIssues = equipmentIssues.filter(i => i.cost && new Date(i.createdAt).getFullYear().toString() === year);
+          const avgCost = costsByYear[year] / yearIssues.length;
+          printHTML += '<tr>';
+          printHTML += '<td><b>' + year + '</b></td>';
+          printHTML += '<td>$' + costsByYear[year].toFixed(2) + '</td>';
+          printHTML += '<td>' + yearIssues.length + '</td>';
+          printHTML += '<td>$' + avgCost.toFixed(2) + '</td>';
+          printHTML += '</tr>';
+        });
+        printHTML += '</table>';
+      }
+      
+      printHTML += '<h2>Detailed Issue History</h2>';
+      printHTML += '<table><tr><th>Date</th><th>Issue</th><th>Severity</th><th>Cost</th><th>Status</th></tr>';
+      
+      equipmentIssues.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(issue => {
+        const severity = issue.severity || 'Minor';
+        printHTML += '<tr class="' + severity.toLowerCase() + '">';
+        printHTML += '<td>' + new Date(issue.createdAt).toLocaleDateString() + '</td>';
+        printHTML += '<td><b>' + issue.title + '</b><br><span style="font-size:9px;color:#666;">' + issue.notes + '</span></td>';
+        printHTML += '<td>' + severity + '</td>';
+        printHTML += '<td><b>' + (issue.cost ? '$' + parseFloat(issue.cost).toFixed(2) : 'N/A') + '</b></td>';
+        printHTML += '<td>' + issue.status + '</td>';
+        printHTML += '</tr>';
+      });
+      
+      printHTML += '</table>';
+      printHTML += '</body></html>';
+      
+      const win = window.open('', '_blank');
+      win.document.write(printHTML);
+      win.document.close();
+      win.focus();
+      setTimeout(() => win.print(), 250);
     }
     
     window.openAddTemplateModal = function() {

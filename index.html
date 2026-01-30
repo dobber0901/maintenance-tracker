@@ -968,6 +968,415 @@
       font-style: italic;
       margin-top: 0.15rem;
     }
+
+    /* Alerts Banner */
+    .alerts-banner {
+      background: linear-gradient(135deg, #fff3cd, #ffeeba);
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+
+    .alerts-banner.show {
+      display: block;
+    }
+
+    .alerts-banner.has-critical {
+      background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+      border-color: #dc3545;
+    }
+
+    .alerts-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .alerts-title {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+
+    .alerts-dismiss {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .alerts-dismiss:hover {
+      opacity: 1;
+    }
+
+    .alerts-content {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .alert-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .alert-item:hover {
+      background: rgba(0,0,0,0.1);
+    }
+
+    .alert-count {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .alert-count.critical {
+      color: var(--danger);
+    }
+
+    .alert-count.warning {
+      color: #d39e00;
+    }
+
+    .alert-count.info {
+      color: #0056b3;
+    }
+
+    /* Hour Meter Styles */
+    .hour-meter-display {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .hour-meter-display strong {
+      color: var(--helena-green);
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .quick-action-btn {
+      flex: 1;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      border: 1px solid var(--border);
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+    }
+
+    .quick-action-btn:hover {
+      border-color: var(--helena-green);
+      color: var(--helena-green);
+      background: white;
+    }
+
+    .next-due-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      margin-top: 0.5rem;
+      display: inline-block;
+    }
+
+    .next-due-badge.overdue {
+      background: rgba(220, 53, 69, 0.1);
+      color: var(--danger);
+    }
+
+    .next-due-badge.soon {
+      background: rgba(255, 193, 7, 0.1);
+      color: #d39e00;
+    }
+
+    .next-due-badge.ok {
+      background: rgba(40, 167, 69, 0.1);
+      color: var(--success);
+    }
+
+    /* Timeline Styles */
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.5rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 1.5rem;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -1.65rem;
+      top: 0.25rem;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--helena-green);
+      border: 2px solid white;
+      box-shadow: 0 0 0 2px var(--helena-green);
+    }
+
+    .timeline-item.issue::before {
+      background: var(--warning);
+      box-shadow: 0 0 0 2px var(--warning);
+    }
+
+    .timeline-item.critical::before {
+      background: var(--danger);
+      box-shadow: 0 0 0 2px var(--danger);
+    }
+
+    .timeline-item.checkout::before {
+      background: #2196F3;
+      box-shadow: 0 0 0 2px #2196F3;
+    }
+
+    .timeline-date {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-content {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+    }
+
+    .timeline-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-description {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Photo Attachment Styles */
+    .photo-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 6px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .photo-upload-area:hover {
+      border-color: var(--helena-green);
+      background: rgba(33, 85, 48, 0.05);
+    }
+
+    .photo-upload-area.has-photo {
+      border-style: solid;
+      border-color: var(--success);
+    }
+
+    .photo-preview {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+    }
+
+    .issue-photo {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .issue-photo:hover {
+      transform: scale(1.02);
+    }
+
+    /* Email Digest Styles */
+    .email-config {
+      background: var(--bg-primary);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .email-preview {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.5rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    /* Mobile Optimization */
+    @media (max-width: 768px) {
+      h1 { font-size: 1.5rem; }
+      .subtitle { font-size: 0.85rem; }
+      header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+        gap: 1rem;
+      }
+      .logo { width: 100px; }
+      .equipment-grid { grid-template-columns: 1fr; }
+      .container { padding: 0.5rem; }
+
+      .nav-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding: 0.5rem;
+        gap: 0.25rem;
+      }
+
+      .nav-tab {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .action-bar {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .action-bar .btn {
+        width: 100%;
+      }
+
+      .search-box {
+        max-width: 100%;
+      }
+
+      .modal-content {
+        padding: 1rem;
+        margin: 0.5rem;
+        max-height: 95vh;
+      }
+
+      .btn {
+        padding: 0.9rem 1.25rem;
+        font-size: 0.85rem;
+      }
+
+      .btn-small {
+        padding: 0.7rem 0.9rem;
+        font-size: 0.8rem;
+      }
+
+      .equipment-card {
+        padding: 0.75rem;
+      }
+
+      .quick-actions {
+        flex-wrap: wrap;
+      }
+
+      .quick-action-btn {
+        min-width: calc(50% - 0.25rem);
+      }
+
+      .stat-card {
+        padding: 1rem;
+      }
+
+      .stat-card-value {
+        font-size: 2rem;
+      }
+
+      .calendar-day {
+        min-height: 60px;
+        font-size: 0.8rem;
+      }
+
+      .alerts-content {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      #headerDateTime {
+        display: none;
+      }
+
+      .dashboard-issue-item {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+
+      .issue-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.25rem; }
+      .equipment-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .status-badge {
+        align-self: flex-start;
+      }
+
+      .equipment-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .stat-item {
+        display: flex;
+        justify-content: space-between;
+        text-align: left;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1004,7 +1413,16 @@
         <div id="currentWeather" style="font-size: 0.85rem; opacity: 0.9;"></div>
       </div>
     </header>
-    
+
+    <!-- Alerts Banner -->
+    <div id="alertsBanner" class="alerts-banner">
+      <div class="alerts-header">
+        <span class="alerts-title">⚠️ Items Needing Attention</span>
+        <button class="alerts-dismiss" onclick="dismissAlerts()">&times;</button>
+      </div>
+      <div class="alerts-content" id="alertsContent"></div>
+    </div>
+
     <div class="nav-tabs">
       <button class="nav-tab active" data-tab="equipment">Equipment Fleet</button>
       <button class="nav-tab" data-tab="dashboard">Dashboard</button>
@@ -1027,33 +1445,44 @@
     
     <!-- Dashboard Tab -->
     <div id="dashboard-tab" class="tab-content">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-        <div class="stat-card">
+      <div class="action-bar">
+        <button class="btn" onclick="window.openEmailDigestModal()">📧 Email Digest</button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="stat-card" style="cursor: pointer;" onclick="switchToTab('equipment')">
           <div class="stat-card-icon" style="color: var(--danger);">⚠️</div>
           <div class="stat-card-value" id="dashOverdueCount">0</div>
           <div class="stat-card-label">Past Due Maintenance</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" style="cursor: pointer;" onclick="switchToTab('equipment')">
           <div class="stat-card-icon" style="color: var(--success);">✓</div>
           <div class="stat-card-value" id="dashUpToDateCount">0</div>
           <div class="stat-card-label">Up to Date</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" style="cursor: pointer;" onclick="switchToTab('issues')">
           <div class="stat-card-icon" style="color: var(--danger);">🛑</div>
           <div class="stat-card-value" id="dashOutOfServiceCount">0</div>
           <div class="stat-card-label">Out of Service</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" style="cursor: pointer;" onclick="switchToTab('issues')">
           <div class="stat-card-icon" style="color: var(--warning);">🔧</div>
           <div class="stat-card-value" id="dashMinorIssuesCount">0</div>
           <div class="stat-card-label">Minor Issues</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" style="cursor: pointer;" onclick="switchToTab('location')">
           <div class="stat-card-icon" style="color: #2196F3;">📍</div>
           <div class="stat-card-value" id="dashCheckedOutCount">0</div>
           <div class="stat-card-label">Checked Out</div>
         </div>
+        <div class="stat-card" style="cursor: pointer;" onclick="switchToTab('schedule')">
+          <div class="stat-card-icon" style="color: var(--helena-green);">📅</div>
+          <div class="stat-card-value" id="dashDueThisWeekCount">0</div>
+          <div class="stat-card-label">Due This Week</div>
+        </div>
       </div>
+
+      <!-- Needs Attention This Week Section -->
+      <div id="dashboardNeedsAttention"></div>
       
       <div id="dashboardCheckedOut"></div>
       <div id="dashboardCriticalIssues"></div>
@@ -1178,6 +1607,10 @@
           <label for="equipmentLocation">Location</label>
           <input type="text" id="equipmentLocation" placeholder="e.g., Main Yard">
         </div>
+        <div class="form-group">
+          <label for="equipmentHourMeter">Current Hour Meter / Odometer</label>
+          <input type="number" id="equipmentHourMeter" min="0" step="0.1" placeholder="e.g., 1250.5 hours or miles">
+        </div>
         <div id="templateLoadSection" style="display: none;">
           <div class="form-group">
             <label>Auto-Load Maintenance Items</label>
@@ -1213,6 +1646,10 @@
         <div class="form-group">
           <label for="editEquipmentLocation">Location</label>
           <input type="text" id="editEquipmentLocation" placeholder="e.g., Main Yard">
+        </div>
+        <div class="form-group">
+          <label for="editEquipmentHourMeter">Current Hour Meter / Odometer</label>
+          <input type="number" id="editEquipmentHourMeter" min="0" step="0.1" placeholder="e.g., 1250.5 hours or miles">
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Update Equipment</button>
       </form>
@@ -1297,6 +1734,10 @@
         <div class="form-group">
           <label for="completionDate">Completion Date *</label>
           <input type="date" id="completionDate" required>
+        </div>
+        <div class="form-group">
+          <label for="completionHours">Current Hour Meter / Odometer</label>
+          <input type="number" id="completionHours" min="0" step="0.1" placeholder="Record current hours/miles at completion">
         </div>
         <div class="form-group">
           <label for="completionNotes">Notes</label>
@@ -1389,6 +1830,14 @@
           <label for="issueNotes">Issue Description/Notes *</label>
           <textarea id="issueNotes" required placeholder="Describe the issue in detail..."></textarea>
         </div>
+        <div class="form-group">
+          <label>Photo (optional)</label>
+          <div class="photo-upload-area" id="issuePhotoArea" onclick="document.getElementById('issuePhoto').click()">
+            <div id="issuePhotoPlaceholder">📷 Click to add photo</div>
+            <img id="issuePhotoPreview" class="photo-preview" style="display: none;">
+            <input type="file" id="issuePhoto" accept="image/*" style="display: none;" onchange="window.previewIssuePhoto(this)">
+          </div>
+        </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Log Issue</button>
       </form>
     </div>
@@ -1448,8 +1897,12 @@
           <input type="text" id="maintenanceItemName" required placeholder="e.g., Oil Change">
         </div>
         <div class="form-group">
-          <label for="maintenanceItemInterval">Interval (days) *</label>
-          <input type="number" id="maintenanceItemInterval" required min="1" placeholder="e.g., 90">
+          <label for="maintenanceItemInterval">Interval (days)</label>
+          <input type="number" id="maintenanceItemInterval" min="1" placeholder="e.g., 90 (leave blank if hour-based only)">
+        </div>
+        <div class="form-group">
+          <label for="maintenanceItemHourInterval">Interval (hours/miles)</label>
+          <input type="number" id="maintenanceItemHourInterval" min="1" placeholder="e.g., 250 (leave blank if time-based only)">
         </div>
         <div class="form-group">
           <label for="maintenanceItemDescription">Description/Instructions</label>
@@ -1474,8 +1927,12 @@
           <input type="text" id="editMaintenanceItemName" required placeholder="e.g., Oil Change">
         </div>
         <div class="form-group">
-          <label for="editMaintenanceItemInterval">Interval (days) *</label>
-          <input type="number" id="editMaintenanceItemInterval" required min="1" placeholder="e.g., 90">
+          <label for="editMaintenanceItemInterval">Interval (days)</label>
+          <input type="number" id="editMaintenanceItemInterval" min="1" placeholder="e.g., 90 (leave blank if hour-based only)">
+        </div>
+        <div class="form-group">
+          <label for="editMaintenanceItemHourInterval">Interval (hours/miles)</label>
+          <input type="number" id="editMaintenanceItemHourInterval" min="1" placeholder="e.g., 250 (leave blank if time-based only)">
         </div>
         <div class="form-group">
           <label for="editMaintenanceItemDescription">Description/Instructions</label>
@@ -1511,6 +1968,44 @@
     </div>
   </div>
   
+  <!-- Email Digest Modal -->
+  <div id="emailDigestModal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Email Maintenance Digest</h2>
+        <button class="close-btn" onclick="closeModal('emailDigestModal')">&times;</button>
+      </div>
+      <div class="email-config">
+        <div class="form-group">
+          <label for="digestEmail">Email Address *</label>
+          <input type="email" id="digestEmail" required placeholder="recipient@example.com">
+        </div>
+        <div class="form-group">
+          <label for="digestDays">Include items due within (days)</label>
+          <select id="digestDays">
+            <option value="7">Next 7 days</option>
+            <option value="14">Next 14 days</option>
+            <option value="30" selected>Next 30 days</option>
+            <option value="60">Next 60 days</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn" onclick="window.generateDigestPreview()">Preview Digest</button>
+          <button class="btn btn-primary" onclick="window.sendEmailDigest()">📧 Send Email</button>
+          <button class="btn" onclick="window.copyDigestToClipboard()">📋 Copy to Clipboard</button>
+        </div>
+      </div>
+      <div id="digestPreview" class="email-preview" style="display: none;"></div>
+    </div>
+  </div>
+
+  <!-- Photo Viewer Modal -->
+  <div id="photoViewerModal" class="modal" onclick="closeModal('photoViewerModal')">
+    <div class="modal-content" style="max-width: 90vw; background: transparent; box-shadow: none; text-align: center;">
+      <img id="photoViewerImage" style="max-width: 100%; max-height: 85vh; border-radius: 8px;">
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
   <script type="module">
@@ -1810,12 +2305,15 @@
         };
       });
 
+      const hourMeterValue = document.getElementById('equipmentHourMeter').value;
+
       const newEquipment = {
         equipmentId: equipmentIdValue,
         name: document.getElementById('equipmentName').value,
         snvin: document.getElementById('equipmentSNVIN').value,
         type: type,
         location: document.getElementById('equipmentLocation').value,
+        hourMeter: hourMeterValue ? parseFloat(hourMeterValue) : null,
         maintenanceItems: maintenanceItems,
         createdAt: new Date().toISOString()
       };
@@ -1863,54 +2361,87 @@
       }
     }
     
-    function getMaintenanceStatus(item) {
-      if (!item.lastCompleted) {
-        return { status: 'danger', daysUntil: -999, nextDue: 'Not Set', statusText: 'Past Due' };
+    function getMaintenanceStatus(item, eq = null) {
+      // Check if never completed
+      if (!item.lastCompleted && !item.lastCompletedHours) {
+        return { status: 'danger', daysUntil: -999, nextDue: 'Never Done', statusText: 'Past Due', hoursUntil: null };
       }
-      
-      const lastDate = new Date(item.lastCompleted);
-      const today = new Date();
-      const nextDue = new Date(lastDate);
-      nextDue.setDate(nextDue.getDate() + item.interval);
-      
-      const daysUntil = Math.ceil((nextDue - today) / (1000 * 60 * 60 * 24));
-      
+
+      let dayStatus = null;
+      let hourStatus = null;
+      let daysUntil = 999;
+      let hoursUntil = null;
+      let nextDue = '';
+
+      // Check day-based interval
+      if (item.interval && item.lastCompleted) {
+        const lastDate = new Date(item.lastCompleted);
+        const today = new Date();
+        const nextDueDate = new Date(lastDate);
+        nextDueDate.setDate(nextDueDate.getDate() + item.interval);
+        daysUntil = Math.ceil((nextDueDate - today) / (1000 * 60 * 60 * 24));
+        nextDue = nextDueDate.toLocaleDateString();
+
+        if (daysUntil < 0) dayStatus = 'danger';
+        else if (daysUntil <= 7) dayStatus = 'warning';
+        else dayStatus = 'good';
+      }
+
+      // Check hour-based interval
+      if (item.hourInterval && eq && eq.hourMeter !== null && eq.hourMeter !== undefined) {
+        const lastHours = item.lastCompletedHours || 0;
+        const currentHours = eq.hourMeter;
+        const nextDueHours = lastHours + item.hourInterval;
+        hoursUntil = nextDueHours - currentHours;
+
+        if (hoursUntil < 0) hourStatus = 'danger';
+        else if (hoursUntil <= 25) hourStatus = 'warning'; // Within 25 hours
+        else hourStatus = 'good';
+
+        // Add hours info to next due string
+        if (nextDue) {
+          nextDue += ` or ${nextDueHours.toLocaleString()} hrs`;
+        } else {
+          nextDue = `${nextDueHours.toLocaleString()} hrs`;
+        }
+      }
+
+      // Determine overall status (worst of the two)
       let status = 'good';
+      if (dayStatus === 'danger' || hourStatus === 'danger') status = 'danger';
+      else if (dayStatus === 'warning' || hourStatus === 'warning') status = 'warning';
+
       let statusText = 'On Schedule';
-      if (daysUntil < 0) {
-        status = 'danger';
-        statusText = 'Past Due';
-      } else if (daysUntil <= 7) {
-        status = 'warning';
-        statusText = 'Coming Due';
-      }
-      
+      if (status === 'danger') statusText = 'Past Due';
+      else if (status === 'warning') statusText = 'Coming Due';
+
       return {
         status,
-        daysUntil,
-        nextDue: nextDue.toLocaleDateString(),
+        daysUntil: daysUntil !== 999 ? daysUntil : (hoursUntil !== null ? Math.round(hoursUntil) : -999),
+        hoursUntil,
+        nextDue: nextDue || 'Not Set',
         statusText
       };
     }
-    
+
     function getEquipmentOverallStatus(eq) {
       if (!eq.maintenanceItems || eq.maintenanceItems.length === 0) {
         return { status: 'good', itemsOverdue: 0, itemsDueSoon: 0 };
       }
-      
+
       let itemsOverdue = 0;
       let itemsDueSoon = 0;
-      
+
       eq.maintenanceItems.forEach(item => {
-        const { status } = getMaintenanceStatus(item);
+        const { status } = getMaintenanceStatus(item, eq);
         if (status === 'danger') itemsOverdue++;
         else if (status === 'warning') itemsDueSoon++;
       });
-      
+
       let overallStatus = 'good';
       if (itemsOverdue > 0) overallStatus = 'danger';
       else if (itemsDueSoon > 0) overallStatus = 'warning';
-      
+
       return { status: overallStatus, itemsOverdue, itemsDueSoon };
     }
     
@@ -1987,6 +2518,19 @@
             statusClass = 'status-warning';
           }
           
+          // Get next due item info
+          let nextDueInfo = null;
+          if (eq.maintenanceItems && eq.maintenanceItems.length > 0) {
+            let soonest = null;
+            eq.maintenanceItems.forEach(item => {
+              const itemStatus = getMaintenanceStatus(item, eq);
+              if (!soonest || itemStatus.daysUntil < soonest.daysUntil) {
+                soonest = { ...itemStatus, name: item.name };
+              }
+            });
+            nextDueInfo = soonest;
+          }
+
           html += `
             <div class="equipment-card ${pendingIssues > 0 ? 'has-issues' : ''}">
               ${pendingIssues > 0 ? `<div class="repair-badge" style="${hasCriticalIssue ? 'background: var(--danger);' : ''}">${checkedOut ? '📍 ' : ''}⚠ ${pendingIssues} Issue${pendingIssues > 1 ? 's' : ''}</div>` : checkedOut ? `<div class="repair-badge" style="background: #2196F3;">📍 Checked Out</div>` : ''}
@@ -1996,10 +2540,11 @@
                   <div class="equipment-name">${eq.name}</div>
                   <div class="equipment-type">${eq.type}</div>
                   ${eq.snvin ? `<div class="equipment-snvin">SN/VIN: ${eq.snvin}</div>` : ''}
+                  ${eq.hourMeter ? `<div class="hour-meter-display">🕐 <strong>${eq.hourMeter.toLocaleString()}</strong> hours/miles</div>` : ''}
                 </div>
                 <span class="status-badge ${statusClass}">${statusText}</span>
               </div>
-              
+
               <div class="equipment-stats">
                 <div class="stat-item">
                   <div class="stat-label">Items</div>
@@ -2014,7 +2559,19 @@
                   <div class="stat-value" style="color: var(--warning);">${itemsDueSoon}</div>
                 </div>
               </div>
-              
+
+              ${nextDueInfo ? `
+                <div class="next-due-badge ${nextDueInfo.status === 'danger' ? 'overdue' : nextDueInfo.status === 'warning' ? 'soon' : 'ok'}">
+                  ${nextDueInfo.status === 'danger' ? '⚠️' : nextDueInfo.status === 'warning' ? '⏰' : '✓'}
+                  Next: ${nextDueInfo.name} ${nextDueInfo.daysUntil === -999 ? '(Never done)' : nextDueInfo.daysUntil < 0 ? `(${Math.abs(nextDueInfo.daysUntil)}d overdue)` : `(${nextDueInfo.daysUntil}d)`}
+                </div>
+              ` : ''}
+
+              <div class="quick-actions">
+                <button class="quick-action-btn" onclick="event.stopPropagation(); window.quickLogIssue('${eq.id}')">⚠️ Log Issue</button>
+                <button class="quick-action-btn" onclick="event.stopPropagation(); window.viewEquipmentDetails('${eq.id}')">📋 Details</button>
+              </div>
+
               <div class="equipment-actions">
                 <button class="btn btn-small btn-primary" onclick="window.viewEquipmentDetails('${eq.id}')">View Details</button>
                 <button class="btn btn-small" onclick="window.openEditEquipmentModal('${eq.id}')">Edit</button>
@@ -2078,8 +2635,9 @@
       currentEquipmentId = equipmentId;
 
       document.getElementById('detailsEquipmentName').textContent = `${eq.equipmentId} - ${eq.name}`;
-      
+
       const content = document.getElementById('equipmentDetailsContent');
+      const isCurrentlyCheckedOut = isCheckedOut(equipmentId);
 
       // Equipment info section
       let infoHTML = `
@@ -2088,6 +2646,12 @@
             <div><strong>Type:</strong> ${eq.type}</div>
             <div><strong>Location:</strong> ${eq.location || 'Not specified'}</div>
             ${eq.snvin ? `<div><strong>SN/VIN:</strong> ${eq.snvin}</div>` : ''}
+            ${eq.hourMeter ? `<div><strong>Hour Meter:</strong> ${eq.hourMeter.toLocaleString()} hrs/mi</div>` : ''}
+          </div>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+            <button class="btn btn-small" onclick="window.viewEquipmentTimeline('${eq.id}')">📜 View Timeline</button>
+            ${!isCurrentlyCheckedOut ? `<button class="btn btn-small" onclick="window.quickCheckOut('${eq.id}')">📍 Check Out</button>` : `<button class="btn btn-small" style="background: #2196F3; color: white; border-color: #2196F3;">📍 Currently Checked Out</button>`}
+            <button class="btn btn-small" onclick="window.quickLogIssue('${eq.id}'); closeModal('equipmentDetailsModal');">⚠️ Log Issue</button>
           </div>
         </div>
       `;
@@ -2099,39 +2663,56 @@
           </div>
         `;
       } else {
-        // CHANGE 1: SORT BY INTERVAL - SMALLEST TO LARGEST
-        const sortedItems = [...eq.maintenanceItems].sort((a, b) => a.interval - b.interval);
-        
+        // Sort by urgency first, then by interval
+        const sortedItems = [...eq.maintenanceItems].sort((a, b) => {
+          const aStatus = getMaintenanceStatus(a, eq);
+          const bStatus = getMaintenanceStatus(b, eq);
+          // Sort by urgency (danger first, then warning, then good)
+          const statusOrder = { danger: 0, warning: 1, good: 2 };
+          if (statusOrder[aStatus.status] !== statusOrder[bStatus.status]) {
+            return statusOrder[aStatus.status] - statusOrder[bStatus.status];
+          }
+          // Then by days until due
+          return aStatus.daysUntil - bStatus.daysUntil;
+        });
+
         content.innerHTML = infoHTML + `
           <div class="maintenance-list">
             ${sortedItems.map(item => {
-              const { status, daysUntil, nextDue, statusText } = getMaintenanceStatus(item);
+              const { status, daysUntil, hoursUntil, nextDue, statusText } = getMaintenanceStatus(item, eq);
 
               let statusClass = 'status-good';
               let statusBadgeText = 'Up to Date';
 
               if (status === 'danger') {
                 statusClass = 'status-danger';
-                statusBadgeText = daysUntil === -999 ? 'Never Done' : `${Math.abs(daysUntil)} Days Overdue`;
+                statusBadgeText = daysUntil === -999 ? 'Never Done' : `${Math.abs(daysUntil)} Overdue`;
               } else if (status === 'warning') {
                 statusClass = 'status-warning';
-                statusBadgeText = `Due in ${daysUntil} Days`;
+                statusBadgeText = `Due in ${daysUntil}${item.hourInterval ? ' days/hrs' : ' days'}`;
               } else {
-                statusBadgeText = `Due in ${daysUntil} Days`;
+                statusBadgeText = `Due in ${daysUntil}${item.hourInterval ? ' days/hrs' : ' days'}`;
               }
+
+              // Build interval string
+              let intervalStr = '';
+              if (item.interval) intervalStr += `${item.interval} days`;
+              if (item.interval && item.hourInterval) intervalStr += ' or ';
+              if (item.hourInterval) intervalStr += `${item.hourInterval} hours`;
 
               return `
                 <div class="maintenance-item">
                   <div class="maintenance-header">
                     <div>
                       <div class="maintenance-title">${item.name}</div>
-                      <div class="maintenance-interval">Every ${item.interval} days</div>
+                      <div class="maintenance-interval">Every ${intervalStr}</div>
                     </div>
                     <span class="status-badge ${statusClass}">${statusBadgeText}</span>
                   </div>
                   ${item.description ? `<div class="maintenance-description">${item.description}</div>` : ''}
                   <div class="maintenance-status">
-                    <strong>Last Completed:</strong> ${item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never'}<br>
+                    <strong>Last Completed:</strong> ${item.lastCompleted ? new Date(item.lastCompleted).toLocaleDateString() : 'Never'}
+                    ${item.lastCompletedHours ? ` @ ${item.lastCompletedHours.toLocaleString()} hrs` : ''}<br>
                     <strong>Next Due:</strong> ${nextDue}<br>
                     <strong>Status:</strong> ${statusText}
                   </div>
@@ -2146,8 +2727,16 @@
           </div>
         `;
       }
-      
+
       document.getElementById('equipmentDetailsModal').classList.add('active');
+    }
+
+    // Quick checkout from equipment details
+    window.quickCheckOut = function(equipmentId) {
+      document.getElementById('checkOutEquipment').value = equipmentId;
+      document.getElementById('checkOutDate').value = new Date().toISOString().split('T')[0];
+      closeModal('equipmentDetailsModal');
+      document.getElementById('checkOutModal').classList.add('active');
     }
     
     window.openCompleteModal = function(equipmentId, maintenanceId) {
@@ -2168,6 +2757,7 @@
       const equipmentId = document.getElementById('completeEquipmentId').value;
       const maintenanceId = document.getElementById('completeMaintenanceId').value;
       const date = document.getElementById('completionDate').value;
+      const hoursValue = document.getElementById('completionHours').value;
       const notes = document.getElementById('completionNotes').value;
 
       const eq = equipment.find(e => e.id === equipmentId);
@@ -2175,19 +2765,35 @@
 
       if (!item.history) item.history = [];
 
-      item.history.push({
+      const historyEntry = {
         date: date,
         notes: notes,
         completedAt: new Date().toISOString()
-      });
+      };
+
+      // Add hours if provided
+      if (hoursValue) {
+        historyEntry.hours = parseFloat(hoursValue);
+        item.lastCompletedHours = parseFloat(hoursValue);
+        // Also update equipment hour meter
+        eq.hourMeter = parseFloat(hoursValue);
+      }
+
+      item.history.push(historyEntry);
       item.lastCompleted = date;
 
       showLoading('Saving maintenance record...');
 
       try {
-        await updateDoc(doc(db, 'equipment', equipmentId), {
+        const updateData = {
           maintenanceItems: eq.maintenanceItems
-        });
+        };
+        // Update hour meter if changed
+        if (hoursValue) {
+          updateData.hourMeter = parseFloat(hoursValue);
+        }
+
+        await updateDoc(doc(db, 'equipment', equipmentId), updateData);
 
         await loadData(false);
         hideLoading();
@@ -2354,16 +2960,27 @@
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         let daySchedules = schedules.filter(s => s.date === dateStr);
-        
+
         if (filterEquipment) {
           daySchedules = daySchedules.filter(s => s.equipmentId === filterEquipment);
         }
-        
+
         const isToday = isCurrentMonth && day === today.getDate();
         const hasSchedule = daySchedules.length > 0;
-        
+
+        // Get weather for this date
+        const weather = getWeatherForDate(dateStr);
+
         calendarHTML += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasSchedule ? 'has-schedule' : ''}" onclick="openScheduleModal('${dateStr}')">`;
-        calendarHTML += `<div class="calendar-day-number">${day}</div>`;
+        calendarHTML += `<div class="calendar-day-number" style="display: flex; justify-content: space-between; align-items: center;">`;
+        calendarHTML += `<span>${day}</span>`;
+        if (weather) {
+          calendarHTML += `<span style="font-size: 0.7rem;" title="${weather.high}°/${weather.low}° - ${weather.precipitation}% rain">${weather.icon}</span>`;
+        }
+        calendarHTML += `</div>`;
+        if (weather) {
+          calendarHTML += `<div style="font-size: 0.6rem; color: var(--text-secondary); text-align: center;">${weather.high}°/${weather.low}°</div>`;
+        }
         if (daySchedules.length > 0) {
           calendarHTML += '<div class="calendar-events">';
           daySchedules.slice(0, 2).forEach(s => {
@@ -2568,6 +3185,12 @@
       document.getElementById('addIssueModal').classList.add('active');
     }
     
+    // Quick log issue from equipment card
+    window.quickLogIssue = function(equipmentId) {
+      document.getElementById('issueEquipment').value = equipmentId;
+      document.getElementById('addIssueModal').classList.add('active');
+    }
+
     window.addIssue = async function(event) {
       event.preventDefault();
 
@@ -2579,6 +3202,7 @@
         severity: document.getElementById('issueSeverity').value,
         cost: costValue ? parseFloat(costValue) : null,
         notes: document.getElementById('issueNotes').value,
+        photo: currentIssuePhoto || null,
         status: 'Pending',
         createdAt: new Date().toISOString(),
         completedAt: null
@@ -2591,6 +3215,11 @@
         await loadData(false);
         hideLoading();
         showToast('Issue logged successfully');
+        // Reset photo state
+        currentIssuePhoto = null;
+        document.getElementById('issuePhotoPreview').style.display = 'none';
+        document.getElementById('issuePhotoPlaceholder').style.display = 'block';
+        document.getElementById('issuePhotoArea').classList.remove('has-photo');
         document.getElementById('addIssueForm').reset();
         closeModal('addIssueModal');
         renderIssues();
@@ -2655,6 +3284,7 @@
               <span class="status-badge ${isCompleted ? 'status-good' : 'status-warning'}">${issue.status}</span>
             </div>
             <div class="issue-notes">${issue.notes}</div>
+            ${issue.photo ? `<img src="${issue.photo}" class="issue-photo" onclick="window.viewPhoto('${issue.photo}')" alt="Issue photo">` : ''}
             <div class="issue-meta">
               <span><strong>Reported:</strong> ${new Date(issue.createdAt).toLocaleDateString()}</span>
               ${issue.cost ? `<span><strong>Estimated Cost:</strong> $${parseFloat(issue.cost).toFixed(2)}</span>` : ''}
@@ -2779,12 +3409,22 @@
         return;
       }
 
+      const dayInterval = document.getElementById('maintenanceItemInterval').value;
+      const hourInterval = document.getElementById('maintenanceItemHourInterval').value;
+
+      if (!dayInterval && !hourInterval) {
+        showToast('Please enter at least a day interval or hour interval', 'warning');
+        return;
+      }
+
       const newItem = {
         id: Date.now() + Math.random(),
         name: document.getElementById('maintenanceItemName').value,
-        interval: parseInt(document.getElementById('maintenanceItemInterval').value),
+        interval: dayInterval ? parseInt(dayInterval) : null,
+        hourInterval: hourInterval ? parseInt(hourInterval) : null,
         description: document.getElementById('maintenanceItemDescription').value,
         lastCompleted: null,
+        lastCompletedHours: null,
         history: []
       };
 
@@ -2852,7 +3492,8 @@
 
       document.getElementById('editMaintenanceItemId').value = itemId;
       document.getElementById('editMaintenanceItemName').value = item.name;
-      document.getElementById('editMaintenanceItemInterval').value = item.interval;
+      document.getElementById('editMaintenanceItemInterval').value = item.interval || '';
+      document.getElementById('editMaintenanceItemHourInterval').value = item.hourInterval || '';
       document.getElementById('editMaintenanceItemDescription').value = item.description || '';
 
       document.getElementById('editMaintenanceItemModal').classList.add('active');
@@ -2881,8 +3522,18 @@
 
       showLoading('Updating maintenance item...');
 
+      const dayInterval = document.getElementById('editMaintenanceItemInterval').value;
+      const hourInterval = document.getElementById('editMaintenanceItemHourInterval').value;
+
+      if (!dayInterval && !hourInterval) {
+        hideLoading();
+        showToast('Please enter at least a day interval or hour interval', 'warning');
+        return;
+      }
+
       item.name = document.getElementById('editMaintenanceItemName').value;
-      item.interval = parseInt(document.getElementById('editMaintenanceItemInterval').value);
+      item.interval = dayInterval ? parseInt(dayInterval) : null;
+      item.hourInterval = hourInterval ? parseInt(hourInterval) : null;
       item.description = document.getElementById('editMaintenanceItemDescription').value;
 
       try {
@@ -2913,7 +3564,8 @@
       document.getElementById('editEquipmentName').value = eq.name;
       document.getElementById('editEquipmentSNVIN').value = eq.snvin || '';
       document.getElementById('editEquipmentLocation').value = eq.location || '';
-      
+      document.getElementById('editEquipmentHourMeter').value = eq.hourMeter || '';
+
       document.getElementById('editEquipmentModal').classList.add('active');
     }
     
@@ -2932,11 +3584,14 @@
         return;
       }
 
+      const hourMeterValue = document.getElementById('editEquipmentHourMeter').value;
+
       const updatedEquipment = {
         equipmentId: newEquipmentId,
         name: document.getElementById('editEquipmentName').value,
         snvin: document.getElementById('editEquipmentSNVIN').value,
-        location: document.getElementById('editEquipmentLocation').value
+        location: document.getElementById('editEquipmentLocation').value,
+        hourMeter: hourMeterValue ? parseFloat(hourMeterValue) : null
       };
 
       showLoading('Updating equipment...');
@@ -2960,14 +3615,18 @@
       // Calculate stats
       let overdueCount = 0;
       let upToDateCount = 0;
-      
+      let dueThisWeekItems = [];
+
       equipment.forEach(eq => {
         let hasOverdue = false;
         if (eq.maintenanceItems) {
           eq.maintenanceItems.forEach(item => {
-            const { status } = getMaintenanceStatus(item);
-            if (status === 'danger') {
+            const maintenanceStatus = getMaintenanceStatus(item, eq);
+            if (maintenanceStatus.status === 'danger') {
               hasOverdue = true;
+              dueThisWeekItems.push({ equipment: eq, item: item, ...maintenanceStatus });
+            } else if (maintenanceStatus.daysUntil <= 7 && maintenanceStatus.daysUntil > 0) {
+              dueThisWeekItems.push({ equipment: eq, item: item, ...maintenanceStatus });
             }
           });
         }
@@ -2977,16 +3636,70 @@
           upToDateCount++;
         }
       });
-      
+
+      // Sort by urgency
+      dueThisWeekItems.sort((a, b) => a.daysUntil - b.daysUntil);
+
       const criticalIssues = issues.filter(i => i.status === 'Pending' && i.severity === 'Critical');
       const minorIssues = issues.filter(i => i.status === 'Pending' && i.severity === 'Minor');
       const checkedOutItems = locations.filter(l => l.status === 'Checked Out');
-      
+
       document.getElementById('dashOverdueCount').textContent = overdueCount;
       document.getElementById('dashUpToDateCount').textContent = upToDateCount;
       document.getElementById('dashOutOfServiceCount').textContent = criticalIssues.length;
       document.getElementById('dashMinorIssuesCount').textContent = minorIssues.length;
       document.getElementById('dashCheckedOutCount').textContent = checkedOutItems.length;
+      document.getElementById('dashDueThisWeekCount').textContent = dueThisWeekItems.filter(i => i.daysUntil > 0 && i.daysUntil <= 7).length;
+
+      // Render Needs Attention This Week section
+      const needsAttentionContainer = document.getElementById('dashboardNeedsAttention');
+      if (dueThisWeekItems.length > 0) {
+        needsAttentionContainer.innerHTML = `
+          <div class="dashboard-section">
+            <h3 class="dashboard-section-title">📋 Needs Attention This Week</h3>
+            ${dueThisWeekItems.slice(0, 10).map(item => {
+              const isOverdue = item.status === 'danger';
+              return `
+                <div class="dashboard-issue-item ${isOverdue ? '' : 'minor'}" style="cursor: pointer;" onclick="window.viewEquipmentDetails('${item.equipment.id}')">
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Equipment</div>
+                    <div class="dashboard-issue-field-value">${item.equipment.equipmentId}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Type</div>
+                    <div class="dashboard-issue-field-value">${item.equipment.type}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Maintenance Item</div>
+                    <div class="dashboard-issue-field-value">${item.item.name}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Next Due</div>
+                    <div class="dashboard-issue-field-value">${item.nextDue}</div>
+                  </div>
+                  <div class="dashboard-issue-field">
+                    <div class="dashboard-issue-field-label">Status</div>
+                    <div class="days-down" style="color: ${isOverdue ? 'var(--danger)' : 'var(--warning)'};">
+                      ${item.daysUntil === -999 ? 'Never Done' : item.daysUntil < 0 ? `${Math.abs(item.daysUntil)}d overdue` : `${item.daysUntil}d left`}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+            ${dueThisWeekItems.length > 10 ? `<p style="text-align: center; color: var(--text-secondary); margin-top: 1rem;">+${dueThisWeekItems.length - 10} more items...</p>` : ''}
+          </div>
+        `;
+      } else {
+        needsAttentionContainer.innerHTML = `
+          <div class="dashboard-section">
+            <h3 class="dashboard-section-title">📋 Needs Attention This Week</h3>
+            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">✓</div>
+              <p>All maintenance is up to date for this week!</p>
+            </div>
+          </div>
+        `;
+      }
       
       // Render Checked Out Equipment Section
       const checkedOutContainer = document.getElementById('dashboardCheckedOut');
@@ -3564,11 +4277,436 @@
     // Update time every second
     updateDateTime();
     setInterval(updateDateTime, 1000);
-    
+
     // Update weather every 10 minutes
     updateWeather();
     setInterval(updateWeather, 600000);
-    
+
+    // ALERTS BANNER FUNCTIONS
+    let alertsDismissed = false;
+
+    function renderAlertsBanner() {
+      if (alertsDismissed) return;
+
+      const banner = document.getElementById('alertsBanner');
+      const content = document.getElementById('alertsContent');
+
+      // Calculate alerts
+      let overdueItems = 0;
+      let dueThisWeek = 0;
+      let criticalIssues = issues.filter(i => i.status === 'Pending' && i.severity === 'Critical').length;
+      let checkedOutCount = locations.filter(l => l.status === 'Checked Out').length;
+
+      equipment.forEach(eq => {
+        if (eq.maintenanceItems) {
+          eq.maintenanceItems.forEach(item => {
+            const { status, daysUntil } = getMaintenanceStatus(item, eq);
+            if (status === 'danger') overdueItems++;
+            else if (daysUntil <= 7 && daysUntil > 0) dueThisWeek++;
+          });
+        }
+      });
+
+      const totalAlerts = overdueItems + dueThisWeek + criticalIssues;
+
+      if (totalAlerts === 0) {
+        banner.classList.remove('show', 'has-critical');
+        return;
+      }
+
+      banner.classList.add('show');
+      if (criticalIssues > 0 || overdueItems > 0) {
+        banner.classList.add('has-critical');
+      } else {
+        banner.classList.remove('has-critical');
+      }
+
+      let alertsHTML = '';
+
+      if (overdueItems > 0) {
+        alertsHTML += `<div class="alert-item" onclick="switchToTab('equipment')">
+          <span class="alert-count critical">${overdueItems}</span>
+          <span>Overdue Maintenance</span>
+        </div>`;
+      }
+
+      if (dueThisWeek > 0) {
+        alertsHTML += `<div class="alert-item" onclick="switchToTab('schedule')">
+          <span class="alert-count warning">${dueThisWeek}</span>
+          <span>Due This Week</span>
+        </div>`;
+      }
+
+      if (criticalIssues > 0) {
+        alertsHTML += `<div class="alert-item" onclick="switchToTab('issues')">
+          <span class="alert-count critical">${criticalIssues}</span>
+          <span>Critical Issues</span>
+        </div>`;
+      }
+
+      if (checkedOutCount > 0) {
+        alertsHTML += `<div class="alert-item" onclick="switchToTab('location')">
+          <span class="alert-count info">${checkedOutCount}</span>
+          <span>Equipment Checked Out</span>
+        </div>`;
+      }
+
+      content.innerHTML = alertsHTML;
+    }
+
+    window.dismissAlerts = function() {
+      alertsDismissed = true;
+      document.getElementById('alertsBanner').classList.remove('show');
+    }
+
+    function switchToTab(tabName) {
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.tab === tabName) tab.classList.add('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById(tabName + '-tab').classList.add('active');
+
+      // Render the tab content
+      if (tabName === 'schedule') renderScheduleCalendar();
+      if (tabName === 'issues') renderIssues();
+      if (tabName === 'location') renderLocations();
+      if (tabName === 'dashboard') renderDashboard();
+    }
+
+    // PHOTO HANDLING FUNCTIONS
+    let currentIssuePhoto = null;
+
+    window.previewIssuePhoto = function(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          currentIssuePhoto = e.target.result;
+          document.getElementById('issuePhotoPreview').src = e.target.result;
+          document.getElementById('issuePhotoPreview').style.display = 'block';
+          document.getElementById('issuePhotoPlaceholder').style.display = 'none';
+          document.getElementById('issuePhotoArea').classList.add('has-photo');
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    window.viewPhoto = function(photoData) {
+      document.getElementById('photoViewerImage').src = photoData;
+      document.getElementById('photoViewerModal').classList.add('active');
+    }
+
+    // EMAIL DIGEST FUNCTIONS
+    window.openEmailDigestModal = function() {
+      document.getElementById('digestPreview').style.display = 'none';
+      document.getElementById('emailDigestModal').classList.add('active');
+    }
+
+    window.generateDigestPreview = function() {
+      const days = parseInt(document.getElementById('digestDays').value);
+      const preview = document.getElementById('digestPreview');
+
+      const upcomingMaintenance = [];
+      const overdueItems = [];
+      const pendingIssues = issues.filter(i => i.status === 'Pending');
+
+      equipment.forEach(eq => {
+        if (eq.maintenanceItems) {
+          eq.maintenanceItems.forEach(item => {
+            const { status, daysUntil, nextDue } = getMaintenanceStatus(item, eq);
+            if (status === 'danger') {
+              overdueItems.push({
+                equipment: eq,
+                item: item,
+                daysUntil: daysUntil,
+                nextDue: nextDue
+              });
+            } else if (daysUntil <= days && daysUntil > 0) {
+              upcomingMaintenance.push({
+                equipment: eq,
+                item: item,
+                daysUntil: daysUntil,
+                nextDue: nextDue
+              });
+            }
+          });
+        }
+      });
+
+      // Sort by days until due
+      upcomingMaintenance.sort((a, b) => a.daysUntil - b.daysUntil);
+      overdueItems.sort((a, b) => a.daysUntil - b.daysUntil);
+
+      let html = `
+        <h3 style="color: var(--helena-green); margin-bottom: 1rem;">Helena Agri-Enterprises - Maintenance Digest</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Generated: ${new Date().toLocaleDateString()}</p>
+      `;
+
+      if (overdueItems.length > 0) {
+        html += `<h4 style="color: var(--danger); margin: 1rem 0 0.5rem;">⚠️ Overdue Maintenance (${overdueItems.length})</h4>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem;">
+          <tr style="background: #f8d7da;">
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ddd;">Equipment</th>
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ddd;">Maintenance Item</th>
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ddd;">Days Overdue</th>
+          </tr>
+          ${overdueItems.map(m => `
+            <tr>
+              <td style="padding: 0.5rem; border: 1px solid #ddd;">${m.equipment.equipmentId} - ${m.equipment.name}</td>
+              <td style="padding: 0.5rem; border: 1px solid #ddd;">${m.item.name}</td>
+              <td style="padding: 0.5rem; border: 1px solid #ddd; color: var(--danger);">${m.daysUntil === -999 ? 'Never Done' : Math.abs(m.daysUntil) + ' days'}</td>
+            </tr>
+          `).join('')}
+        </table>`;
+      }
+
+      if (upcomingMaintenance.length > 0) {
+        html += `<h4 style="color: var(--warning); margin: 1rem 0 0.5rem;">📅 Upcoming Maintenance (${upcomingMaintenance.length})</h4>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem;">
+          <tr style="background: #fff3cd;">
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ddd;">Equipment</th>
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ddd;">Maintenance Item</th>
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ddd;">Due In</th>
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ddd;">Due Date</th>
+          </tr>
+          ${upcomingMaintenance.map(m => `
+            <tr>
+              <td style="padding: 0.5rem; border: 1px solid #ddd;">${m.equipment.equipmentId} - ${m.equipment.name}</td>
+              <td style="padding: 0.5rem; border: 1px solid #ddd;">${m.item.name}</td>
+              <td style="padding: 0.5rem; border: 1px solid #ddd;">${m.daysUntil} days</td>
+              <td style="padding: 0.5rem; border: 1px solid #ddd;">${m.nextDue}</td>
+            </tr>
+          `).join('')}
+        </table>`;
+      }
+
+      if (pendingIssues.length > 0) {
+        html += `<h4 style="color: var(--helena-green); margin: 1rem 0 0.5rem;">🔧 Pending Issues (${pendingIssues.length})</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr style="background: var(--bg-primary);">
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ddd;">Equipment</th>
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ddd;">Issue</th>
+            <th style="padding: 0.5rem; text-align: left; border: 1px solid #ddd;">Severity</th>
+          </tr>
+          ${pendingIssues.map(issue => {
+            const eq = equipment.find(e => e.id === issue.equipmentId);
+            return `
+              <tr>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">${eq ? eq.equipmentId : 'Unknown'}</td>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">${issue.title}</td>
+                <td style="padding: 0.5rem; border: 1px solid #ddd; color: ${issue.severity === 'Critical' ? 'var(--danger)' : 'var(--warning)'};">${issue.severity}</td>
+              </tr>
+            `;
+          }).join('')}
+        </table>`;
+      }
+
+      if (overdueItems.length === 0 && upcomingMaintenance.length === 0 && pendingIssues.length === 0) {
+        html += `<p style="color: var(--success); text-align: center; padding: 2rem;">✓ All equipment is up to date!</p>`;
+      }
+
+      preview.innerHTML = html;
+      preview.style.display = 'block';
+    }
+
+    window.copyDigestToClipboard = function() {
+      const preview = document.getElementById('digestPreview');
+      if (preview.style.display === 'none') {
+        generateDigestPreview();
+      }
+
+      // Create plain text version
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = preview.innerHTML;
+      const text = tempDiv.textContent || tempDiv.innerText;
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Digest copied to clipboard');
+      }).catch(() => {
+        showToast('Failed to copy to clipboard', 'error');
+      });
+    }
+
+    window.sendEmailDigest = function() {
+      const email = document.getElementById('digestEmail').value;
+      if (!email) {
+        showToast('Please enter an email address', 'warning');
+        return;
+      }
+
+      // Generate digest if not already done
+      if (document.getElementById('digestPreview').style.display === 'none') {
+        generateDigestPreview();
+      }
+
+      // Create mailto link with digest content
+      const subject = encodeURIComponent('Helena Agri-Enterprises - Maintenance Digest');
+      const preview = document.getElementById('digestPreview');
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = preview.innerHTML;
+      const body = encodeURIComponent(tempDiv.textContent || tempDiv.innerText);
+
+      window.open(`mailto:${email}?subject=${subject}&body=${body}`);
+      showToast('Opening email client...');
+    }
+
+    // EQUIPMENT TIMELINE FUNCTION
+    window.viewEquipmentTimeline = function(equipmentId) {
+      const eq = equipment.find(e => e.id === equipmentId);
+      if (!eq) return;
+
+      // Gather all events
+      const events = [];
+
+      // Maintenance history
+      if (eq.maintenanceItems) {
+        eq.maintenanceItems.forEach(item => {
+          if (item.history) {
+            item.history.forEach(h => {
+              events.push({
+                type: 'maintenance',
+                date: new Date(h.date || h.completedAt),
+                title: item.name,
+                description: h.notes || 'Maintenance completed',
+                hours: h.hours
+              });
+            });
+          }
+        });
+      }
+
+      // Issues
+      const equipmentIssues = issues.filter(i => i.equipmentId === equipmentId);
+      equipmentIssues.forEach(issue => {
+        events.push({
+          type: issue.severity === 'Critical' ? 'critical' : 'issue',
+          date: new Date(issue.createdAt),
+          title: issue.title,
+          description: issue.notes,
+          status: issue.status
+        });
+        if (issue.completedAt) {
+          events.push({
+            type: 'maintenance',
+            date: new Date(issue.completedAt),
+            title: `Issue Resolved: ${issue.title}`,
+            description: 'Issue marked as complete'
+          });
+        }
+      });
+
+      // Location history
+      const equipmentLocations = locations.filter(l => l.equipmentId === equipmentId);
+      equipmentLocations.forEach(loc => {
+        events.push({
+          type: 'checkout',
+          date: new Date(loc.checkOutDate),
+          title: `Checked out to ${loc.customer}`,
+          description: ''
+        });
+        if (loc.returnDate) {
+          events.push({
+            type: 'maintenance',
+            date: new Date(loc.returnDate),
+            title: 'Equipment returned',
+            description: `Returned from ${loc.customer}`
+          });
+        }
+      });
+
+      // Sort by date descending
+      events.sort((a, b) => b.date - a.date);
+
+      // Build timeline HTML
+      let timelineHTML = `
+        <h4 style="margin-bottom: 1rem; color: var(--helena-green);">Equipment Timeline</h4>
+        <div class="timeline">
+      `;
+
+      if (events.length === 0) {
+        timelineHTML += '<p style="color: var(--text-secondary);">No history recorded yet.</p>';
+      } else {
+        events.forEach(event => {
+          timelineHTML += `
+            <div class="timeline-item ${event.type}">
+              <div class="timeline-date">${event.date.toLocaleDateString()} ${event.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+              <div class="timeline-content">
+                <div class="timeline-title">${event.title}</div>
+                ${event.description ? `<div class="timeline-description">${event.description}</div>` : ''}
+                ${event.hours ? `<div class="timeline-description">Hours: ${event.hours}</div>` : ''}
+                ${event.status ? `<div class="timeline-description">Status: ${event.status}</div>` : ''}
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      timelineHTML += '</div>';
+
+      // Show in equipment details
+      const detailsContent = document.getElementById('equipmentDetailsContent');
+      const existingTimeline = detailsContent.querySelector('.timeline');
+      if (existingTimeline) {
+        existingTimeline.parentElement.remove();
+      }
+
+      const timelineSection = document.createElement('div');
+      timelineSection.style.marginTop = '2rem';
+      timelineSection.style.paddingTop = '2rem';
+      timelineSection.style.borderTop = '2px solid var(--border)';
+      timelineSection.innerHTML = timelineHTML;
+      detailsContent.appendChild(timelineSection);
+    }
+
+    // WEATHER FORECAST FOR SCHEDULING
+    let weatherForecast = null;
+
+    async function fetchWeatherForecast() {
+      try {
+        const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.9512&longitude=-95.6508&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&temperature_unit=fahrenheit&timezone=America%2FChicago&forecast_days=14');
+        const data = await response.json();
+        weatherForecast = data.daily;
+      } catch (error) {
+        console.error('Error fetching weather forecast:', error);
+      }
+    }
+
+    function getWeatherIcon(code) {
+      if (code === 0) return '☀️';
+      if (code <= 3) return '⛅';
+      if (code <= 48) return '🌫️';
+      if (code <= 67) return '🌧️';
+      if (code <= 77) return '🌨️';
+      if (code <= 82) return '🌧️';
+      if (code <= 86) return '🌨️';
+      if (code >= 95) return '⛈️';
+      return '🌤️';
+    }
+
+    function getWeatherForDate(dateStr) {
+      if (!weatherForecast) return null;
+      const idx = weatherForecast.time.indexOf(dateStr);
+      if (idx === -1) return null;
+      return {
+        high: Math.round(weatherForecast.temperature_2m_max[idx]),
+        low: Math.round(weatherForecast.temperature_2m_min[idx]),
+        precipitation: weatherForecast.precipitation_probability_max[idx],
+        icon: getWeatherIcon(weatherForecast.weathercode[idx])
+      };
+    }
+
+    // Fetch weather on load
+    fetchWeatherForecast();
+
+    // Update loadData to render alerts
+    const originalLoadData = loadData;
+    loadData = async function(showLoadingIndicator = true) {
+      await originalLoadData(showLoadingIndicator);
+      renderAlertsBanner();
+    };
+
     loadData();
   </script>
 </body>

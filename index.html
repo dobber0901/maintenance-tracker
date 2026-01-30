@@ -2609,37 +2609,66 @@
     window.checkOutEquipment = async function(event) {
       event.preventDefault();
       
+      console.log('Checking out equipment...');
+      
+      const equipmentId = document.getElementById('checkOutEquipment').value;
+      const customer = document.getElementById('checkOutCustomer').value;
+      const checkOutDate = document.getElementById('checkOutDate').value;
+      
+      console.log('Equipment ID:', equipmentId);
+      console.log('Customer:', customer);
+      console.log('Check Out Date:', checkOutDate);
+      
+      if (!equipmentId || !customer || !checkOutDate) {
+        alert('Please fill in all required fields');
+        return;
+      }
+      
       const newLocation = {
-        equipmentId: document.getElementById('checkOutEquipment').value,
-        customer: document.getElementById('checkOutCustomer').value,
-        checkOutDate: document.getElementById('checkOutDate').value,
+        equipmentId: equipmentId,
+        customer: customer,
+        checkOutDate: checkOutDate,
         returnDate: null,
         status: 'Checked Out',
         createdAt: new Date().toISOString()
       };
       
+      console.log('New location object:', newLocation);
+      
       try {
-        await addDoc(collection(db, 'locations'), newLocation);
+        const docRef = await addDoc(collection(db, 'locations'), newLocation);
+        console.log('Location added with ID:', docRef.id);
         await loadData();
+        console.log('Data reloaded, locations:', locations);
         document.getElementById('checkOutForm').reset();
         closeModal('checkOutModal');
         renderLocations();
+        console.log('Location check-out complete');
       } catch (error) {
         console.error('Error checking out equipment:', error);
-        alert('Error checking out equipment. Please try again.');
+        console.error('Error details:', error.message, error.code);
+        alert('Error checking out equipment: ' + error.message);
       }
     }
     
     window.renderLocations = function() {
+      console.log('Rendering locations...');
+      console.log('Total locations:', locations.length);
+      
       const container = document.getElementById('locationsList');
       const filterEquipment = document.getElementById('locationEquipmentFilter').value;
       const showReturned = document.getElementById('showReturnedItems').checked;
+      
+      console.log('Filter equipment:', filterEquipment);
+      console.log('Show returned:', showReturned);
       
       let filteredLocations = locations.filter(l => {
         const matchesEquipment = !filterEquipment || l.equipmentId === filterEquipment;
         const matchesStatus = showReturned || l.status === 'Checked Out';
         return matchesEquipment && matchesStatus;
       });
+      
+      console.log('Filtered locations:', filteredLocations.length);
       
       // Sort: Checked Out first, then by check out date (newest first)
       filteredLocations.sort((a, b) => {
@@ -2683,6 +2712,8 @@
           </div>
         `;
       }).join('');
+      
+      console.log('Locations rendered');
     }
     
     window.returnEquipment = async function(locationId) {

@@ -2262,6 +2262,41 @@
       }, 3000);
     }
 
+    // Compress image to reduce size for Firestore storage (1MB limit per document)
+    function compressImage(file, maxWidth = 1200, quality = 0.7) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            // Scale down if needed
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Convert to compressed JPEG
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressedDataUrl);
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
     async function loadData(showLoadingIndicator = true) {
       if (showLoadingIndicator) showLoading('Loading data...');
       try {
@@ -3811,17 +3846,23 @@
     }
     
     // Edit issue photo handling - multiple photos
-    window.previewEditIssuePhotos = function(input) {
+    window.previewEditIssuePhotos = async function(input) {
       if (input.files && input.files.length > 0) {
-        Array.from(input.files).forEach(file => {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            editIssueNewPhotos.push(e.target.result);
+        document.getElementById('editIssuePhotoPlaceholder').textContent = '📷 Processing photos...';
+
+        for (const file of Array.from(input.files)) {
+          try {
+            const compressedPhoto = await compressImage(file);
+            editIssueNewPhotos.push(compressedPhoto);
             renderEditIssueNewPhotos();
-          };
-          reader.readAsDataURL(file);
-        });
+          } catch (error) {
+            console.error('Error processing photo:', error);
+            showToast('Error processing photo', 'error');
+          }
+        }
+
         input.value = ''; // Reset input to allow selecting same files again
+        document.getElementById('editIssuePhotoPlaceholder').textContent = '📷 Click to add more photos';
       }
     }
 
@@ -4965,16 +5006,21 @@
     }
 
     // PHOTO HANDLING FUNCTIONS - Multiple photos support
-    window.previewIssuePhotos = function(input) {
+    window.previewIssuePhotos = async function(input) {
       if (input.files && input.files.length > 0) {
-        Array.from(input.files).forEach(file => {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            currentIssuePhotos.push(e.target.result);
+        document.getElementById('issuePhotoPlaceholder').textContent = '📷 Processing photos...';
+
+        for (const file of Array.from(input.files)) {
+          try {
+            const compressedPhoto = await compressImage(file);
+            currentIssuePhotos.push(compressedPhoto);
             renderIssuePhotoPreviews();
-          };
-          reader.readAsDataURL(file);
-        });
+          } catch (error) {
+            console.error('Error processing photo:', error);
+            showToast('Error processing photo', 'error');
+          }
+        }
+
         input.value = ''; // Reset to allow selecting same files
         document.getElementById('issuePhotoPlaceholder').textContent = '📷 Click to add more photos';
         document.getElementById('issuePhotoArea').classList.add('has-photo');

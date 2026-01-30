@@ -2144,6 +2144,7 @@
     let currentYear = new Date().getFullYear();
     let calendarViewMode = 'month'; // 'month' or 'week'
     let currentWeekStart = getWeekStart(new Date());
+    let currentIssuePhoto = null;
 
     function getWeekStart(date) {
       const d = new Date(date);
@@ -4854,8 +4855,6 @@
     }
 
     // PHOTO HANDLING FUNCTIONS
-    let currentIssuePhoto = null;
-
     window.previewIssuePhoto = function(input) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();

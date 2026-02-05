@@ -1368,6 +1368,255 @@
       border-color: var(--helena-green);
     }
 
+    /* Products Grid Styles */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.25rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .product-card:hover {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .product-part-number {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--helena-green);
+      margin-bottom: 0.5rem;
+    }
+
+    .product-description {
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .product-type {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .product-type.liquid {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .product-type.dry {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .product-actions {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Load Tracking Styles */
+    .load-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    .load-card.complete {
+      border-left: 4px solid var(--success);
+      opacity: 0.8;
+    }
+
+    .load-card.partial {
+      border-left: 4px solid var(--warning);
+    }
+
+    .load-card.open {
+      border-left: 4px solid var(--helena-green);
+    }
+
+    .load-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .load-product-info {
+      flex: 1;
+    }
+
+    .load-part-number {
+      font-family: 'Roboto Condensed', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--helena-green);
+    }
+
+    .load-description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .load-progress {
+      text-align: right;
+    }
+
+    .load-progress-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .load-progress-bar {
+      width: 120px;
+      height: 8px;
+      background: var(--bg-primary);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.25rem;
+    }
+
+    .load-progress-fill {
+      height: 100%;
+      background: var(--helena-green);
+      transition: width 0.3s;
+    }
+
+    .load-lines {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .load-line {
+      display: grid;
+      grid-template-columns: 50px 1fr 100px 100px;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.75rem;
+      background: var(--bg-primary);
+      border-radius: 6px;
+    }
+
+    .load-line-number {
+      font-weight: 700;
+      color: var(--helena-green);
+    }
+
+    .load-line-release {
+      font-family: monospace;
+      font-size: 0.95rem;
+    }
+
+    .load-line-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .load-line-status input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .load-line-status.assigned {
+      color: #1976d2;
+    }
+
+    .load-line-status.delivered {
+      color: var(--success);
+    }
+
+    .load-actions {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .release-field-group {
+      background: var(--bg-primary);
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+    }
+
+    .release-field-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--helena-green);
+    }
+
+    .release-field-group input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .edit-load-line {
+      display: grid;
+      grid-template-columns: 60px 1fr 80px 80px 40px;
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.75rem;
+      background: var(--bg-primary);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+    }
+
+    .edit-load-line input[type="text"] {
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .edit-load-line .remove-line-btn {
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    .edit-load-line .remove-line-btn:hover {
+      background: #c0392b;
+    }
+
+    @media (max-width: 768px) {
+      .load-line {
+        grid-template-columns: 40px 1fr;
+        gap: 0.5rem;
+      }
+
+      .load-line-status {
+        grid-column: span 2;
+        justify-content: flex-start;
+      }
+
+      .edit-load-line {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+    }
+
     /* Email Digest Styles */
     .email-config {
       background: var(--bg-primary);
@@ -1566,6 +1815,8 @@
       <button class="nav-tab" data-tab="issues">Equipment Issues</button>
       <button class="nav-tab" data-tab="location">Item Location</button>
       <button class="nav-tab" data-tab="costrepair">Cost Repair</button>
+      <button class="nav-tab" data-tab="products">Products</button>
+      <button class="nav-tab" data-tab="loads">Load Tracking</button>
     </div>
     
     <div id="equipment-tab" class="tab-content active">
@@ -1703,8 +1954,145 @@
       
       <div id="costRepairList"></div>
     </div>
+
+    <!-- Products Tab -->
+    <div id="products-tab" class="tab-content">
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="openAddProductModal()">+ Add Product</button>
+        <div class="search-box">
+          <input type="text" id="productSearch" placeholder="Search products..." oninput="window.filterProducts()">
+        </div>
+      </div>
+      <div id="productsList" class="products-grid"></div>
+    </div>
+
+    <!-- Load Tracking Tab -->
+    <div id="loads-tab" class="tab-content">
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="openAddLoadModal()">+ New Load Request</button>
+        <select id="loadStatusFilter" onchange="renderLoads()">
+          <option value="">All Loads</option>
+          <option value="open">Open</option>
+          <option value="partial">Partially Delivered</option>
+          <option value="complete">Complete</option>
+        </select>
+        <select id="loadProductFilter" onchange="renderLoads()">
+          <option value="">All Products</option>
+        </select>
+      </div>
+      <div id="loadsList"></div>
+    </div>
   </div>
-  
+
+  <!-- Add Product Modal -->
+  <div id="addProductModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Product</h2>
+        <button class="close-btn" onclick="closeModal('addProductModal')">&times;</button>
+      </div>
+      <form id="addProductForm" onsubmit="addProduct(event)">
+        <div class="form-group">
+          <label for="productPartNumber">Part Number *</label>
+          <input type="text" id="productPartNumber" required placeholder="e.g., FERT-001">
+        </div>
+        <div class="form-group">
+          <label for="productDescription">Item Description *</label>
+          <input type="text" id="productDescription" required placeholder="e.g., 10-34-0 Liquid Starter">
+        </div>
+        <div class="form-group">
+          <label for="productType">Product Type *</label>
+          <select id="productType" required>
+            <option value="">Select Type</option>
+            <option value="Liquid">Liquid Fertilizer</option>
+            <option value="Dry">Dry Fertilizer</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Add Product</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Product Modal -->
+  <div id="editProductModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Product</h2>
+        <button class="close-btn" onclick="closeModal('editProductModal')">&times;</button>
+      </div>
+      <form id="editProductForm" onsubmit="updateProduct(event)">
+        <input type="hidden" id="editProductId">
+        <div class="form-group">
+          <label for="editProductPartNumber">Part Number *</label>
+          <input type="text" id="editProductPartNumber" required>
+        </div>
+        <div class="form-group">
+          <label for="editProductDescription">Item Description *</label>
+          <input type="text" id="editProductDescription" required>
+        </div>
+        <div class="form-group">
+          <label for="editProductType">Product Type *</label>
+          <select id="editProductType" required>
+            <option value="Liquid">Liquid Fertilizer</option>
+            <option value="Dry">Dry Fertilizer</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Product</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Load Modal -->
+  <div id="addLoadModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 class="modal-title">New Load Request</h2>
+        <button class="close-btn" onclick="closeModal('addLoadModal')">&times;</button>
+      </div>
+      <form id="addLoadForm" onsubmit="addLoad(event)">
+        <div class="form-group">
+          <label for="loadProduct">Product *</label>
+          <select id="loadProduct" required onchange="fillProductInfo()">
+            <option value="">Select Product</option>
+          </select>
+        </div>
+        <div id="loadProductInfo" style="display: none; background: var(--bg-primary); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+          <div><strong>Description:</strong> <span id="loadProductDescription"></span></div>
+          <div><strong>Type:</strong> <span id="loadProductType"></span></div>
+        </div>
+        <div class="form-group">
+          <label for="loadQuantity">Number of Loads Requested *</label>
+          <input type="number" id="loadQuantity" required min="1" max="20" value="1" onchange="generateReleaseFields()">
+        </div>
+        <div id="releaseFieldsContainer"></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Create Load Request</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Load Modal -->
+  <div id="editLoadModal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Load Request</h2>
+        <button class="close-btn" onclick="closeModal('editLoadModal')">&times;</button>
+      </div>
+      <form id="editLoadForm" onsubmit="updateLoad(event)">
+        <input type="hidden" id="editLoadId">
+        <div style="background: var(--bg-primary); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+          <div><strong>Part Number:</strong> <span id="editLoadPartNumber"></span></div>
+          <div><strong>Description:</strong> <span id="editLoadDescription"></span></div>
+          <div><strong>Type:</strong> <span id="editLoadType"></span></div>
+        </div>
+        <div id="editReleaseFieldsContainer"></div>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Update Load</button>
+          <button type="button" class="btn" onclick="addLoadLine()" style="flex: 0;">+ Add Load</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Add Equipment Modal -->
   <div id="addEquipmentModal" class="modal">
     <div class="modal-content">
@@ -2208,6 +2596,8 @@
     let schedules = [];
     let issues = [];
     let locations = [];
+    let products = [];
+    let loads = [];
     let currentEquipmentId = null;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
@@ -2358,9 +2748,22 @@
           ...doc.data()
         }));
 
+        const productsSnapshot = await getDocs(collection(db, 'products'));
+        products = productsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        const loadsSnapshot = await getDocs(collection(db, 'loads'));
+        loads = loadsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
         renderEquipment();
         renderTemplates();
         populateEquipmentSelects();
+        populateProductSelects();
       } catch (error) {
         console.error('Error loading data:', error);
         showToast('Error loading data. Please refresh the page.', 'error');
@@ -2489,6 +2892,10 @@
           renderLocations();
         } else if (tabName === 'costrepair') {
           renderCostRepair();
+        } else if (tabName === 'products') {
+          renderProducts();
+        } else if (tabName === 'loads') {
+          renderLoads();
         }
       });
     });
@@ -5031,6 +5438,8 @@
       if (tabName === 'issues') renderIssues();
       if (tabName === 'location') renderLocations();
       if (tabName === 'dashboard') renderDashboard();
+      if (tabName === 'products') renderProducts();
+      if (tabName === 'loads') renderLoads();
     }
 
     // PHOTO HANDLING FUNCTIONS - Multiple photos support
@@ -5079,6 +5488,496 @@
     window.viewPhoto = function(photoData) {
       document.getElementById('photoViewerImage').src = photoData;
       document.getElementById('photoViewerModal').classList.add('active');
+    }
+
+    // PRODUCTS FUNCTIONS
+    function populateProductSelects() {
+      const loadProductSelect = document.getElementById('loadProduct');
+      const loadProductFilter = document.getElementById('loadProductFilter');
+
+      const sortedProducts = [...products].sort((a, b) => a.partNumber.localeCompare(b.partNumber));
+
+      // Load product dropdown
+      if (loadProductSelect) {
+        loadProductSelect.innerHTML = '<option value="">Select Product</option>' +
+          sortedProducts.map(p => `<option value="${p.id}">${p.partNumber} - ${p.description}</option>`).join('');
+      }
+
+      // Load product filter
+      if (loadProductFilter) {
+        loadProductFilter.innerHTML = '<option value="">All Products</option>' +
+          sortedProducts.map(p => `<option value="${p.id}">${p.partNumber}</option>`).join('');
+      }
+    }
+
+    window.openAddProductModal = function() {
+      document.getElementById('addProductForm').reset();
+      document.getElementById('addProductModal').classList.add('active');
+    }
+
+    window.addProduct = async function(event) {
+      event.preventDefault();
+
+      const newProduct = {
+        partNumber: document.getElementById('productPartNumber').value.trim(),
+        description: document.getElementById('productDescription').value.trim(),
+        type: document.getElementById('productType').value,
+        createdAt: new Date().toISOString()
+      };
+
+      // Check for duplicate part number
+      if (products.some(p => p.partNumber.toLowerCase() === newProduct.partNumber.toLowerCase())) {
+        showToast('A product with this part number already exists', 'error');
+        return;
+      }
+
+      showLoading('Adding product...');
+
+      try {
+        await addDoc(collection(db, 'products'), newProduct);
+        await loadData(false);
+        hideLoading();
+        showToast('Product added successfully');
+        document.getElementById('addProductForm').reset();
+        closeModal('addProductModal');
+        renderProducts();
+      } catch (error) {
+        console.error('Error adding product:', error);
+        hideLoading();
+        showToast('Error adding product. Please try again.', 'error');
+      }
+    }
+
+    window.renderProducts = function() {
+      const container = document.getElementById('productsList');
+      const searchTerm = document.getElementById('productSearch')?.value.toLowerCase() || '';
+
+      let filteredProducts = products.filter(p => {
+        return p.partNumber.toLowerCase().includes(searchTerm) ||
+               p.description.toLowerCase().includes(searchTerm);
+      });
+
+      filteredProducts.sort((a, b) => a.partNumber.localeCompare(b.partNumber));
+
+      if (filteredProducts.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h3>No Products Found</h3>
+            <p>Add products to start tracking loads.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredProducts.map(product => `
+        <div class="product-card">
+          <div class="product-part-number">${product.partNumber}</div>
+          <div class="product-description">${product.description}</div>
+          <span class="product-type ${product.type.toLowerCase()}">${product.type} Fertilizer</span>
+          <div class="product-actions">
+            <button class="btn btn-small" onclick="window.openEditProductModal('${product.id}')">Edit</button>
+            <button class="btn btn-small" onclick="window.deleteProduct('${product.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.filterProducts = function() {
+      renderProducts();
+    }
+
+    window.openEditProductModal = function(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+
+      document.getElementById('editProductId').value = productId;
+      document.getElementById('editProductPartNumber').value = product.partNumber;
+      document.getElementById('editProductDescription').value = product.description;
+      document.getElementById('editProductType').value = product.type;
+
+      document.getElementById('editProductModal').classList.add('active');
+    }
+
+    window.updateProduct = async function(event) {
+      event.preventDefault();
+
+      const productId = document.getElementById('editProductId').value;
+      const updatedProduct = {
+        partNumber: document.getElementById('editProductPartNumber').value.trim(),
+        description: document.getElementById('editProductDescription').value.trim(),
+        type: document.getElementById('editProductType').value
+      };
+
+      // Check for duplicate part number (excluding current product)
+      if (products.some(p => p.id !== productId && p.partNumber.toLowerCase() === updatedProduct.partNumber.toLowerCase())) {
+        showToast('A product with this part number already exists', 'error');
+        return;
+      }
+
+      showLoading('Updating product...');
+
+      try {
+        await updateDoc(doc(db, 'products', productId), updatedProduct);
+        await loadData(false);
+        hideLoading();
+        showToast('Product updated successfully');
+        closeModal('editProductModal');
+        renderProducts();
+      } catch (error) {
+        console.error('Error updating product:', error);
+        hideLoading();
+        showToast('Error updating product. Please try again.', 'error');
+      }
+    }
+
+    window.deleteProduct = async function(productId) {
+      // Check if product is used in any loads
+      const usedInLoads = loads.some(l => l.productId === productId);
+      if (usedInLoads) {
+        showToast('Cannot delete product - it is used in existing loads', 'error');
+        return;
+      }
+
+      if (!confirm('Are you sure you want to delete this product?')) return;
+
+      showLoading('Deleting product...');
+
+      try {
+        await deleteDoc(doc(db, 'products', productId));
+        await loadData(false);
+        hideLoading();
+        showToast('Product deleted successfully');
+        renderProducts();
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        hideLoading();
+        showToast('Error deleting product. Please try again.', 'error');
+      }
+    }
+
+    // LOAD TRACKING FUNCTIONS
+    window.openAddLoadModal = function() {
+      document.getElementById('addLoadForm').reset();
+      document.getElementById('loadProductInfo').style.display = 'none';
+      document.getElementById('releaseFieldsContainer').innerHTML = '';
+      populateProductSelects();
+      document.getElementById('addLoadModal').classList.add('active');
+    }
+
+    window.fillProductInfo = function() {
+      const productId = document.getElementById('loadProduct').value;
+      const infoDiv = document.getElementById('loadProductInfo');
+
+      if (!productId) {
+        infoDiv.style.display = 'none';
+        return;
+      }
+
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        document.getElementById('loadProductDescription').textContent = product.description;
+        document.getElementById('loadProductType').textContent = product.type + ' Fertilizer';
+        infoDiv.style.display = 'block';
+        generateReleaseFields();
+      }
+    }
+
+    window.generateReleaseFields = function() {
+      const quantity = parseInt(document.getElementById('loadQuantity').value) || 1;
+      const container = document.getElementById('releaseFieldsContainer');
+
+      let html = '<div style="margin-top: 1rem;"><strong>Release Numbers:</strong></div>';
+      for (let i = 1; i <= quantity; i++) {
+        html += `
+          <div class="release-field-group">
+            <label>Load ${i} - Release Number</label>
+            <input type="text" id="releaseNumber${i}" placeholder="Enter release number">
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    window.addLoad = async function(event) {
+      event.preventDefault();
+
+      const productId = document.getElementById('loadProduct').value;
+      const product = products.find(p => p.id === productId);
+      const quantity = parseInt(document.getElementById('loadQuantity').value);
+
+      if (!product) {
+        showToast('Please select a product', 'error');
+        return;
+      }
+
+      // Gather release numbers
+      const loadLines = [];
+      for (let i = 1; i <= quantity; i++) {
+        const releaseNumber = document.getElementById(`releaseNumber${i}`).value.trim();
+        loadLines.push({
+          lineNumber: i,
+          releaseNumber: releaseNumber,
+          assigned: false,
+          delivered: false
+        });
+      }
+
+      const newLoad = {
+        productId: product.id,
+        partNumber: product.partNumber,
+        description: product.description,
+        type: product.type,
+        loadLines: loadLines,
+        createdAt: new Date().toISOString()
+      };
+
+      showLoading('Creating load request...');
+
+      try {
+        await addDoc(collection(db, 'loads'), newLoad);
+        await loadData(false);
+        hideLoading();
+        showToast('Load request created successfully');
+        closeModal('addLoadModal');
+        renderLoads();
+      } catch (error) {
+        console.error('Error creating load:', error);
+        hideLoading();
+        showToast('Error creating load request. Please try again.', 'error');
+      }
+    }
+
+    window.renderLoads = function() {
+      const container = document.getElementById('loadsList');
+      const statusFilter = document.getElementById('loadStatusFilter')?.value || '';
+      const productFilter = document.getElementById('loadProductFilter')?.value || '';
+
+      let filteredLoads = [...loads];
+
+      // Apply product filter
+      if (productFilter) {
+        filteredLoads = filteredLoads.filter(l => l.productId === productFilter);
+      }
+
+      // Apply status filter
+      if (statusFilter) {
+        filteredLoads = filteredLoads.filter(l => {
+          const status = getLoadStatus(l);
+          return status === statusFilter;
+        });
+      }
+
+      // Sort by created date (newest first), then by open status
+      filteredLoads.sort((a, b) => {
+        const aStatus = getLoadStatus(a);
+        const bStatus = getLoadStatus(b);
+        // Open loads first, then partial, then complete
+        const statusOrder = { open: 0, partial: 1, complete: 2 };
+        if (statusOrder[aStatus] !== statusOrder[bStatus]) {
+          return statusOrder[aStatus] - statusOrder[bStatus];
+        }
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
+      if (filteredLoads.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🚚</div>
+            <h3>No Loads Found</h3>
+            <p>Create a new load request to start tracking deliveries.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredLoads.map(load => {
+        const status = getLoadStatus(load);
+        const deliveredCount = load.loadLines.filter(l => l.delivered).length;
+        const totalCount = load.loadLines.length;
+        const progressPercent = totalCount > 0 ? (deliveredCount / totalCount) * 100 : 0;
+
+        return `
+          <div class="load-card ${status}">
+            <div class="load-header">
+              <div class="load-product-info">
+                <div class="load-part-number">${load.partNumber}</div>
+                <div class="load-description">${load.description} <span class="product-type ${load.type.toLowerCase()}" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">${load.type}</span></div>
+              </div>
+              <div class="load-progress">
+                <div class="load-progress-text">${deliveredCount} / ${totalCount} Delivered</div>
+                <div class="load-progress-bar">
+                  <div class="load-progress-fill" style="width: ${progressPercent}%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="load-lines">
+              ${load.loadLines.map(line => `
+                <div class="load-line">
+                  <div class="load-line-number">Load ${line.lineNumber}</div>
+                  <div class="load-line-release">${line.releaseNumber || '<em style="color: var(--text-secondary);">No release #</em>'}</div>
+                  <div class="load-line-status assigned">
+                    <input type="checkbox" ${line.assigned ? 'checked' : ''} onchange="window.updateLoadLineStatus('${load.id}', ${line.lineNumber}, 'assigned', this.checked)">
+                    <span>Assigned</span>
+                  </div>
+                  <div class="load-line-status delivered">
+                    <input type="checkbox" ${line.delivered ? 'checked' : ''} onchange="window.updateLoadLineStatus('${load.id}', ${line.lineNumber}, 'delivered', this.checked)">
+                    <span>Delivered</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="load-actions">
+              <button class="btn btn-small" onclick="window.openEditLoadModal('${load.id}')">Edit</button>
+              <button class="btn btn-small" onclick="window.deleteLoad('${load.id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getLoadStatus(load) {
+      const deliveredCount = load.loadLines.filter(l => l.delivered).length;
+      const totalCount = load.loadLines.length;
+
+      if (deliveredCount === 0) return 'open';
+      if (deliveredCount === totalCount) return 'complete';
+      return 'partial';
+    }
+
+    window.updateLoadLineStatus = async function(loadId, lineNumber, field, value) {
+      const load = loads.find(l => l.id === loadId);
+      if (!load) return;
+
+      const loadLine = load.loadLines.find(l => l.lineNumber === lineNumber);
+      if (!loadLine) return;
+
+      loadLine[field] = value;
+
+      // If marking as delivered, also mark as assigned
+      if (field === 'delivered' && value) {
+        loadLine.assigned = true;
+      }
+
+      try {
+        await updateDoc(doc(db, 'loads', loadId), {
+          loadLines: load.loadLines
+        });
+        await loadData(false);
+        renderLoads();
+      } catch (error) {
+        console.error('Error updating load status:', error);
+        showToast('Error updating status. Please try again.', 'error');
+      }
+    }
+
+    window.openEditLoadModal = function(loadId) {
+      const load = loads.find(l => l.id === loadId);
+      if (!load) return;
+
+      document.getElementById('editLoadId').value = loadId;
+      document.getElementById('editLoadPartNumber').textContent = load.partNumber;
+      document.getElementById('editLoadDescription').textContent = load.description;
+      document.getElementById('editLoadType').textContent = load.type + ' Fertilizer';
+
+      renderEditLoadLines(load);
+
+      document.getElementById('editLoadModal').classList.add('active');
+    }
+
+    function renderEditLoadLines(load) {
+      const container = document.getElementById('editReleaseFieldsContainer');
+
+      container.innerHTML = load.loadLines.map(line => `
+        <div class="edit-load-line" data-line-number="${line.lineNumber}">
+          <div class="load-line-number">Load ${line.lineNumber}</div>
+          <input type="text" value="${line.releaseNumber || ''}" placeholder="Release number" class="edit-release-input">
+          <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
+            <input type="checkbox" ${line.assigned ? 'checked' : ''} class="edit-assigned-input"> Assigned
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
+            <input type="checkbox" ${line.delivered ? 'checked' : ''} class="edit-delivered-input"> Delivered
+          </label>
+          <button type="button" class="remove-line-btn" onclick="this.parentElement.remove()">×</button>
+        </div>
+      `).join('');
+    }
+
+    window.addLoadLine = function() {
+      const container = document.getElementById('editReleaseFieldsContainer');
+      const existingLines = container.querySelectorAll('.edit-load-line');
+      const nextLineNumber = existingLines.length + 1;
+
+      const newLine = document.createElement('div');
+      newLine.className = 'edit-load-line';
+      newLine.dataset.lineNumber = nextLineNumber;
+      newLine.innerHTML = `
+        <div class="load-line-number">Load ${nextLineNumber}</div>
+        <input type="text" value="" placeholder="Release number" class="edit-release-input">
+        <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
+          <input type="checkbox" class="edit-assigned-input"> Assigned
+        </label>
+        <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
+          <input type="checkbox" class="edit-delivered-input"> Delivered
+        </label>
+        <button type="button" class="remove-line-btn" onclick="this.parentElement.remove()">×</button>
+      `;
+      container.appendChild(newLine);
+    }
+
+    window.updateLoad = async function(event) {
+      event.preventDefault();
+
+      const loadId = document.getElementById('editLoadId').value;
+      const container = document.getElementById('editReleaseFieldsContainer');
+      const lineElements = container.querySelectorAll('.edit-load-line');
+
+      if (lineElements.length === 0) {
+        showToast('At least one load line is required', 'error');
+        return;
+      }
+
+      const loadLines = Array.from(lineElements).map((el, index) => ({
+        lineNumber: index + 1,
+        releaseNumber: el.querySelector('.edit-release-input').value.trim(),
+        assigned: el.querySelector('.edit-assigned-input').checked,
+        delivered: el.querySelector('.edit-delivered-input').checked
+      }));
+
+      showLoading('Updating load...');
+
+      try {
+        await updateDoc(doc(db, 'loads', loadId), {
+          loadLines: loadLines
+        });
+        await loadData(false);
+        hideLoading();
+        showToast('Load updated successfully');
+        closeModal('editLoadModal');
+        renderLoads();
+      } catch (error) {
+        console.error('Error updating load:', error);
+        hideLoading();
+        showToast('Error updating load. Please try again.', 'error');
+      }
+    }
+
+    window.deleteLoad = async function(loadId) {
+      if (!confirm('Are you sure you want to delete this load request?')) return;
+
+      showLoading('Deleting load...');
+
+      try {
+        await deleteDoc(doc(db, 'loads', loadId));
+        await loadData(false);
+        hideLoading();
+        showToast('Load deleted successfully');
+        renderLoads();
+      } catch (error) {
+        console.error('Error deleting load:', error);
+        hideLoading();
+        showToast('Error deleting load. Please try again.', 'error');
+      }
     }
 
     // EMAIL DIGEST FUNCTIONS

@@ -1502,8 +1502,8 @@
 
     .load-line {
       display: grid;
-      grid-template-columns: 50px 1fr 100px 100px;
-      gap: 1rem;
+      grid-template-columns: 50px 1fr 130px 90px 90px 90px;
+      gap: 0.75rem;
       align-items: center;
       padding: 0.75rem;
       background: var(--bg-primary);
@@ -1545,6 +1545,70 @@
       margin-top: 1rem;
       display: flex;
       gap: 0.5rem;
+    }
+
+    /* Collapsible Load Cards */
+    .load-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      cursor: pointer;
+      padding: 0.5rem;
+      margin: -0.5rem -0.5rem 0 -0.5rem;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .load-card-header:hover {
+      background: var(--bg-primary);
+    }
+
+    .load-collapse-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      color: var(--text-secondary);
+      transition: transform 0.2s;
+    }
+
+    .load-card.collapsed .load-collapse-btn {
+      transform: rotate(-90deg);
+    }
+
+    .load-card.collapsed .load-lines,
+    .load-card.collapsed .load-actions {
+      display: none;
+    }
+
+    .load-line-status select {
+      padding: 0.35rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.8rem;
+      max-width: 120px;
+    }
+
+    .assigned-option-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      background: white;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .assigned-option-item button {
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      font-size: 0.8rem;
     }
 
     .release-field-group {
@@ -1602,12 +1666,20 @@
 
     @media (max-width: 768px) {
       .load-line {
-        grid-template-columns: 40px 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 0.5rem;
       }
 
+      .load-line-number {
+        grid-column: 1;
+      }
+
+      .load-line-release {
+        grid-column: 2;
+      }
+
       .load-line-status {
-        grid-column: span 2;
+        grid-column: span 1;
         justify-content: flex-start;
       }
 
@@ -2112,6 +2184,8 @@
         <select id="loadProductFilter" onchange="renderLoads()">
           <option value="">All Products</option>
         </select>
+        <button class="btn btn-small" onclick="openAssignedOptionsModal()">⚙️ Manage Assigned Options</button>
+        <button class="btn btn-small" onclick="toggleAllLoads()" id="collapseAllBtn">Collapse All</button>
       </div>
       <div id="loadsList"></div>
     </div>
@@ -2179,8 +2253,13 @@
           </select>
         </div>
         <div class="form-group" id="recurringIntervalGroup" style="display: none;">
-          <label for="taskInterval">Recurring Interval (days) *</label>
-          <input type="number" id="taskInterval" min="1" placeholder="e.g., 30 for monthly">
+          <label for="taskFrequency">Frequency *</label>
+          <select id="taskFrequency">
+            <option value="1">Daily</option>
+            <option value="7">Weekly</option>
+            <option value="14">Bi-Weekly</option>
+            <option value="30" selected>Monthly</option>
+          </select>
         </div>
         <div class="form-group">
           <label for="taskOwner">Owner *</label>
@@ -2220,8 +2299,13 @@
           </select>
         </div>
         <div class="form-group" id="editRecurringIntervalGroup" style="display: none;">
-          <label for="editTaskInterval">Recurring Interval (days) *</label>
-          <input type="number" id="editTaskInterval" min="1">
+          <label for="editTaskFrequency">Frequency *</label>
+          <select id="editTaskFrequency">
+            <option value="1">Daily</option>
+            <option value="7">Weekly</option>
+            <option value="14">Bi-Weekly</option>
+            <option value="30">Monthly</option>
+          </select>
         </div>
         <div class="form-group">
           <label for="editTaskOwner">Owner *</label>
@@ -2350,6 +2434,33 @@
           <button type="button" class="btn" onclick="addLoadLine()" style="flex: 0;">+ Add Load</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Manage Assigned Options Modal -->
+  <div id="assignedOptionsModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Manage Assigned Options</h2>
+        <button class="close-btn" onclick="closeModal('assignedOptionsModal')">&times;</button>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">Add options that will appear in the "Assigned To" dropdown for load lines.</p>
+      </div>
+      <div class="form-group">
+        <label>Add New Option</label>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="newAssignedOption" placeholder="e.g., Driver Name or Truck #" style="flex: 1;">
+          <button class="btn btn-primary" onclick="addAssignedOption()">Add</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Current Options</label>
+        <div id="assignedOptionsList" style="background: var(--bg-primary); padding: 1rem; border-radius: 6px; max-height: 250px; overflow-y: auto;">
+          <p style="color: var(--text-secondary);">No options added yet.</p>
+        </div>
+      </div>
+      <button class="btn" style="width: 100%;" onclick="closeModal('assignedOptionsModal')">Done</button>
     </div>
   </div>
 
@@ -2859,6 +2970,8 @@
     let products = [];
     let loads = [];
     let tasks = [];
+    let assignedOptions = [];
+    let collapsedLoads = new Set();
     let currentEquipmentId = null;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
@@ -3023,6 +3136,13 @@
 
         const tasksSnapshot = await getDocs(collection(db, 'tasks'));
         tasks = tasksSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        // Load assigned options for load tracking
+        const assignedOptionsSnapshot = await getDocs(collection(db, 'assignedOptions'));
+        assignedOptions = assignedOptionsSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
@@ -6062,38 +6182,63 @@
         return;
       }
 
+      // Build assigned options dropdown HTML
+      const assignedOptionsHTML = assignedOptions.length > 0
+        ? `<option value="">-- Select --</option>` + assignedOptions.map(opt => `<option value="${opt.name}">${opt.name}</option>`).join('')
+        : `<option value="">No options</option>`;
+
       container.innerHTML = filteredLoads.map(load => {
         const status = getLoadStatus(load);
         const deliveredCount = load.loadLines.filter(l => l.delivered).length;
         const totalCount = load.loadLines.length;
         const progressPercent = totalCount > 0 ? (deliveredCount / totalCount) * 100 : 0;
+        const isCollapsed = collapsedLoads.has(load.id);
 
         return `
-          <div class="load-card ${status}">
-            <div class="load-header">
-              <div class="load-product-info">
-                <div class="load-part-number">${load.partNumber}</div>
-                <div class="load-description">${load.description} <span class="product-type ${load.type.toLowerCase()}" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">${load.type}</span></div>
-              </div>
-              <div class="load-progress">
-                <div class="load-progress-text">${deliveredCount} / ${totalCount} Delivered</div>
-                <div class="load-progress-bar">
-                  <div class="load-progress-fill" style="width: ${progressPercent}%"></div>
+          <div class="load-card ${status} ${isCollapsed ? 'collapsed' : ''}" data-load-id="${load.id}">
+            <div class="load-card-header" onclick="window.toggleLoadCollapse('${load.id}')">
+              <div class="load-header" style="flex: 1; pointer-events: none;">
+                <div class="load-product-info">
+                  <div class="load-part-number">${load.partNumber}</div>
+                  <div class="load-description">${load.description} <span class="product-type ${load.type.toLowerCase()}" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">${load.type}</span></div>
+                </div>
+                <div class="load-progress">
+                  <div class="load-progress-text">${deliveredCount} / ${totalCount} Delivered</div>
+                  <div class="load-progress-bar">
+                    <div class="load-progress-fill" style="width: ${progressPercent}%"></div>
+                  </div>
                 </div>
               </div>
+              <button class="load-collapse-btn" title="Collapse/Expand">▼</button>
             </div>
             <div class="load-lines">
+              <div class="load-line" style="background: var(--helena-green); color: white; font-weight: 600; font-size: 0.8rem;">
+                <div>Load #</div>
+                <div>Release #</div>
+                <div>Assigned To</div>
+                <div>Received</div>
+                <div>Unload Req</div>
+                <div>Delivered</div>
+              </div>
               ${load.loadLines.map(line => `
                 <div class="load-line">
                   <div class="load-line-number">Load ${line.lineNumber}</div>
-                  <div class="load-line-release">${line.releaseNumber || '<em style="color: var(--text-secondary);">No release #</em>'}</div>
-                  <div class="load-line-status assigned">
-                    <input type="checkbox" ${line.assigned ? 'checked' : ''} onchange="window.updateLoadLineStatus('${load.id}', ${line.lineNumber}, 'assigned', this.checked)">
-                    <span>Assigned</span>
+                  <div class="load-line-release">${line.releaseNumber || '<em style="color: var(--text-secondary);">--</em>'}</div>
+                  <div class="load-line-status">
+                    <select onchange="window.updateLoadLineStatus('${load.id}', ${line.lineNumber}, 'assignedTo', this.value)">
+                      ${assignedOptions.length > 0
+                        ? `<option value="">--</option>` + assignedOptions.map(opt => `<option value="${opt.name}" ${line.assignedTo === opt.name ? 'selected' : ''}>${opt.name}</option>`).join('')
+                        : `<option value="">--</option>`}
+                    </select>
+                  </div>
+                  <div class="load-line-status">
+                    <input type="checkbox" ${line.receivedIn ? 'checked' : ''} onchange="window.updateLoadLineStatus('${load.id}', ${line.lineNumber}, 'receivedIn', this.checked)" title="Received In">
+                  </div>
+                  <div class="load-line-status">
+                    <input type="checkbox" ${line.unloadRequested ? 'checked' : ''} onchange="window.updateLoadLineStatus('${load.id}', ${line.lineNumber}, 'unloadRequested', this.checked)" title="Unload Requested">
                   </div>
                   <div class="load-line-status delivered">
-                    <input type="checkbox" ${line.delivered ? 'checked' : ''} onchange="window.updateLoadLineStatus('${load.id}', ${line.lineNumber}, 'delivered', this.checked)">
-                    <span>Delivered</span>
+                    <input type="checkbox" ${line.delivered ? 'checked' : ''} onchange="window.updateLoadLineStatus('${load.id}', ${line.lineNumber}, 'delivered', this.checked)" title="Delivered">
                   </div>
                 </div>
               `).join('')}
@@ -6125,9 +6270,9 @@
 
       loadLine[field] = value;
 
-      // If marking as delivered, also mark as assigned
-      if (field === 'delivered' && value) {
-        loadLine.assigned = true;
+      // If marking receivedIn as checked, also check unloadRequested
+      if (field === 'receivedIn' && value) {
+        loadLine.unloadRequested = true;
       }
 
       try {
@@ -6159,12 +6304,26 @@
     function renderEditLoadLines(load) {
       const container = document.getElementById('editReleaseFieldsContainer');
 
+      const assignedOptionsHTML = assignedOptions.length > 0
+        ? `<option value="">--</option>` + assignedOptions.map(opt => `<option value="${opt.name}">${opt.name}</option>`).join('')
+        : `<option value="">--</option>`;
+
       container.innerHTML = load.loadLines.map(line => `
         <div class="edit-load-line" data-line-number="${line.lineNumber}">
           <div class="load-line-number">Load ${line.lineNumber}</div>
           <input type="text" value="${line.releaseNumber || ''}" placeholder="Release number" class="edit-release-input">
           <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
-            <input type="checkbox" ${line.assigned ? 'checked' : ''} class="edit-assigned-input"> Assigned
+            <select class="edit-assigned-select" style="padding: 0.25rem; font-size: 0.85rem;">
+              ${assignedOptions.length > 0
+                ? `<option value="">--</option>` + assignedOptions.map(opt => `<option value="${opt.name}" ${line.assignedTo === opt.name ? 'selected' : ''}>${opt.name}</option>`).join('')
+                : `<option value="">--</option>`}
+            </select>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
+            <input type="checkbox" ${line.receivedIn ? 'checked' : ''} class="edit-received-input"> Received
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
+            <input type="checkbox" ${line.unloadRequested ? 'checked' : ''} class="edit-unload-input"> Unload
           </label>
           <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
             <input type="checkbox" ${line.delivered ? 'checked' : ''} class="edit-delivered-input"> Delivered
@@ -6186,7 +6345,17 @@
         <div class="load-line-number">Load ${nextLineNumber}</div>
         <input type="text" value="" placeholder="Release number" class="edit-release-input">
         <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
-          <input type="checkbox" class="edit-assigned-input"> Assigned
+          <select class="edit-assigned-select" style="padding: 0.25rem; font-size: 0.85rem;">
+            ${assignedOptions.length > 0
+              ? `<option value="">--</option>` + assignedOptions.map(opt => `<option value="${opt.name}">${opt.name}</option>`).join('')
+              : `<option value="">--</option>`}
+          </select>
+        </label>
+        <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
+          <input type="checkbox" class="edit-received-input"> Received
+        </label>
+        <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
+          <input type="checkbox" class="edit-unload-input"> Unload
         </label>
         <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
           <input type="checkbox" class="edit-delivered-input"> Delivered
@@ -6211,7 +6380,9 @@
       const loadLines = Array.from(lineElements).map((el, index) => ({
         lineNumber: index + 1,
         releaseNumber: el.querySelector('.edit-release-input').value.trim(),
-        assigned: el.querySelector('.edit-assigned-input').checked,
+        assignedTo: el.querySelector('.edit-assigned-select')?.value || '',
+        receivedIn: el.querySelector('.edit-received-input')?.checked || false,
+        unloadRequested: el.querySelector('.edit-unload-input')?.checked || false,
         delivered: el.querySelector('.edit-delivered-input').checked
       }));
 
@@ -6251,7 +6422,108 @@
       }
     }
 
+    // ASSIGNED OPTIONS MANAGEMENT
+    window.openAssignedOptionsModal = function() {
+      renderAssignedOptions();
+      document.getElementById('assignedOptionsModal').classList.add('active');
+    }
+
+    function renderAssignedOptions() {
+      const container = document.getElementById('assignedOptionsList');
+
+      if (assignedOptions.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-secondary);">No options added yet.</p>';
+        return;
+      }
+
+      container.innerHTML = assignedOptions.map(opt => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid var(--border-color);">
+          <span>${opt.name}</span>
+          <button class="btn btn-small" onclick="deleteAssignedOption('${opt.id}')" style="background: #dc3545; color: white;">×</button>
+        </div>
+      `).join('');
+    }
+
+    window.addAssignedOption = async function() {
+      const input = document.getElementById('newAssignedOption');
+      const name = input.value.trim();
+
+      if (!name) {
+        showToast('Please enter an option name', 'error');
+        return;
+      }
+
+      // Check for duplicate
+      if (assignedOptions.some(opt => opt.name.toLowerCase() === name.toLowerCase())) {
+        showToast('This option already exists', 'error');
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, 'assignedOptions'), { name });
+        await loadData(false);
+        renderAssignedOptions();
+        renderLoads();
+        input.value = '';
+        showToast('Option added successfully');
+      } catch (error) {
+        console.error('Error adding option:', error);
+        showToast('Error adding option. Please try again.', 'error');
+      }
+    }
+
+    window.deleteAssignedOption = async function(optionId) {
+      if (!confirm('Are you sure you want to delete this option?')) return;
+
+      try {
+        await deleteDoc(doc(db, 'assignedOptions', optionId));
+        await loadData(false);
+        renderAssignedOptions();
+        renderLoads();
+        showToast('Option deleted successfully');
+      } catch (error) {
+        console.error('Error deleting option:', error);
+        showToast('Error deleting option. Please try again.', 'error');
+      }
+    }
+
+    // LOAD COLLAPSE/EXPAND FUNCTIONS
+    window.toggleLoadCollapse = function(loadId) {
+      if (collapsedLoads.has(loadId)) {
+        collapsedLoads.delete(loadId);
+      } else {
+        collapsedLoads.add(loadId);
+      }
+      renderLoads();
+    }
+
+    window.toggleAllLoads = function() {
+      const btn = document.getElementById('collapseAllBtn');
+      const allCollapsed = loads.every(l => collapsedLoads.has(l.id));
+
+      if (allCollapsed) {
+        // Expand all
+        collapsedLoads.clear();
+        btn.textContent = 'Collapse All';
+      } else {
+        // Collapse all
+        loads.forEach(l => collapsedLoads.add(l.id));
+        btn.textContent = 'Expand All';
+      }
+      renderLoads();
+    }
+
     // TASKS FUNCTIONS
+    function getFrequencyLabel(interval) {
+      switch (interval) {
+        case 1: return 'Daily';
+        case 7: return 'Weekly';
+        case 14: return 'Bi-Weekly';
+        case 30: return 'Monthly';
+        default: return `Every ${interval} days`;
+      }
+    }
+
     function populateTaskOwnerFilter() {
       const filterSelect = document.getElementById('taskOwnerFilter');
       if (!filterSelect) return;
@@ -6274,7 +6546,6 @@
       const taskType = document.getElementById('taskType').value;
       const intervalGroup = document.getElementById('recurringIntervalGroup');
       intervalGroup.style.display = taskType === 'recurring' ? 'block' : 'none';
-      document.getElementById('taskInterval').required = taskType === 'recurring';
     }
 
     window.toggleEditRecurringFields = function() {
@@ -6283,7 +6554,6 @@
       const lastCompletedGroup = document.getElementById('editLastCompletedGroup');
       intervalGroup.style.display = taskType === 'recurring' ? 'block' : 'none';
       lastCompletedGroup.style.display = taskType === 'recurring' ? 'block' : 'none';
-      document.getElementById('editTaskInterval').required = taskType === 'recurring';
     }
 
     window.addTask = async function(event) {
@@ -6293,7 +6563,7 @@
       const newTask = {
         name: document.getElementById('taskName').value.trim(),
         type: taskType,
-        interval: taskType === 'recurring' ? parseInt(document.getElementById('taskInterval').value) : null,
+        interval: taskType === 'recurring' ? parseInt(document.getElementById('taskFrequency').value) : null,
         owner: document.getElementById('taskOwner').value.trim(),
         dueDate: document.getElementById('taskDueDate').value,
         lastCompleted: null,
@@ -6390,7 +6660,7 @@
             </td>
             <td>
               <span class="task-type-badge ${task.type}">${task.type === 'recurring' ? 'Recurring' : 'Single'}</span>
-              ${task.type === 'recurring' && task.interval ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">Every ${task.interval} days</div>` : ''}
+              ${task.type === 'recurring' && task.interval ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">${getFrequencyLabel(task.interval)}</div>` : ''}
             </td>
             <td>${task.owner || '-'}</td>
             <td>${new Date(task.dueDate).toLocaleDateString()}</td>
@@ -6415,7 +6685,7 @@
       document.getElementById('editTaskId').value = taskId;
       document.getElementById('editTaskName').value = task.name;
       document.getElementById('editTaskType').value = task.type;
-      document.getElementById('editTaskInterval').value = task.interval || '';
+      document.getElementById('editTaskFrequency').value = task.interval || 30;
       document.getElementById('editTaskOwner').value = task.owner;
       document.getElementById('editTaskDueDate').value = task.dueDate;
       document.getElementById('editTaskLastCompleted').value = task.lastCompleted || '';
@@ -6435,7 +6705,7 @@
       const updatedTask = {
         name: document.getElementById('editTaskName').value.trim(),
         type: taskType,
-        interval: taskType === 'recurring' ? parseInt(document.getElementById('editTaskInterval').value) : null,
+        interval: taskType === 'recurring' ? parseInt(document.getElementById('editTaskFrequency').value) : null,
         owner: document.getElementById('editTaskOwner').value.trim(),
         dueDate: document.getElementById('editTaskDueDate').value,
         lastCompleted: document.getElementById('editTaskLastCompleted').value || null,

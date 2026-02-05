@@ -6524,6 +6524,18 @@
       }
     }
 
+    // Helper to parse date string as local date (avoids timezone issues)
+    function parseLocalDate(dateString) {
+      if (!dateString) return null;
+      const [year, month, day] = dateString.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function formatLocalDate(dateString) {
+      const date = parseLocalDate(dateString);
+      return date ? date.toLocaleDateString() : '-';
+    }
+
     function populateTaskOwnerFilter() {
       const filterSelect = document.getElementById('taskOwnerFilter');
       if (!filterSelect) return;
@@ -6636,8 +6648,7 @@
       weekFromNow.setDate(weekFromNow.getDate() + 7);
 
       tbody.innerHTML = filteredTasks.map(task => {
-        const dueDate = new Date(task.dueDate);
-        dueDate.setHours(0, 0, 0, 0);
+        const dueDate = parseLocalDate(task.dueDate);
 
         let rowClass = '';
         let statusBadge = '';
@@ -6663,8 +6674,8 @@
               ${task.type === 'recurring' && task.interval ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">${getFrequencyLabel(task.interval)}</div>` : ''}
             </td>
             <td>${task.owner || '-'}</td>
-            <td>${new Date(task.dueDate).toLocaleDateString()}</td>
-            <td>${task.lastCompleted ? new Date(task.lastCompleted).toLocaleDateString() : '-'}</td>
+            <td>${formatLocalDate(task.dueDate)}</td>
+            <td>${task.lastCompleted ? formatLocalDate(task.lastCompleted) : '-'}</td>
             <td>${statusBadge}</td>
             <td>
               <div class="task-actions">
@@ -6808,15 +6819,14 @@
 
       if (reportType === 'urgent') {
         filteredTasks = filteredTasks.filter(task => {
-          const dueDate = new Date(task.dueDate);
-          dueDate.setHours(0, 0, 0, 0);
+          const dueDate = parseLocalDate(task.dueDate);
           return dueDate <= weekFromNow;
         });
         reportTitle = 'Urgent Tasks - Past Due & Due This Week';
       }
 
       // Sort by due date
-      filteredTasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+      filteredTasks.sort((a, b) => parseLocalDate(a.dueDate) - parseLocalDate(b.dueDate));
 
       // Apply current owner filter if set
       const ownerFilter = document.getElementById('taskOwnerFilter')?.value;
@@ -6866,8 +6876,7 @@
       `;
 
       filteredTasks.forEach(task => {
-        const dueDate = new Date(task.dueDate);
-        dueDate.setHours(0, 0, 0, 0);
+        const dueDate = parseLocalDate(task.dueDate);
 
         let rowClass = '';
         let status = '';
@@ -6889,10 +6898,10 @@
         printHTML += `
           <tr class="${rowClass}">
             <td><strong>${task.name}</strong>${task.notes ? '<br><small>' + task.notes.substring(0, 100) + '</small>' : ''}</td>
-            <td>${task.type === 'recurring' ? 'Recurring' + (task.interval ? ' (' + task.interval + ' days)' : '') : 'Single'}</td>
+            <td>${task.type === 'recurring' ? 'Recurring' + (task.interval ? ' (' + getFrequencyLabel(task.interval) + ')' : '') : 'Single'}</td>
             <td>${task.owner || '-'}</td>
-            <td>${new Date(task.dueDate).toLocaleDateString()}</td>
-            <td>${task.lastCompleted ? new Date(task.lastCompleted).toLocaleDateString() : '-'}</td>
+            <td>${formatLocalDate(task.dueDate)}</td>
+            <td>${task.lastCompleted ? formatLocalDate(task.lastCompleted) : '-'}</td>
             <td><span class="status ${statusClass}">${status}</span></td>
           </tr>
         `;

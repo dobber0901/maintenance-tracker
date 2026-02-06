@@ -1821,6 +1821,109 @@
       }
     }
 
+    /* Orders Table Styles */
+    .orders-table-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      overflow-x: auto;
+    }
+
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    .orders-table thead {
+      background: var(--helena-green);
+      color: white;
+    }
+
+    .orders-table th {
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-family: 'Roboto Condensed', sans-serif;
+      white-space: nowrap;
+    }
+
+    .orders-table td {
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .orders-table tbody tr:hover {
+      background: var(--bg-primary);
+    }
+
+    .orders-table tbody tr.order-overdue {
+      background: #ffebee;
+    }
+
+    .orders-table tbody tr.order-overdue td {
+      color: var(--danger);
+    }
+
+    .orders-table tbody tr.order-complete {
+      background: #e8f5e9;
+      opacity: 0.8;
+    }
+
+    .order-type-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .order-type-badge.product {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .order-type-badge.service {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .order-status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .order-status-badge.pending {
+      background: #fff8e1;
+      color: #f57c00;
+    }
+
+    .order-status-badge.in_progress {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .order-status-badge.complete {
+      background: var(--success);
+      color: white;
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .order-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
     /* Email Digest Styles */
     .email-config {
       background: var(--bg-primary);
@@ -2022,6 +2125,7 @@
       <button class="nav-tab" data-tab="products">Products</button>
       <button class="nav-tab" data-tab="loads">Load Tracking</button>
       <button class="nav-tab" data-tab="tasks">Tasks</button>
+      <button class="nav-tab" data-tab="orders">Orders</button>
     </div>
     
     <div id="equipment-tab" class="tab-content active">
@@ -2176,10 +2280,11 @@
       <div class="action-bar">
         <button class="btn btn-primary" onclick="openAddLoadModal()">+ New Load Request</button>
         <select id="loadStatusFilter" onchange="renderLoads()">
+          <option value="active" selected>Active (Open/Partial)</option>
           <option value="">All Loads</option>
-          <option value="open">Open</option>
+          <option value="open">Open Only</option>
           <option value="partial">Partially Delivered</option>
-          <option value="complete">Complete</option>
+          <option value="complete">Complete Only</option>
         </select>
         <select id="loadProductFilter" onchange="renderLoads()">
           <option value="">All Products</option>
@@ -2226,6 +2331,49 @@
             </tr>
           </thead>
           <tbody id="tasksTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Orders Tab -->
+    <div id="orders-tab" class="tab-content">
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="openAddOrderModal()">+ New Order</button>
+        <select id="orderAssignedFilter" onchange="renderOrders()">
+          <option value="">All Assigned</option>
+        </select>
+        <select id="orderTypeFilter" onchange="renderOrders()">
+          <option value="">All Types</option>
+          <option value="product">Product</option>
+          <option value="service">Service</option>
+        </select>
+        <select id="orderStatusFilter" onchange="renderOrders()">
+          <option value="active" selected>Active Orders</option>
+          <option value="">All Orders</option>
+          <option value="complete">Completed</option>
+        </select>
+        <button class="btn btn-small" onclick="printSelectedOrders()">📄 Print Selected</button>
+        <label style="display: flex; align-items: center; gap: 0.25rem; margin-left: auto;">
+          <input type="checkbox" id="selectAllOrders" onchange="toggleSelectAllOrders()"> Select All
+        </label>
+      </div>
+      <div class="orders-table-container">
+        <table class="orders-table" id="ordersTable">
+          <thead>
+            <tr>
+              <th style="width: 40px;"></th>
+              <th>Customer</th>
+              <th>Type</th>
+              <th>Product/Service</th>
+              <th>Qty</th>
+              <th>Due Date</th>
+              <th>Assigned</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody">
           </tbody>
         </table>
       </div>
@@ -2324,6 +2472,124 @@
           <textarea id="editTaskNotes"></textarea>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Update Task</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Order Modal -->
+  <div id="addOrderModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">New Order</h2>
+        <button class="close-btn" onclick="closeModal('addOrderModal')">&times;</button>
+      </div>
+      <form id="addOrderForm" onsubmit="addOrder(event)">
+        <div class="form-group">
+          <label for="orderCustomer">Customer *</label>
+          <input type="text" id="orderCustomer" required placeholder="Customer name">
+        </div>
+        <div class="form-group">
+          <label for="orderType">Order Type *</label>
+          <select id="orderType" required onchange="toggleOrderServiceFields()">
+            <option value="">Select Type</option>
+            <option value="product">Product</option>
+            <option value="service">Service</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="orderProductService">Product/Service Description *</label>
+          <input type="text" id="orderProductService" required placeholder="Enter product or service">
+        </div>
+        <div class="form-group">
+          <label for="orderQty">Quantity *</label>
+          <input type="number" id="orderQty" required min="1" value="1">
+        </div>
+        <div class="form-group">
+          <label for="orderDueDate">Due Date *</label>
+          <input type="date" id="orderDueDate" required>
+        </div>
+        <div id="orderServiceDatesGroup" style="display: none;">
+          <div class="form-group">
+            <label for="orderStartDate">Start Date</label>
+            <input type="date" id="orderStartDate">
+          </div>
+          <div class="form-group">
+            <label for="orderFinishDate">Finish Date</label>
+            <input type="date" id="orderFinishDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="orderAssigned">Assigned To *</label>
+          <input type="text" id="orderAssigned" required placeholder="Who will deliver/complete this order">
+        </div>
+        <div class="form-group">
+          <label for="orderNotes">Special Notes</label>
+          <textarea id="orderNotes" placeholder="Any special instructions..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Create Order</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Order Modal -->
+  <div id="editOrderModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Order</h2>
+        <button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button>
+      </div>
+      <form id="editOrderForm" onsubmit="updateOrder(event)">
+        <input type="hidden" id="editOrderId">
+        <div class="form-group">
+          <label for="editOrderCustomer">Customer *</label>
+          <input type="text" id="editOrderCustomer" required>
+        </div>
+        <div class="form-group">
+          <label for="editOrderType">Order Type *</label>
+          <select id="editOrderType" required onchange="toggleEditOrderServiceFields()">
+            <option value="product">Product</option>
+            <option value="service">Service</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editOrderProductService">Product/Service Description *</label>
+          <input type="text" id="editOrderProductService" required>
+        </div>
+        <div class="form-group">
+          <label for="editOrderQty">Quantity *</label>
+          <input type="number" id="editOrderQty" required min="1">
+        </div>
+        <div class="form-group">
+          <label for="editOrderDueDate">Due Date *</label>
+          <input type="date" id="editOrderDueDate" required>
+        </div>
+        <div id="editOrderServiceDatesGroup" style="display: none;">
+          <div class="form-group">
+            <label for="editOrderStartDate">Start Date</label>
+            <input type="date" id="editOrderStartDate">
+          </div>
+          <div class="form-group">
+            <label for="editOrderFinishDate">Finish Date</label>
+            <input type="date" id="editOrderFinishDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="editOrderAssigned">Assigned To *</label>
+          <input type="text" id="editOrderAssigned" required>
+        </div>
+        <div class="form-group">
+          <label for="editOrderNotes">Special Notes</label>
+          <textarea id="editOrderNotes"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="editOrderStatus">Status</label>
+          <select id="editOrderStatus">
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="complete">Complete</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Order</button>
       </form>
     </div>
   </div>
@@ -2970,8 +3236,10 @@
     let products = [];
     let loads = [];
     let tasks = [];
+    let orders = [];
     let assignedOptions = [];
     let collapsedLoads = new Set();
+    let selectedOrders = new Set();
     let currentEquipmentId = null;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
@@ -3140,6 +3408,13 @@
           ...doc.data()
         }));
 
+        // Load orders
+        const ordersSnapshot = await getDocs(collection(db, 'orders'));
+        orders = ordersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
         // Load assigned options for load tracking
         const assignedOptionsSnapshot = await getDocs(collection(db, 'assignedOptions'));
         assignedOptions = assignedOptionsSnapshot.docs.map(doc => ({
@@ -3152,6 +3427,7 @@
         populateEquipmentSelects();
         populateProductSelects();
         populateTaskOwnerFilter();
+        populateOrderAssignedFilter();
       } catch (error) {
         console.error('Error loading data:', error);
         showToast('Error loading data. Please refresh the page.', 'error');
@@ -3286,6 +3562,8 @@
           renderLoads();
         } else if (tabName === 'tasks') {
           renderTasks();
+        } else if (tabName === 'orders') {
+          renderOrders();
         }
       });
     });
@@ -5831,6 +6109,7 @@
       if (tabName === 'products') renderProducts();
       if (tabName === 'loads') renderLoads();
       if (tabName === 'tasks') renderTasks();
+      if (tabName === 'orders') renderOrders();
     }
 
     // PHOTO HANDLING FUNCTIONS - Multiple photos support
@@ -6155,6 +6434,9 @@
       if (statusFilter) {
         filteredLoads = filteredLoads.filter(l => {
           const status = getLoadStatus(l);
+          if (statusFilter === 'active') {
+            return status === 'open' || status === 'partial';
+          }
           return status === statusFilter;
         });
       }
@@ -6244,6 +6526,7 @@
               `).join('')}
             </div>
             <div class="load-actions">
+              ${status !== 'complete' ? `<button class="btn btn-small btn-primary" onclick="window.completeLoad('${load.id}')">✓ Complete</button>` : ''}
               <button class="btn btn-small" onclick="window.openEditLoadModal('${load.id}')">Edit</button>
               <button class="btn btn-small" onclick="window.deleteLoad('${load.id}')">Delete</button>
             </div>
@@ -6419,6 +6702,37 @@
         console.error('Error deleting load:', error);
         hideLoading();
         showToast('Error deleting load. Please try again.', 'error');
+      }
+    }
+
+    window.completeLoad = async function(loadId) {
+      if (!confirm('Mark all lines as delivered and complete this load?')) return;
+
+      const load = loads.find(l => l.id === loadId);
+      if (!load) return;
+
+      // Mark all lines as delivered
+      const updatedLines = load.loadLines.map(line => ({
+        ...line,
+        delivered: true,
+        receivedIn: true,
+        unloadRequested: true
+      }));
+
+      showLoading('Completing load...');
+
+      try {
+        await updateDoc(doc(db, 'loads', loadId), {
+          loadLines: updatedLines
+        });
+        await loadData(false);
+        hideLoading();
+        showToast('Load completed successfully');
+        renderLoads();
+      } catch (error) {
+        console.error('Error completing load:', error);
+        hideLoading();
+        showToast('Error completing load. Please try again.', 'error');
       }
     }
 
@@ -6913,6 +7227,366 @@
           <div style="margin-top: 20px; font-size: 10px; color: #666;">
             Total Tasks: ${filteredTasks.length}
           </div>
+        </body>
+        </html>
+      `;
+
+      const win = window.open('', '_blank');
+      win.document.write(printHTML);
+      win.document.close();
+      win.focus();
+      setTimeout(() => win.print(), 250);
+    }
+
+    // ORDERS FUNCTIONS
+    function populateOrderAssignedFilter() {
+      const filterSelect = document.getElementById('orderAssignedFilter');
+      if (!filterSelect) return;
+
+      const assigned = [...new Set(orders.map(o => o.assigned).filter(Boolean))].sort();
+
+      filterSelect.innerHTML = '<option value="">All Assigned</option>' +
+        assigned.map(a => `<option value="${a}">${a}</option>`).join('');
+    }
+
+    window.openAddOrderModal = function() {
+      document.getElementById('addOrderForm').reset();
+      document.getElementById('orderServiceDatesGroup').style.display = 'none';
+      document.getElementById('orderDueDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('addOrderModal').classList.add('active');
+    }
+
+    window.toggleOrderServiceFields = function() {
+      const orderType = document.getElementById('orderType').value;
+      document.getElementById('orderServiceDatesGroup').style.display = orderType === 'service' ? 'block' : 'none';
+    }
+
+    window.toggleEditOrderServiceFields = function() {
+      const orderType = document.getElementById('editOrderType').value;
+      document.getElementById('editOrderServiceDatesGroup').style.display = orderType === 'service' ? 'block' : 'none';
+    }
+
+    window.addOrder = async function(event) {
+      event.preventDefault();
+
+      const orderType = document.getElementById('orderType').value;
+      const newOrder = {
+        customer: document.getElementById('orderCustomer').value.trim(),
+        orderType: orderType,
+        productService: document.getElementById('orderProductService').value.trim(),
+        qty: parseInt(document.getElementById('orderQty').value),
+        dueDate: document.getElementById('orderDueDate').value,
+        startDate: orderType === 'service' ? document.getElementById('orderStartDate').value : null,
+        finishDate: orderType === 'service' ? document.getElementById('orderFinishDate').value : null,
+        assigned: document.getElementById('orderAssigned').value.trim(),
+        notes: document.getElementById('orderNotes').value.trim(),
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+
+      showLoading('Creating order...');
+
+      try {
+        await addDoc(collection(db, 'orders'), newOrder);
+        await loadData(false);
+        hideLoading();
+        showToast('Order created successfully');
+        document.getElementById('addOrderForm').reset();
+        closeModal('addOrderModal');
+        renderOrders();
+      } catch (error) {
+        console.error('Error creating order:', error);
+        hideLoading();
+        showToast('Error creating order. Please try again.', 'error');
+      }
+    }
+
+    window.renderOrders = function() {
+      const tbody = document.getElementById('ordersTableBody');
+      const assignedFilter = document.getElementById('orderAssignedFilter')?.value || '';
+      const typeFilter = document.getElementById('orderTypeFilter')?.value || '';
+      const statusFilter = document.getElementById('orderStatusFilter')?.value || 'active';
+
+      let filteredOrders = [...orders];
+
+      // Apply assigned filter
+      if (assignedFilter) {
+        filteredOrders = filteredOrders.filter(o => o.assigned === assignedFilter);
+      }
+
+      // Apply type filter
+      if (typeFilter) {
+        filteredOrders = filteredOrders.filter(o => o.orderType === typeFilter);
+      }
+
+      // Apply status filter
+      if (statusFilter) {
+        if (statusFilter === 'active') {
+          filteredOrders = filteredOrders.filter(o => o.status !== 'complete');
+        } else {
+          filteredOrders = filteredOrders.filter(o => o.status === statusFilter);
+        }
+      }
+
+      // Sort by due date
+      filteredOrders.sort((a, b) => parseLocalDate(a.dueDate) - parseLocalDate(b.dueDate));
+
+      if (filteredOrders.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">📦</div>
+              <div>No orders found. Create a new order to get started.</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      tbody.innerHTML = filteredOrders.map(order => {
+        const dueDate = parseLocalDate(order.dueDate);
+        const isOverdue = dueDate < today && order.status !== 'complete';
+        const isComplete = order.status === 'complete';
+
+        let rowClass = '';
+        if (isOverdue) rowClass = 'order-overdue';
+        if (isComplete) rowClass = 'order-complete';
+
+        const statusLabel = {
+          'pending': 'Pending',
+          'in_progress': 'In Progress',
+          'complete': 'Complete'
+        };
+
+        return `
+          <tr class="${rowClass}">
+            <td>
+              <input type="checkbox" class="order-checkbox" data-order-id="${order.id}"
+                ${selectedOrders.has(order.id) ? 'checked' : ''}
+                onchange="toggleOrderSelection('${order.id}')">
+            </td>
+            <td><strong>${order.customer}</strong></td>
+            <td><span class="order-type-badge ${order.orderType}">${order.orderType === 'product' ? 'Product' : 'Service'}</span></td>
+            <td>
+              ${order.productService}
+              ${order.orderType === 'service' && order.startDate ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">${formatLocalDate(order.startDate)} - ${order.finishDate ? formatLocalDate(order.finishDate) : 'TBD'}</div>` : ''}
+            </td>
+            <td>${order.qty}</td>
+            <td>${formatLocalDate(order.dueDate)}</td>
+            <td>${order.assigned || '-'}</td>
+            <td><span class="order-status-badge ${order.status}">${statusLabel[order.status] || order.status}</span></td>
+            <td>
+              <div class="order-actions">
+                ${order.status !== 'complete' ? `<button class="btn btn-small btn-primary" onclick="window.completeOrder('${order.id}')">✓</button>` : ''}
+                <button class="btn btn-small" onclick="window.openEditOrderModal('${order.id}')">Edit</button>
+                <button class="btn btn-small" onclick="window.deleteOrder('${order.id}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.toggleOrderSelection = function(orderId) {
+      if (selectedOrders.has(orderId)) {
+        selectedOrders.delete(orderId);
+      } else {
+        selectedOrders.add(orderId);
+      }
+      // Update select all checkbox state
+      const selectAll = document.getElementById('selectAllOrders');
+      if (selectAll) {
+        const visibleOrders = document.querySelectorAll('.order-checkbox');
+        const allChecked = Array.from(visibleOrders).every(cb => cb.checked);
+        selectAll.checked = allChecked && visibleOrders.length > 0;
+      }
+    }
+
+    window.toggleSelectAllOrders = function() {
+      const selectAll = document.getElementById('selectAllOrders');
+      const checkboxes = document.querySelectorAll('.order-checkbox');
+
+      checkboxes.forEach(cb => {
+        const orderId = cb.dataset.orderId;
+        if (selectAll.checked) {
+          selectedOrders.add(orderId);
+          cb.checked = true;
+        } else {
+          selectedOrders.delete(orderId);
+          cb.checked = false;
+        }
+      });
+    }
+
+    window.openEditOrderModal = function(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      document.getElementById('editOrderId').value = orderId;
+      document.getElementById('editOrderCustomer').value = order.customer;
+      document.getElementById('editOrderType').value = order.orderType;
+      document.getElementById('editOrderProductService').value = order.productService;
+      document.getElementById('editOrderQty').value = order.qty;
+      document.getElementById('editOrderDueDate').value = order.dueDate;
+      document.getElementById('editOrderStartDate').value = order.startDate || '';
+      document.getElementById('editOrderFinishDate').value = order.finishDate || '';
+      document.getElementById('editOrderAssigned').value = order.assigned;
+      document.getElementById('editOrderNotes').value = order.notes || '';
+      document.getElementById('editOrderStatus').value = order.status;
+
+      toggleEditOrderServiceFields();
+
+      document.getElementById('editOrderModal').classList.add('active');
+    }
+
+    window.updateOrder = async function(event) {
+      event.preventDefault();
+
+      const orderId = document.getElementById('editOrderId').value;
+      const orderType = document.getElementById('editOrderType').value;
+
+      const updatedOrder = {
+        customer: document.getElementById('editOrderCustomer').value.trim(),
+        orderType: orderType,
+        productService: document.getElementById('editOrderProductService').value.trim(),
+        qty: parseInt(document.getElementById('editOrderQty').value),
+        dueDate: document.getElementById('editOrderDueDate').value,
+        startDate: orderType === 'service' ? document.getElementById('editOrderStartDate').value : null,
+        finishDate: orderType === 'service' ? document.getElementById('editOrderFinishDate').value : null,
+        assigned: document.getElementById('editOrderAssigned').value.trim(),
+        notes: document.getElementById('editOrderNotes').value.trim(),
+        status: document.getElementById('editOrderStatus').value
+      };
+
+      showLoading('Updating order...');
+
+      try {
+        await updateDoc(doc(db, 'orders', orderId), updatedOrder);
+        await loadData(false);
+        hideLoading();
+        showToast('Order updated successfully');
+        closeModal('editOrderModal');
+        renderOrders();
+      } catch (error) {
+        console.error('Error updating order:', error);
+        hideLoading();
+        showToast('Error updating order. Please try again.', 'error');
+      }
+    }
+
+    window.completeOrder = async function(orderId) {
+      if (!confirm('Mark this order as complete?')) return;
+
+      showLoading('Completing order...');
+
+      try {
+        await updateDoc(doc(db, 'orders', orderId), { status: 'complete' });
+        await loadData(false);
+        hideLoading();
+        showToast('Order completed');
+        renderOrders();
+      } catch (error) {
+        console.error('Error completing order:', error);
+        hideLoading();
+        showToast('Error completing order. Please try again.', 'error');
+      }
+    }
+
+    window.deleteOrder = async function(orderId) {
+      if (!confirm('Are you sure you want to delete this order?')) return;
+
+      showLoading('Deleting order...');
+
+      try {
+        await deleteDoc(doc(db, 'orders', orderId));
+        selectedOrders.delete(orderId);
+        await loadData(false);
+        hideLoading();
+        showToast('Order deleted successfully');
+        renderOrders();
+      } catch (error) {
+        console.error('Error deleting order:', error);
+        hideLoading();
+        showToast('Error deleting order. Please try again.', 'error');
+      }
+    }
+
+    window.printSelectedOrders = function() {
+      if (selectedOrders.size === 0) {
+        showToast('Please select at least one order to print', 'error');
+        return;
+      }
+
+      const selectedOrdersList = orders.filter(o => selectedOrders.has(o.id));
+
+      let printHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Selected Orders Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h1 { color: #1a5d1a; border-bottom: 2px solid #1a5d1a; padding-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th { background: #1a5d1a; color: white; padding: 10px; text-align: left; }
+            td { padding: 10px; border-bottom: 1px solid #ddd; }
+            tr:nth-child(even) { background: #f9f9f9; }
+            .type-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+            .type-badge.product { background: #e3f2fd; color: #1976d2; }
+            .type-badge.service { background: #fff3e0; color: #e65100; }
+            .status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+            .status.pending { background: #fff8e1; color: #f57c00; }
+            .status.in_progress { background: #e3f2fd; color: #1976d2; }
+            .status.complete { background: #4caf50; color: white; }
+            .notes { font-size: 11px; color: #666; margin-top: 4px; }
+            @media print { body { padding: 0; } }
+          </style>
+        </head>
+        <body>
+          <h1>Helena Agri-Enterprises - Orders Report</h1>
+          <p>Generated: ${new Date().toLocaleString()}</p>
+          <p>Total Orders: ${selectedOrdersList.length}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Product/Service</th>
+                <th>Qty</th>
+                <th>Due Date</th>
+                <th>Assigned</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      const statusLabel = { 'pending': 'Pending', 'in_progress': 'In Progress', 'complete': 'Complete' };
+
+      selectedOrdersList.forEach(order => {
+        printHTML += `
+          <tr>
+            <td><strong>${order.customer}</strong></td>
+            <td><span class="type-badge ${order.orderType}">${order.orderType === 'product' ? 'Product' : 'Service'}</span></td>
+            <td>
+              ${order.productService}
+              ${order.orderType === 'service' && order.startDate ? `<div style="font-size: 11px; color: #666;">${order.startDate} - ${order.finishDate || 'TBD'}</div>` : ''}
+              ${order.notes ? `<div class="notes">${order.notes}</div>` : ''}
+            </td>
+            <td>${order.qty}</td>
+            <td>${formatLocalDate(order.dueDate)}</td>
+            <td>${order.assigned || '-'}</td>
+            <td><span class="status ${order.status}">${statusLabel[order.status] || order.status}</span></td>
+          </tr>
+        `;
+      });
+
+      printHTML += `
+            </tbody>
+          </table>
         </body>
         </html>
       `;

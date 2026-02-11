@@ -7516,7 +7516,7 @@
           `<div style="font-size: 0.85rem;">${item.description}</div>`
         ).join('');
         const qtyDisplay = items.map(item =>
-          `<div style="font-size: 0.85rem;">${item.qty} ${item.uom || 'Each'}</div>`
+          `<div style="font-size: 0.85rem;">${item.qty} ${item.uom || 'Each'}${item.qtyDelivered ? ` <span style="color: var(--success);">(${item.qtyDelivered} del)</span>` : ''}</div>`
         ).join('');
 
         return `

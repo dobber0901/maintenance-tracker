@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Equipment Management System - Helena Agri-Enterprises</title>
+  <title>Operations Planner - Helena Agri-Enterprises</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@400;700&display=swap');
     
@@ -2131,8 +2131,8 @@
         </g>
       </svg>
       <div class="header-text">
-        <h1>🛠️ Preventive Maintenance Log</h1>
-        <p class="subtitle">Helena Agri-Enterprises Equipment Management System</p>
+        <h1>📋 Operations Planner</h1>
+        <p class="subtitle">Helena Agri-Enterprises</p>
       </div>
       <div id="headerDateTime" style="text-align: right; color: white; min-width: 200px;">
         <div id="currentDate" style="font-size: 0.9rem; font-weight: 500;"></div>
@@ -7513,7 +7513,10 @@
         // Handle both old single-item orders and new multi-item orders
         const items = order.items || [{ description: order.productService, qty: order.qty, uom: order.uom || 'Each', qtyDelivered: order.qtyDelivered || 0 }];
         const itemsDisplay = items.map(item =>
-          `<div style="font-size: 0.85rem;">${item.description}: ${item.qty} ${item.uom || 'Each'}${item.qtyDelivered ? ` (${item.qtyDelivered} delivered)` : ''}</div>`
+          `<div style="font-size: 0.85rem;">${item.description}</div>`
+        ).join('');
+        const qtyDisplay = items.map(item =>
+          `<div style="font-size: 0.85rem;">${item.qty} ${item.uom || 'Each'}</div>`
         ).join('');
 
         return `
@@ -7529,7 +7532,7 @@
               ${itemsDisplay}
               ${order.orderType === 'service' && order.startDate ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">${formatLocalDate(order.startDate)} - ${order.finishDate ? formatLocalDate(order.finishDate) : 'TBD'}</div>` : ''}
             </td>
-            <td>${items.length} item${items.length > 1 ? 's' : ''}</td>
+            <td>${qtyDisplay}</td>
             <td>${formatLocalDate(order.dueDate)}</td>
             <td>${order.assigned || '-'}</td>
             <td><span class="order-status-badge ${order.status}">${statusLabel[order.status] || order.status}</span></td>

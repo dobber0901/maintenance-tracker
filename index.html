@@ -1924,6 +1924,43 @@
       cursor: pointer;
     }
 
+    .order-item-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      background: var(--bg-primary);
+      border-radius: 4px;
+    }
+
+    .order-item-row input,
+    .order-item-row select {
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .order-item-header {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    #orderItemsContainer,
+    #editOrderItemsContainer {
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.5rem;
+      background: white;
+    }
+
     /* Email Digest Styles */
     .email-config {
       background: var(--bg-primary);
@@ -2354,6 +2391,7 @@
           <option value="complete">Completed</option>
         </select>
         <button class="btn btn-small" onclick="printSelectedOrders()">📄 Print Selected</button>
+        <button class="btn btn-small" onclick="openUomModal()">⚙️ Unit of Measure</button>
         <label style="display: flex; align-items: center; gap: 0.25rem; margin-left: auto;">
           <input type="checkbox" id="selectAllOrders" onchange="toggleSelectAllOrders()"> Select All
         </label>
@@ -2478,7 +2516,7 @@
 
   <!-- Add Order Modal -->
   <div id="addOrderModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 700px;">
       <div class="modal-header">
         <h2 class="modal-title">New Order</h2>
         <button class="close-btn" onclick="closeModal('addOrderModal')">&times;</button>
@@ -2495,14 +2533,6 @@
             <option value="product">Product</option>
             <option value="service">Service</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label for="orderProductService">Product/Service Description *</label>
-          <input type="text" id="orderProductService" required placeholder="Enter product or service">
-        </div>
-        <div class="form-group">
-          <label for="orderQty">Quantity *</label>
-          <input type="number" id="orderQty" required min="1" value="1">
         </div>
         <div class="form-group">
           <label for="orderDueDate">Due Date *</label>
@@ -2522,6 +2552,22 @@
           <label for="orderAssigned">Assigned To *</label>
           <input type="text" id="orderAssigned" required placeholder="Who will deliver/complete this order">
         </div>
+
+        <div class="form-group">
+          <label style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Order Items *</span>
+            <button type="button" class="btn btn-small" onclick="addOrderItemRow()">+ Add Item</button>
+          </label>
+          <div id="orderItemsContainer">
+            <div class="order-item-row" data-item="1">
+              <input type="text" placeholder="Product/Service" class="item-description" required style="flex: 2;">
+              <input type="number" placeholder="Qty" class="item-qty" min="0.01" step="0.01" value="1" required style="width: 80px;">
+              <select class="item-uom" style="width: 100px;"></select>
+              <button type="button" class="btn btn-small" onclick="removeOrderItemRow(this)" style="background: #dc3545; color: white;">×</button>
+            </div>
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="orderNotes">Special Notes</label>
           <textarea id="orderNotes" placeholder="Any special instructions..."></textarea>
@@ -2533,7 +2579,7 @@
 
   <!-- Edit Order Modal -->
   <div id="editOrderModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 750px;">
       <div class="modal-header">
         <h2 class="modal-title">Edit Order</h2>
         <button class="close-btn" onclick="closeModal('editOrderModal')">&times;</button>
@@ -2550,14 +2596,6 @@
             <option value="product">Product</option>
             <option value="service">Service</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label for="editOrderProductService">Product/Service Description *</label>
-          <input type="text" id="editOrderProductService" required>
-        </div>
-        <div class="form-group">
-          <label for="editOrderQty">Quantity *</label>
-          <input type="number" id="editOrderQty" required min="1">
         </div>
         <div class="form-group">
           <label for="editOrderDueDate">Due Date *</label>
@@ -2577,6 +2615,15 @@
           <label for="editOrderAssigned">Assigned To *</label>
           <input type="text" id="editOrderAssigned" required>
         </div>
+
+        <div class="form-group">
+          <label style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Order Items</span>
+            <button type="button" class="btn btn-small" onclick="addEditOrderItemRow()">+ Add Item</button>
+          </label>
+          <div id="editOrderItemsContainer"></div>
+        </div>
+
         <div class="form-group">
           <label for="editOrderNotes">Special Notes</label>
           <textarea id="editOrderNotes"></textarea>
@@ -2591,6 +2638,33 @@
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Update Order</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Unit of Measure Modal -->
+  <div id="uomModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Manage Units of Measure</h2>
+        <button class="close-btn" onclick="closeModal('uomModal')">&times;</button>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">Add or remove units of measure for order quantities.</p>
+      </div>
+      <div class="form-group">
+        <label>Add New Unit</label>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="newUomOption" placeholder="e.g., Bushels" style="flex: 1;">
+          <button class="btn btn-primary" onclick="addUomOption()">Add</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Current Units</label>
+        <div id="uomOptionsList" style="background: var(--bg-primary); padding: 1rem; border-radius: 6px; max-height: 250px; overflow-y: auto;">
+          <p style="color: var(--text-secondary);">Loading...</p>
+        </div>
+      </div>
+      <button class="btn" style="width: 100%;" onclick="closeModal('uomModal')">Done</button>
     </div>
   </div>
 
@@ -3237,6 +3311,7 @@
     let loads = [];
     let tasks = [];
     let orders = [];
+    let unitOfMeasures = [];
     let assignedOptions = [];
     let collapsedLoads = new Set();
     let selectedOrders = new Set();
@@ -3414,6 +3489,22 @@
           id: doc.id,
           ...doc.data()
         }));
+
+        // Load unit of measures
+        const uomSnapshot = await getDocs(collection(db, 'unitOfMeasures'));
+        unitOfMeasures = uomSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        // Initialize default UOMs if empty
+        if (unitOfMeasures.length === 0) {
+          const defaultUoms = ['Each', 'Tons', 'Trailers', 'Gallons', 'Acres'];
+          for (const name of defaultUoms) {
+            await addDoc(collection(db, 'unitOfMeasures'), { name });
+          }
+          const refreshUom = await getDocs(collection(db, 'unitOfMeasures'));
+          unitOfMeasures = refreshUom.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        }
 
         // Load assigned options for load tracking
         const assignedOptionsSnapshot = await getDocs(collection(db, 'assignedOptions'));
@@ -7249,11 +7340,54 @@
         assigned.map(a => `<option value="${a}">${a}</option>`).join('');
     }
 
+    function getUomOptionsHTML(selectedValue = '') {
+      return unitOfMeasures.map(u =>
+        `<option value="${u.name}" ${u.name === selectedValue ? 'selected' : ''}>${u.name}</option>`
+      ).join('');
+    }
+
     window.openAddOrderModal = function() {
       document.getElementById('addOrderForm').reset();
       document.getElementById('orderServiceDatesGroup').style.display = 'none';
       document.getElementById('orderDueDate').value = new Date().toISOString().split('T')[0];
+
+      // Initialize with one item row
+      const container = document.getElementById('orderItemsContainer');
+      container.innerHTML = `
+        <div class="order-item-row" data-item="1">
+          <input type="text" placeholder="Product/Service" class="item-description" required style="flex: 2;">
+          <input type="number" placeholder="Qty" class="item-qty" min="0.01" step="0.01" value="1" required style="width: 80px;">
+          <select class="item-uom" style="width: 100px;">${getUomOptionsHTML()}</select>
+          <button type="button" class="btn btn-small" onclick="removeOrderItemRow(this)" style="background: #dc3545; color: white;">×</button>
+        </div>
+      `;
+
       document.getElementById('addOrderModal').classList.add('active');
+    }
+
+    window.addOrderItemRow = function() {
+      const container = document.getElementById('orderItemsContainer');
+      const itemCount = container.querySelectorAll('.order-item-row').length + 1;
+
+      const newRow = document.createElement('div');
+      newRow.className = 'order-item-row';
+      newRow.dataset.item = itemCount;
+      newRow.innerHTML = `
+        <input type="text" placeholder="Product/Service" class="item-description" required style="flex: 2;">
+        <input type="number" placeholder="Qty" class="item-qty" min="0.01" step="0.01" value="1" required style="width: 80px;">
+        <select class="item-uom" style="width: 100px;">${getUomOptionsHTML()}</select>
+        <button type="button" class="btn btn-small" onclick="removeOrderItemRow(this)" style="background: #dc3545; color: white;">×</button>
+      `;
+      container.appendChild(newRow);
+    }
+
+    window.removeOrderItemRow = function(btn) {
+      const container = btn.closest('#orderItemsContainer') || btn.closest('#editOrderItemsContainer');
+      if (container.querySelectorAll('.order-item-row').length > 1) {
+        btn.closest('.order-item-row').remove();
+      } else {
+        showToast('At least one item is required', 'error');
+      }
     }
 
     window.toggleOrderServiceFields = function() {
@@ -7270,11 +7404,26 @@
       event.preventDefault();
 
       const orderType = document.getElementById('orderType').value;
+
+      // Collect all items
+      const itemRows = document.querySelectorAll('#orderItemsContainer .order-item-row');
+      const items = Array.from(itemRows).map((row, index) => ({
+        lineNumber: index + 1,
+        description: row.querySelector('.item-description').value.trim(),
+        qty: parseFloat(row.querySelector('.item-qty').value),
+        uom: row.querySelector('.item-uom').value,
+        qtyDelivered: 0
+      }));
+
+      if (items.length === 0 || items.some(i => !i.description)) {
+        showToast('Please add at least one item with a description', 'error');
+        return;
+      }
+
       const newOrder = {
         customer: document.getElementById('orderCustomer').value.trim(),
         orderType: orderType,
-        productService: document.getElementById('orderProductService').value.trim(),
-        qty: parseInt(document.getElementById('orderQty').value),
+        items: items,
         dueDate: document.getElementById('orderDueDate').value,
         startDate: orderType === 'service' ? document.getElementById('orderStartDate').value : null,
         finishDate: orderType === 'service' ? document.getElementById('orderFinishDate').value : null,
@@ -7361,6 +7510,12 @@
           'complete': 'Complete'
         };
 
+        // Handle both old single-item orders and new multi-item orders
+        const items = order.items || [{ description: order.productService, qty: order.qty, uom: order.uom || 'Each', qtyDelivered: order.qtyDelivered || 0 }];
+        const itemsDisplay = items.map(item =>
+          `<div style="font-size: 0.85rem;">${item.description}: ${item.qty} ${item.uom || 'Each'}${item.qtyDelivered ? ` (${item.qtyDelivered} delivered)` : ''}</div>`
+        ).join('');
+
         return `
           <tr class="${rowClass}">
             <td>
@@ -7371,10 +7526,10 @@
             <td><strong>${order.customer}</strong></td>
             <td><span class="order-type-badge ${order.orderType}">${order.orderType === 'product' ? 'Product' : 'Service'}</span></td>
             <td>
-              ${order.productService}
+              ${itemsDisplay}
               ${order.orderType === 'service' && order.startDate ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">${formatLocalDate(order.startDate)} - ${order.finishDate ? formatLocalDate(order.finishDate) : 'TBD'}</div>` : ''}
             </td>
-            <td>${order.qty}</td>
+            <td>${items.length} item${items.length > 1 ? 's' : ''}</td>
             <td>${formatLocalDate(order.dueDate)}</td>
             <td>${order.assigned || '-'}</td>
             <td><span class="order-status-badge ${order.status}">${statusLabel[order.status] || order.status}</span></td>
@@ -7421,6 +7576,23 @@
       });
     }
 
+    window.addEditOrderItemRow = function() {
+      const container = document.getElementById('editOrderItemsContainer');
+      const itemCount = container.querySelectorAll('.order-item-row').length + 1;
+
+      const newRow = document.createElement('div');
+      newRow.className = 'order-item-row';
+      newRow.dataset.item = itemCount;
+      newRow.innerHTML = `
+        <input type="text" placeholder="Product/Service" class="item-description" required style="flex: 2;">
+        <input type="number" placeholder="Qty Ordered" class="item-qty" min="0.01" step="0.01" value="1" required style="width: 80px;">
+        <select class="item-uom" style="width: 90px;">${getUomOptionsHTML()}</select>
+        <input type="number" placeholder="Delivered" class="item-qty-delivered" min="0" step="0.01" value="0" style="width: 80px;">
+        <button type="button" class="btn btn-small" onclick="removeOrderItemRow(this)" style="background: #dc3545; color: white;">×</button>
+      `;
+      container.appendChild(newRow);
+    }
+
     window.openEditOrderModal = function(orderId) {
       const order = orders.find(o => o.id === orderId);
       if (!order) return;
@@ -7428,14 +7600,25 @@
       document.getElementById('editOrderId').value = orderId;
       document.getElementById('editOrderCustomer').value = order.customer;
       document.getElementById('editOrderType').value = order.orderType;
-      document.getElementById('editOrderProductService').value = order.productService;
-      document.getElementById('editOrderQty').value = order.qty;
       document.getElementById('editOrderDueDate').value = order.dueDate;
       document.getElementById('editOrderStartDate').value = order.startDate || '';
       document.getElementById('editOrderFinishDate').value = order.finishDate || '';
       document.getElementById('editOrderAssigned').value = order.assigned;
       document.getElementById('editOrderNotes').value = order.notes || '';
       document.getElementById('editOrderStatus').value = order.status;
+
+      // Populate items - support both old and new format
+      const items = order.items || [{ description: order.productService, qty: order.qty, uom: order.uom || 'Each', qtyDelivered: order.qtyDelivered || 0 }];
+      const container = document.getElementById('editOrderItemsContainer');
+      container.innerHTML = items.map((item, index) => `
+        <div class="order-item-row" data-item="${index + 1}">
+          <input type="text" placeholder="Product/Service" class="item-description" value="${item.description || ''}" required style="flex: 2;">
+          <input type="number" placeholder="Qty Ordered" class="item-qty" min="0.01" step="0.01" value="${item.qty || 1}" required style="width: 80px;">
+          <select class="item-uom" style="width: 90px;">${getUomOptionsHTML(item.uom)}</select>
+          <input type="number" placeholder="Delivered" class="item-qty-delivered" min="0" step="0.01" value="${item.qtyDelivered || 0}" style="width: 80px;">
+          <button type="button" class="btn btn-small" onclick="removeOrderItemRow(this)" style="background: #dc3545; color: white;">×</button>
+        </div>
+      `).join('');
 
       toggleEditOrderServiceFields();
 
@@ -7448,11 +7631,25 @@
       const orderId = document.getElementById('editOrderId').value;
       const orderType = document.getElementById('editOrderType').value;
 
+      // Collect all items
+      const itemRows = document.querySelectorAll('#editOrderItemsContainer .order-item-row');
+      const items = Array.from(itemRows).map((row, index) => ({
+        lineNumber: index + 1,
+        description: row.querySelector('.item-description').value.trim(),
+        qty: parseFloat(row.querySelector('.item-qty').value),
+        uom: row.querySelector('.item-uom').value,
+        qtyDelivered: parseFloat(row.querySelector('.item-qty-delivered').value) || 0
+      }));
+
+      if (items.length === 0 || items.some(i => !i.description)) {
+        showToast('Please add at least one item with a description', 'error');
+        return;
+      }
+
       const updatedOrder = {
         customer: document.getElementById('editOrderCustomer').value.trim(),
         orderType: orderType,
-        productService: document.getElementById('editOrderProductService').value.trim(),
-        qty: parseInt(document.getElementById('editOrderQty').value),
+        items: items,
         dueDate: document.getElementById('editOrderDueDate').value,
         startDate: orderType === 'service' ? document.getElementById('editOrderStartDate').value : null,
         finishDate: orderType === 'service' ? document.getElementById('editOrderFinishDate').value : null,
@@ -7514,6 +7711,68 @@
       }
     }
 
+    // UOM MANAGEMENT FUNCTIONS
+    window.openUomModal = function() {
+      renderUomOptions();
+      document.getElementById('uomModal').classList.add('active');
+    }
+
+    function renderUomOptions() {
+      const container = document.getElementById('uomOptionsList');
+
+      if (unitOfMeasures.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-secondary);">No units added yet.</p>';
+        return;
+      }
+
+      container.innerHTML = unitOfMeasures.map(uom => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid var(--border-color);">
+          <span>${uom.name}</span>
+          <button class="btn btn-small" onclick="deleteUomOption('${uom.id}')" style="background: #dc3545; color: white;">×</button>
+        </div>
+      `).join('');
+    }
+
+    window.addUomOption = async function() {
+      const input = document.getElementById('newUomOption');
+      const name = input.value.trim();
+
+      if (!name) {
+        showToast('Please enter a unit name', 'error');
+        return;
+      }
+
+      if (unitOfMeasures.some(u => u.name.toLowerCase() === name.toLowerCase())) {
+        showToast('This unit already exists', 'error');
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, 'unitOfMeasures'), { name });
+        await loadData(false);
+        renderUomOptions();
+        input.value = '';
+        showToast('Unit added successfully');
+      } catch (error) {
+        console.error('Error adding unit:', error);
+        showToast('Error adding unit. Please try again.', 'error');
+      }
+    }
+
+    window.deleteUomOption = async function(uomId) {
+      if (!confirm('Are you sure you want to delete this unit?')) return;
+
+      try {
+        await deleteDoc(doc(db, 'unitOfMeasures', uomId));
+        await loadData(false);
+        renderUomOptions();
+        showToast('Unit deleted successfully');
+      } catch (error) {
+        console.error('Error deleting unit:', error);
+        showToast('Error deleting unit. Please try again.', 'error');
+      }
+    }
+
     window.printSelectedOrders = function() {
       if (selectedOrders.size === 0) {
         showToast('Please select at least one order to print', 'error');
@@ -7567,16 +7826,22 @@
       const statusLabel = { 'pending': 'Pending', 'in_progress': 'In Progress', 'complete': 'Complete' };
 
       selectedOrdersList.forEach(order => {
+        // Handle both old and new format
+        const items = order.items || [{ description: order.productService, qty: order.qty, uom: order.uom || 'Each', qtyDelivered: order.qtyDelivered || 0 }];
+        const itemsDisplay = items.map(item =>
+          `<div>${item.description}: ${item.qty} ${item.uom || 'Each'}${item.qtyDelivered ? ` (${item.qtyDelivered} delivered)` : ''}</div>`
+        ).join('');
+
         printHTML += `
           <tr>
             <td><strong>${order.customer}</strong></td>
             <td><span class="type-badge ${order.orderType}">${order.orderType === 'product' ? 'Product' : 'Service'}</span></td>
             <td>
-              ${order.productService}
-              ${order.orderType === 'service' && order.startDate ? `<div style="font-size: 11px; color: #666;">${order.startDate} - ${order.finishDate || 'TBD'}</div>` : ''}
+              ${itemsDisplay}
+              ${order.orderType === 'service' && order.startDate ? `<div style="font-size: 11px; color: #666;">${formatLocalDate(order.startDate)} - ${order.finishDate ? formatLocalDate(order.finishDate) : 'TBD'}</div>` : ''}
               ${order.notes ? `<div class="notes">${order.notes}</div>` : ''}
             </td>
-            <td>${order.qty}</td>
+            <td>${items.length} item${items.length > 1 ? 's' : ''}</td>
             <td>${formatLocalDate(order.dueDate)}</td>
             <td>${order.assigned || '-'}</td>
             <td><span class="status ${order.status}">${statusLabel[order.status] || order.status}</span></td>
